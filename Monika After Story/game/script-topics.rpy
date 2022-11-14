@@ -514,13 +514,13 @@ label mas_bad_derand_topic:
         menu:
             m "Do you want me to stop, [player]?{fast}"
 
-            "Yes, please.":
+            "Yes, please.{#mas_bad_derand_topic_1}":
                 m 2dkc "Alright..."
                 #Lose affection
                 $ mas_loseAffectionFraction(min_amount=35)
                 $ derand_flagged_topic()
 
-            "It's alright.":
+            "It's alright.{#mas_bad_derand_topic_1}":
                 m 2duu "Thank you, [player]."
                 m 2eua "It means a lot that you're willing to hear me out."
 
@@ -533,12 +533,12 @@ label mas_bad_derand_topic:
         menu:
             m "Well [player], should I stop?{fast}"
 
-            "Yes, please.":
+            "Yes, please.{#mas_bad_derand_topic_2}":
                 m 2dsc "Alright."
                 $ mas_loseAffectionFraction(min_amount=20)
                 $ derand_flagged_topic()
 
-            "It's alright.":
+            "It's alright.{#mas_bad_derand_topic_2}":
                 m 2eka "Thank you, [player]."
                 $ _stil_ = " " if mas_isMoniNormal(higher=True) else " still "
                 m "I appreciate that you're[_stil_]willing to hear me out."
