@@ -6291,7 +6291,7 @@ label mas_f14_monika_valentines_intro:
 
                     menu:
                         m "So, do you want me to put on the white sundress?{fast}"
-                        "Yes.":
+                        "Yes.{#mas_f14_monika_valentines_intro_1}":
                             m 3hub "Okay!"
                             m 3eua "I'll be right back."
                             call mas_clothes_change(mas_clothes_sundress_white, unlock=True, outfit_mode=True)
@@ -6299,7 +6299,7 @@ label mas_f14_monika_valentines_intro:
                             m 3eua "Something about wearing this dress on Valentine's Day just feels right."
                             m 1eua "..."
 
-                        "No.":
+                        "No.{#mas_f14_monika_valentines_intro_1}":
                             m 1eka "Okay, [player]."
                             m 3hua "This {i}is{/i} a really nice outfit..."
                             m 3eka "And besides, it doesn't matter what I'm wearing..."
