@@ -1404,7 +1404,7 @@ label bye_trick_or_treat:
             "Yes.":
                 m 2etc "Well...{w=1}okay then, [player]..."
 
-            "No.":
+            "No.{#bye_trick_or_treat_1}":
                 m 2hub "Ahaha!"
                 m "Be a little patient, [player]~"
                 m 4eub "Let's just make the most out of it later this evening, okay?"
@@ -4456,7 +4456,7 @@ label monika_resolutions:
         menu:
             m "Did you make any New Year's resolutions last year?{fast}"
 
-            "Yes.":
+            "Yes.{#monika_resolutions_1}":
                 m 3hua "It always makes me so proud to hear that you're trying to better yourself, [player]."
                 m 2eka "That said..."
 

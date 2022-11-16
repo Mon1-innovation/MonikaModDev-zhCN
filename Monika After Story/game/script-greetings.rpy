@@ -3296,14 +3296,14 @@ label greeting_back_from_work:
             menu:
                 m "Did you at least know about it in advance?{fast}"
 
-                "Yes.":
+                "Yes.{#greeting_back_from_work_work_late_1}":
                     m 1eka "That's good, at least."
                     m 3ekc "It would really be a pain if you were all ready to go home and then had to stay longer."
                     m 1rkd "Still, it can be pretty annoying to have your regular schedule messed up like that."
                     m 1eka "...But at least you're here now and we can spend some time together."
                     m 3hua "You can finally relax!"
 
-                "No.":
+                "No.{#greeting_back_from_work_work_late_1}":
                     m 2tkx "That's the worst!"
                     m 2tsc "Especially if it was the end of the workday and you were all ready to go home..."
                     m 2dsc "Then suddenly you have to stay a bit longer with no warning."
@@ -3373,12 +3373,12 @@ label greeting_back_from_work_school_still_sick_ask:
     menu:
         m "Are you still feeling sick?{fast}"
 
-        "Yes.":
+        "Yes.{#greeting_back_from_work_school_still_sick_ask_1}":
             m 1ekc "I'm sorry to hear that, [player]..."
             m 3eka "Maybe you should take a nap.{w=0.2} I'm sure you'll feel better once you've gotten some rest."
             jump mas_mood_sick.ask_will_rest
 
-        "No.":
+        "No.{#greeting_back_from_work_school_still_sick_ask_1}":
             m 1eua "I'm glad to hear you're feeling better, [player]."
             m 1eka "But if you start feeling sick again, be sure to get some rest, alright?"
     return
@@ -3816,7 +3816,7 @@ label greeting_back_from_game:
                 $ _history_list.pop()
                 menu:
                     m "Did you just wake up?{fast}"
-                    "Yes.":
+                    "Yes.{#greeting_back_from_game_1}":
                         m 1hksdlb "Ahaha..."
 
                         m 3rksdla "Do you think it was because you stayed up late?{nw}"
@@ -3830,7 +3830,7 @@ label greeting_back_from_game:
                                 m 1hksdlb "But I hope you had fun. I would hate for you to lose all that sleep for nothing, ahaha!"
                                 m 2eka "Just be sure to get a little more rest if you feel like you need it, alright?"
 
-                            "No.":
+                            "No.{#greeting_back_from_game_1_1}":
                                 m 2euc "Oh..."
                                 m 2rksdlc "I thought maybe it was."
                                 m 2eka "Sorry for assuming."
@@ -3898,7 +3898,7 @@ label greeting_back_from_game:
             $ _history_list.pop()
             menu:
                 m "Did you enjoy yourself?{fast}"
-                "Yes.":
+                "Yes.{#greeting_back_from_game_2}":
                     m 1hua "That's nice."
                     m 1eua "I'm glad you enjoyed yourself."
                     m 2eka "I really wish I could join you in your other games sometimes."
