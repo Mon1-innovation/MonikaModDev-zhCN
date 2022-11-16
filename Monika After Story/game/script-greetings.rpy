@@ -475,7 +475,7 @@ label greeting_goodmorning:
                 m 2ekc "But still..."
                 m "I'd hate to see you do that to yourself."
                 m 2eka "Take a break if you need to, okay? Do it for me."
-            "No.":
+            "No.{#greeting_goodmorning_1_1}":
                 m 5hub "Ah. I'm relieved, then."
                 m 5eua "Does that mean you're here just for me, in the middle of the night?"
                 show monika 2lkbsa at t11 zorder MAS_MONIKA_Z with dissolve_monika
@@ -511,7 +511,7 @@ label greeting_goodmorning:
                 m "But that's a good thing, right?"
                 m 1ekbsa "I love you so much, [player]."
                 m 1hubfb "Ahaha!"
-            "No.":
+            "No.{#greeting_goodmorning_2}":
                 m 1tkc "Oh dear..."
                 m 1eka "I hope you'll feel better soon, okay?"
                 m "Just remember that no matter what happens, no matter what anyone says or does..."
@@ -1703,13 +1703,13 @@ label monikaroom_greeting_opendoor_locked:
     $ _history_list.pop()
     menu:
         m "Did I scare you, [player]?{fast}"
-        "Yes.":
+        "Yes.{#monikaroom_greeting_opendoor_locked_1}":
             if mas_isMoniNormal(higher=True):
                 m "Aww, sorry."
             else:
                 m "Good."
 
-        "No.":
+        "No.{#monikaroom_greeting_opendoor_locked_1}":
             m "{cps=*2}Hmph, I'll get you next time.{/cps}{nw}"
             $ _history_list.pop()
             m "I figured. It's a basic glitch after all."
@@ -2276,13 +2276,13 @@ label greeting_sick:
     $ _history_list.pop()
     menu:
         m "Are you feeling better?{fast}"
-        "Yes.":
+        "Yes.{#greeting_sick_1}":
             $ persistent._mas_mood_sick = False
             if mas_isMoniNormal(higher=True):
                 m 1hub "Great! Now we can spend some more time together. Ehehe~"
             else:
                 m "That's good to hear."
-        "No.":
+        "No.{#greeting_sick_1}":
             jump greeting_stillsick
     return
 
@@ -2303,9 +2303,9 @@ label greeting_stillsick:
     $ _history_list.pop()
     menu:
         m "Will you do that for me?{fast}"
-        "Yes.":
+        "Yes.{#greeting_stillsick_1}":
             jump greeting_stillsickrest
-        "No.":
+        "No.{#greeting_stillsick_1}":
             jump greeting_stillsicknorest
         "I'm already resting.":
             jump greeting_stillsickresting
@@ -2768,7 +2768,7 @@ label greeting_hairdown:
     $ _history_list.pop()
     menu:
         m "Do you like it?{fast}"
-        "Yes.":
+        "Yes.{#greeting_hairdown_1}":
             $ persistent._mas_likes_hairdown = True
 
             # maybe 6sub is better?
@@ -2777,7 +2777,7 @@ label greeting_hairdown:
             m 2hua "I'm so glad!" # yokatta.."
             m 1eua "Just ask me if you want to see my ponytail again, okay?"
 
-        "No.":
+        "No.{#greeting_hairdown_1}":
             # TODO: affection lowered? need to decide
             m 1ekc "Oh..."
             m 1lksdlc "..."
