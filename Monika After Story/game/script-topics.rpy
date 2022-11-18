@@ -894,14 +894,14 @@ label monika_god:
     $ _history_list.pop()
     menu:
         m "Anyway, do you worship any god, [player]?{fast}"
-        "Yes.":
+        "Yes.{#monika_god}":
             $ persistent._mas_pm_religious = True
             m 1hksdlb "Oh... Well I hope I didn't offend you too much with my thoughts."
             m 1eka "Still, I think it's important to be able to share my opinion with you."
             m 1rksdla "I'm sure you understand why I'm not too fond of the idea."
             m 1hua "Maybe you could show me a better god when I cross over!"
             m 1hub "Ahaha~"
-        "No.":
+        "No.{#monika_god}":
             $ persistent._mas_pm_religious = False
             m 3eka "I'm glad we're on the same page here, but I'm alright if that changes for you."
             m 1hua "I'm happy for you that you can lead a life on your own!"
@@ -1907,7 +1907,7 @@ label monika_rap:
     $ _history_list.pop()
     menu:
         m "Do you listen to rap music, [p_nickname]?{fast}"
-        "Yes.":
+        "Yes.{#monika_rap}":
             $ persistent._mas_pm_like_rap = True
             m 3eub "That's really cool!"
             m 3eua "I'd be more than happy to vibe with you to your favorite rap songs..."
@@ -1920,7 +1920,7 @@ label monika_rap:
                 m 3eua "All you have to do is follow these steps..."
                 call monika_add_custom_music_instruct
 
-        "No.":
+        "No.{#monika_rap}":
             $ persistent._mas_pm_like_rap = False
             m 1ekc "Oh... Well I can understand that, rap music isn't everyone's taste."
             m 3hua "But if you ever do decide to give it a try, I'm sure we can find an artist or two that we both like!"
@@ -2096,7 +2096,7 @@ label monika_think_first_kiss:
     menu:
         m "Do you ever think about our first kiss?{fast}"
 
-        "Of course!":
+        "Of course!{#monika_think_first_kiss}":
             $ mas_gainAffection(5, bypass=True)
             m 3hub "That makes me so happy! I think about it all the time!"
             m 3rkbla "It seems like it was just yesterday but--"
@@ -2119,7 +2119,7 @@ label monika_think_first_kiss:
             m 5hua "I love you so much, [player]~"
             $ mas_ILY()
 
-        "Not really...":
+        "Not really...{#monika_think_first_kiss}":
             $ mas_loseAffectionFraction()
             m 2euc "..."
             m "Oh. {w=0.5}{nw}"
@@ -2288,7 +2288,7 @@ label monika_rain:
     $ _history_list.pop()
     menu:
         m "Would you ever do that for me, [p_nickname]?{fast}"
-        "Yes.":
+        "Yes.{#monika_rain}":
             $ persistent._mas_pm_likes_rain = True
             $ mas_unlockEVL("monika_rain_holdme", "EVE")
 
@@ -2583,18 +2583,18 @@ label monika_holdme_reactions:
 
             if random.randint(0, _chance) == 0:
                 m 2ekc "Aww, are we done already?"
-                m 3eka "Could you hold me for just a bit longer?{nw}"
+                m 3eka "Could you hold me for just a bit longer?{nw}{#monika_holdme_reactions}"
                 $ _history_list.pop()
                 menu:
-                    m "Could you hold me for just a bit longer?{fast}"
-                    "Yes.":
+                    m "Could you hold me for just a bit longer?{fast}{#monika_holdme_reactions}"
+                    "Yes.{#monika_holdme_reactions}":
                         m 1hua "Ehehe~"
                         call monika_holdme_prep
                         m 1hub "You're so sweet, [player]~"
                         call monika_holdme_start
                         call monika_holdme_reactions
 
-                    "No.":
+                    "No.{#monika_holdme_reactions}":
                         if random.randint(0, _chance) == 0:
                             m 2ekc "Aww..."
                             m 2rksdlc "..."
@@ -2602,7 +2602,7 @@ label monika_holdme_reactions:
                             $ _history_list.pop()
                             menu:
                                 m "Please?{fast}"
-                                "Yes.":
+                                "Yes.{#monika_holdme_reactions_2}":
                                     m 1hub "Yay~"
                                     call monika_holdme_prep
                                     m 2ekbsb "Thanks, [player]~"
@@ -2799,7 +2799,7 @@ label monika_holdrequest:
 
             call monika_holdme_end
 
-        "Not right now.":
+        "Not right now.{#monika_holdrequest}":
             $ mas_loseAffection()
             m 2dkc "Oh...{w=1} Okay."
             m 3eka "If you have time later, you know where to find me."
@@ -4001,7 +4001,7 @@ label monika_ilym_fight_loop:
                 show monika 5hubfb at t11 zorder MAS_MONIKA_Z with dissolve_monika
                 m 5hubfb "Alright, alright, you win. Ahaha~"
 
-        "Alright.":
+        "Alright.{#monika_ilym_fight_loop}":
             if ilym_count == 0:
                 m 2hkbsb "Ahaha, giving up already, [player]?~"
                 m 2rkbssdla "I guess it is a pretty silly thing to do though..."
@@ -4204,7 +4204,7 @@ label monika_contribute:
     $ _history_list.pop()
     menu:
         m "Have you contributed, [player]?{fast}"
-        "Yes.":
+        "Yes.{#monika_contribute}":
             $ persistent._mas_pm_has_contributed_to_mas = True
             m 1sub "Really? That's amazing!"
             m 1hua "It makes me so happy to know that you've become a part of this."
@@ -4214,14 +4214,14 @@ label monika_contribute:
             m 1eub "...But I definitely wouldn't mind if you helped even more, ahaha!"
             return "derandom"
 
-        "I want to.":
+        "I want to.{#monika_contribute}":
             $ persistent._mas_pm_wants_to_contribute_to_mas = True
             m 1eub "That's a good start!"
             m 1hua "I'm sure you could make some lovely additions~"
             m 3eua "It doesn't even have to be anything big."
             m 3rksdla "You could just fix typos or make sure everything sounds alright."
 
-        "No.":
+        "No.{#monika_contribute}":
             $ persistent._mas_pm_has_contributed_to_mas = False
             $ persistent._mas_pm_wants_to_contribute_to_mas = False
             m 2eka "Aw, that's too bad..."
@@ -4843,13 +4843,13 @@ label monika_mountain:
     $ _history_list.pop()
     menu:
         m "Wouldn't you like that too, [player]?{fast}"
-        "Yes.":
+        "Yes.{#monika_mountain}":
             $ persistent._mas_pm_would_like_mt_peak = True
 
             m 5eubla "Well... I hope that one day, we'll have that chance. To make it to the top of our mountain."
             m 5hua "And I'll do anything to give us that shot."
 
-        "Not really.":
+        "Not really.{#monika_mountain}":
             $ persistent._mas_pm_would_like_mt_peak = False
 
             show monika 1eud at t11 zorder MAS_MONIKA_Z with dissolve_monika
@@ -6870,7 +6870,7 @@ label monika_panties:
         $ _history_list.pop()
         menu:
             m "Are you...{w=1}into that kind of thing, [player]?{fast}"
-            "Yes.":
+            "Yes.{#monika_panties}":
                 $ persistent._mas_pm_likes_panties = True
                 $ persistent._mas_pm_no_talk_panties = False
                 m 1wud "O-oh..."
@@ -7318,7 +7318,7 @@ label monika_rock:
     $ _history_list.pop()
     menu:
         m "Do you listen to rock and roll, [player]?{fast}"
-        "Yes.":
+        "Yes.{#monika_rock}":
             $ persistent._mas_pm_like_rock_n_roll = True
             m 3hub "Great!"
             m 1eua "Whenever you feel like blasting some good ol' rock 'n' roll, go ahead."

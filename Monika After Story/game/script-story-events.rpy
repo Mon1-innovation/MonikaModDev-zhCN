@@ -92,7 +92,7 @@ label monika_gender_redo:
         menu:
             m "Have you made some personal discoveries since the last time we talked about this?{fast}"
 
-            "Yes.":
+            "Yes.{#monika_gender_redo}":
                 m 1eka "I see. I know I've been there."
                 m 3hua "I'm so proud of you for going on that journey of self-discovery."
                 m 1eub "...And even prouder of you for being courageous enough to tell me!"
@@ -1383,7 +1383,7 @@ label mas_crashed_long_whq:
             m 2wud "The game...{w=0.3}crashed?"
             m 2ekd "That's scary, [player]."
 
-        "I don't know.":
+        "I don't know.{#mas_crashed_long_whq_1}":
             m "Well..."
             m "I'd really appreciate it if you could look into it."
             m "It's scary to be suddenly thrown into the darkness like that."
@@ -1951,7 +1951,7 @@ label mas_bday_player_bday_select_select:
                     m 1eka "Try again~"
                     jump mas_bday_player_bday_select_select
 
-        "No.":
+        "No.{#mas_bday_player_bday_select_select_1}":
             m 1euc "Oh, that's wrong?"
             m 1eua "Then try again."
             jump mas_bday_player_bday_select_select
@@ -2011,7 +2011,7 @@ label mas_text_speed_enabler:
     $ _history_list.pop()
     menu:
         m "Are you a fast reader?{fast}"
-        "Yes.":
+        "Yes.{#mas_text_speed_enabler}":
             $ persistent._mas_pm_is_fast_reader = True
             $ persistent._mas_text_speed_enabled = True
 
@@ -2019,7 +2019,7 @@ label mas_text_speed_enabler:
             m 1kua "I guess you do a lot of reading in your spare time."
             m 1eua "In that case..."
 
-        "No.":
+        "No.{#mas_text_speed_enabler}":
             $ persistent._mas_pm_is_fast_reader = False
             $ persistent._mas_text_speed_enabled = True
 
