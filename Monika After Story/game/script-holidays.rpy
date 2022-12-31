@@ -4460,7 +4460,7 @@ label monika_resolutions:
                 m 3hua "It always makes me so proud to hear that you're trying to better yourself, [player]."
                 m 2eka "That said..."
 
-                call monika_resolutions_accomplished_resolutions_menu("Did you accomplish last year's resolutions?")
+                call monika_resolutions_accomplished_resolutions_menu(_("Did you accomplish last year's resolutions?"))
 
 
             "No.":
@@ -4478,7 +4478,7 @@ label monika_resolutions:
 
     #If we made a resolution last year, then we should ask if the player accomplished it
     elif mas_HistVerifyLastYear_k(True, "nye.actions.made_new_years_resolutions"):
-        call monika_resolutions_accomplished_resolutions_menu("Since you made a resolution last year, did you accomplish it?")
+        call monika_resolutions_accomplished_resolutions_menu(_("Since you made a resolution last year, did you accomplish it?"))
 
     #This path will be the first thing you see if you didn't make a resolution last year
     m "Do you have any resolutions for next year?{nw}"
