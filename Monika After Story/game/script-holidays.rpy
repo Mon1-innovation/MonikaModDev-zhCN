@@ -1404,7 +1404,7 @@ label bye_trick_or_treat:
             "Yes.":
                 m 2etc "Well...{w=1}okay then, [player]..."
 
-            "No.":
+            "No.{#bye_trick_or_treat_1}":
                 m 2hub "Ahaha!"
                 m "Be a little patient, [player]~"
                 m 4eub "Let's just make the most out of it later this evening, okay?"
@@ -4456,11 +4456,11 @@ label monika_resolutions:
         menu:
             m "Did you make any New Year's resolutions last year?{fast}"
 
-            "Yes.":
+            "Yes.{#monika_resolutions_1}":
                 m 3hua "It always makes me so proud to hear that you're trying to better yourself, [player]."
                 m 2eka "That said..."
 
-                call monika_resolutions_accomplished_resolutions_menu("Did you accomplish last year's resolutions?")
+                call monika_resolutions_accomplished_resolutions_menu(_("Did you accomplish last year's resolutions?"))
 
 
             "No.":
@@ -4478,7 +4478,7 @@ label monika_resolutions:
 
     #If we made a resolution last year, then we should ask if the player accomplished it
     elif mas_HistVerifyLastYear_k(True, "nye.actions.made_new_years_resolutions"):
-        call monika_resolutions_accomplished_resolutions_menu("Since you made a resolution last year, did you accomplish it?")
+        call monika_resolutions_accomplished_resolutions_menu(_("Since you made a resolution last year, did you accomplish it?"))
 
     #This path will be the first thing you see if you didn't make a resolution last year
     m "Do you have any resolutions for next year?{nw}"
@@ -6291,7 +6291,7 @@ label mas_f14_monika_valentines_intro:
 
                     menu:
                         m "So, do you want me to put on the white sundress?{fast}"
-                        "Yes.":
+                        "Yes.{#mas_f14_monika_valentines_intro_1}":
                             m 3hub "Okay!"
                             m 3eua "I'll be right back."
                             call mas_clothes_change(mas_clothes_sundress_white, unlock=True, outfit_mode=True)
@@ -6299,7 +6299,7 @@ label mas_f14_monika_valentines_intro:
                             m 3eua "Something about wearing this dress on Valentine's Day just feels right."
                             m 1eua "..."
 
-                        "No.":
+                        "No.{#mas_f14_monika_valentines_intro_1}":
                             m 1eka "Okay, [player]."
                             m 3hua "This {i}is{/i} a really nice outfit..."
                             m 3eka "And besides, it doesn't matter what I'm wearing..."
