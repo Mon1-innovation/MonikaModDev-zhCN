@@ -1,7 +1,4 @@
 python early:
-    renpy.config.version = renpy.config.version + ".Mobile"
-
-python early:
     if renpy.android:
         p_debug = os.path.exists("/storage/emulated/0/MAS/debug.p")
     else:
