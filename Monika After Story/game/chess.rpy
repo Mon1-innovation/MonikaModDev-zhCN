@@ -43,7 +43,7 @@ init python in mas_chess:
 
     if renpy.android:
         CHESS_SAVE_PATH = "/storage/emulated/0/MAS/chess_game"
-    else 
+    else: 
         CHESS_SAVE_PATH = "/chess_games/"
     CHESS_SAVE_EXT = ".pgn"
     CHESS_SAVE_NAME = "abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ-_0123456789"

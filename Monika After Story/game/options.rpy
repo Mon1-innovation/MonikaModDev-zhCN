@@ -124,20 +124,20 @@ init python:
     ## This is the archive of data for your mod
     #build.archive(build.name, "all")
 
-    #Add the pictures necessary for the scrollable menu
-    build.classify("game/gui/**",build.name)
-
-    ## These files get put into your data file
-    build.classify("game/mod_assets/**",build.name)
-    #build.classify("game/**.rpy",build.name) #Optional line to include plaintext scripts
-    build.classify("game/*.rpyc",build.name) #Serialized scripts must be included
-    build.classify("game/dev/*.*",None) #But not the dev folder
-    build.classify("README.html",build.name) #Included help file for mod installation
-    build.classify("game/python-packages/**",build.name)#Additional python pacakges
-    build.classify("CustomIcon**.**",build.name)
-
-
-    build.package(build.directory_name + "Mod",'zip',build.name,description='DDLC Compatible Mod')
+    ##Add the pictures necessary for the scrollable menu
+    #build.classify("game/gui/**",build.name)
+#
+    ### These files get put into your data file
+    #build.classify("game/mod_assets/**",build.name)
+    ##build.classify("game/**.rpy",build.name) #Optional line to include plaintext scripts
+    #build.classify("game/*.rpyc",build.name) #Serialized scripts must be included
+    #build.classify("game/dev/*.*",None) #But not the dev folder
+    #build.classify("README.html",build.name) #Included help file for mod installation
+    #build.classify("game/python-packages/**",build.name)#Additional python pacakges
+    #build.classify("CustomIcon**.**",build.name)
+#
+#
+    #build.package(build.directory_name + "Mod",'zip',build.name,description='DDLC Compatible Mod')
 
     build.classify('**~', None)
     build.classify('**.bak', None)
@@ -152,7 +152,7 @@ init python:
     build.classify('script-regex.txt', None)
     build.classify('/game/10', None)
     build.classify('/game/cache/*.*', None)
-    build.classify('**.rpa',None)
+    #build.classify('**.rpa',None)
     build.classify("game/mod_assets/api_keys.json", None)
     build.classify("**.pem", None)
 

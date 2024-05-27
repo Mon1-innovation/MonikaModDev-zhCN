@@ -70,7 +70,7 @@ label import_ddlc_persistent:
                 "/storage/emulated/0/Android/data/keyi.ddlc.chs/files/saves/",
                 "/storage/",
                 "/storage/emulated/0/Android/data/com.refii.ddlc/DDLC-1454445547/"
-            }
+            ]
             for cp in check_path:
                 ddlc_save_path = glob(check_path + 'persistent')
                 if ddlc_save_path:
