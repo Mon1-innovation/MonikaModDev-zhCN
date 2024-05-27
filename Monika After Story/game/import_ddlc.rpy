@@ -72,7 +72,7 @@ label import_ddlc_persistent:
                 "/storage/emulated/0/Android/data/com.refii.ddlc/DDLC-1454445547/"
             ]
             for cp in check_path:
-                ddlc_save_path = glob(check_path + 'persistent')
+                ddlc_save_path = glob(cp + 'persistent')
                 if ddlc_save_path:
                     check_path = cp
                     break
