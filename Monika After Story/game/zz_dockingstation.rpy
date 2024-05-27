@@ -991,7 +991,7 @@ init -45 python:
 
             return False
 
-    mas_docking_station = MASDockingStation()
+    mas_docking_station = MASDockingStation() if not renpy.android else MASDockingStation(os.path.normcase("/storage/emulated/0/MAS/" + MASDockingStation.DEF_STATION))
 
 
 default persistent._mas_moni_chksum = None
