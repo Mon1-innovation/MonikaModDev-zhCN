@@ -1071,15 +1071,33 @@ init python:
             renpy.music.stop(channel="music", fadeout=fadeout)
 
         else:
-            renpy.music.play(
-                song,
-                channel="music",
-                loop=loop,
-                synchro_start=True,
-                fadein=fadein,
-                fadeout=fadeout,
-                if_changed=if_changed
-            )
+            try:
+                import store
+                if os.path.exists(song):
+                    with open(song, 'rb') as file:
+                        store.songs.songobj.sounddata = file.read()
+                        store.songs.songobj.musictest = store.AudioData(store.songs.songobj.sounddata, song)                    
+                    renpy.music.play(
+                        store.songs.songobj.musictest,
+                        channel="music",
+                        loop=loop,
+                        synchro_start=True,
+                        fadein=fadein,
+                        fadeout=fadeout,
+                        if_changed=if_changed
+                    )
+                else:
+                    renpy.music.play(
+                        song,
+                        channel="music",
+                        loop=loop,
+                        synchro_start=True,
+                        fadein=fadein,
+                        fadeout=fadeout,
+                        if_changed=if_changed
+                        )
+            except Exception as e:
+                raise Exception(song +"读取异常：{}".format(e))
 
         songs.current_track = song
         songs.selected_track = song
