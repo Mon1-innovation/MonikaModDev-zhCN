@@ -16,7 +16,7 @@ python early:
     p_perm_dict = {}
     def req_perm():
         for i in p_perms:
-            if not renpy.check_permission(i):
+            if renpy.version(True)[0] > 6 and not renpy.check_permission(i):
                 p_perm_dict[i] = renpy.request_permission(i)
                 p_perm_dict[i] = renpy.check_permission(i)
         pass
