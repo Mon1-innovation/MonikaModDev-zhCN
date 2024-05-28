@@ -14,9 +14,11 @@ python early:
     ]
     # 权限请求
     p_perm_dict = {}
+    def check_perm_request_available():
+        return renpy.version(True)[0] > 6 and renpy.version(True)[1] >= 4 and renpy.version(True)[2] >= 9
     def req_perm():
         for i in p_perms:
-            if renpy.version(True)[0] > 6 and not renpy.check_permission(i):
+            if check_perm_request_available() and not renpy.check_permission(i):
                 p_perm_dict[i] = renpy.request_permission(i)
                 p_perm_dict[i] = renpy.check_permission(i)
         pass
