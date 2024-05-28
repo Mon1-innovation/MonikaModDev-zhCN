@@ -174,7 +174,7 @@ init -900 python in mas_affection:
         LOVE: 0.15
     }
 
-    __STRUCT = struct.Struct(__STRUCT_FMT)
+    __STRUCT = struct.Struct(str(__STRUCT_FMT))
 
     # compare functions for affection / group
     def _compareAff(aff_1, aff_2):
