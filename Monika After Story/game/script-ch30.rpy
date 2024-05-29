@@ -313,7 +313,8 @@ init python:
     import os
     import eliza      # mod specific
     import datetime   # mod specific
-    import battery    # mod specific
+    if mas_utils.isNewRenpy():
+        import battery    # mod specific
     import re
     import store.songs as songs
     import store.hkb_button as hkb_button
@@ -352,7 +353,7 @@ init python:
         mcname = persistent.mcname
 
     # check for battery support
-    mas_battery_supported = battery.is_supported()
+    mas_battery_supported = mas_utils.isNewRenpy() and battery.is_supported()
 
     # we need a new music channel for background audio (like rain!)
     # this uses the amb (ambient) mixer.
