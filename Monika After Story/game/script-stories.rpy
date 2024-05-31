@@ -100,7 +100,7 @@ init -1 python in mas_stories:
             story_type - story type to get
 
         OUT:
-            list of locked stories for the given story type
+            dict of locked stories for the given story type
         """
         return store.Event.filterEvents(
             story_database,
@@ -123,7 +123,7 @@ init -1 python in mas_stories:
         stories = get_new_stories_for_type(story_type)
 
         #Grab one of the stories
-        story = renpy.random.choice(stories.values())
+        story = renpy.random.choice(tuple(stories.values()))
 
         #Unlock and return its eventlabel
         story.unlocked = True
@@ -173,7 +173,7 @@ label monika_short_stories_menu:
         # build menu list
         stories_menu_items = [
             (story_ev.prompt, story_evl, False, False)
-            for story_evl, story_ev in mas_stories.story_database.iteritems()
+            for story_evl, story_ev in mas_stories.story_database.items()
             if Event._filterEvent(
                 story_ev,
                 pool=False,
@@ -1889,7 +1889,7 @@ label mas_scary_story_prison_escape:
     m 7eua "Over time, she became good friends with one of the prison caretakers."
     m 3esc "His job was to bury any prisoners who died in a graveyard just outside the prison walls."
     m 3esd "Whenever a prisoner died, the caretaker rang a bell which was heard by all of the inmates."
-    m 3esc "Next, he got the body and put it in a casket, and then entered his office to fill out the death certificate before returning to the nail the casket lid shut."
+    m 3esc "Next, he got the body and put it in a casket, and then entered his office to fill out the death certificate before returning to nail the casket lid shut."
     m 3esd "Finally, he put it on a wagon to take to the graveyard and bury it."
     m 1euc "Knowing this routine, the woman devised an escape plan and shared it with the caretaker..."
     m 1eud "The next time the bell rang, the woman would leave her cell and sneak into the dark room where the coffins were kept."

@@ -330,7 +330,7 @@ init -20 python in mas_island_event:
             # FIXME: py3 update
             return {
                 id_: data.default_unlocked
-                for id_, data in cls._data_map.iteritems()
+                for id_, data in cls._data_map.items()
             }
 
         @classmethod
@@ -344,7 +344,7 @@ init -20 python in mas_island_event:
             # FIXME: py3 update
             return {
                 id_: data.fp_map
-                for id_, data in cls._data_map.iteritems()
+                for id_, data in cls._data_map.items()
                 if data.type == type_ and data.fp_map
             }
 
@@ -572,7 +572,7 @@ init -20 python in mas_island_event:
         )
     )
     IslandsDataDefinition(
-        "decal_house",
+        "decal_house",# FIXME: clear and snow sprites appear to be of different sizes
         partial_disp=functools.partial(
             ParallaxDecal,
             x=215,
@@ -742,6 +742,80 @@ init -20 python in mas_island_event:
             y=-99,
             z=5,
             # on_click=True
+        )
+    )
+    # D25 specific deco
+    IslandsDataDefinition(
+        "decal_bookshelf_lantern",
+        filenames=("d", "n", "s"),
+        partial_disp=functools.partial(
+            ParallaxDecal,
+            x=387,
+            y=47,
+            z=7,
+            on_click=True
+        )
+    )
+    IslandsDataDefinition(
+        "decal_circle_garland",
+        filenames=("d", "n", "s"),
+        partial_disp=functools.partial(
+            ParallaxDecal,
+            x=234,
+            y=22,
+            z=2,
+            on_click=True
+        )
+    )
+    IslandsDataDefinition(
+        "decal_hanging_lantern",
+        filenames=("d", "n", "s"),
+        partial_disp=functools.partial(
+            ParallaxDecal,
+            x=210,
+            y=23,
+            z=2,
+            on_click=True
+        )
+    )
+    IslandsDataDefinition(
+        "decal_rectangle_garland",
+        filenames=("d", "n", "s"),
+        partial_disp=functools.partial(
+            ParallaxDecal,
+            x=320,
+            y=28,
+            z=2,
+            on_click=True
+        )
+    )
+    TREE_LIGHTS_FPS = (
+        "other/tree_lights/d",
+        "other/tree_lights/n_0",
+        "other/tree_lights/n_1",
+        "other/tree_lights/n_2",
+        "other/tree_lights/s"
+    )
+    IslandsDataDefinition(
+        "decal_tree_lights",
+        fp_map={},# TODO: move TREE_LIGHTS_FPS to fp_map
+        partial_disp=functools.partial(
+            ParallaxDecal,
+            x=140,
+            y=-168,
+            z=5,
+            # on_click=True
+        )
+    )
+    IslandsDataDefinition(
+        "decal_wreath",
+        filenames=("d", "n", "s"),
+        partial_disp=functools.partial(
+            ParallaxDecal,
+            x=294,
+            y=33,
+            z=2,
+            on_click=True
         )
     )
 
@@ -1022,7 +1096,7 @@ init -25 python in mas_island_event:
         OUT:
             True upon success, False otherwise
         """
-        err_msg = "Failed to decode isld data: {}.\n"
+        err_msg = "Failed to decode isld data: {}."
 
         pkg = islands_station.getPackage("our_reality")
 
@@ -1051,10 +1125,10 @@ init -25 python in mas_island_event:
                 map_ - the map to get filenames from, and which will be overriden
             """
             # FIXME: py3 update
-            for name, path_map in map_.iteritems():
-                for sprite_type, path in path_map.iteritems():
+            for name, path_map in map_.items():
+                for sprite_type, path in path_map.items():
                     raw_data = zip_file.read(path)
-                    img = store.MASImageData(raw_data, "{}_{}.png".format(name, sprite_type))
+                    img = store.im.Data(raw_data, "{}_{}.png".format(name, sprite_type))
                     path_map[sprite_type] = img
 
         try:
@@ -1070,14 +1144,20 @@ init -25 python in mas_island_event:
 
                 # Anim frames are handled a bit differently
                 glitch_frames = tuple(
-                    (store.MASImageData(zip_file.read(fn), fn + ".png") for fn in GLITCH_FPS)
+                    (store.im.Data(zip_file.read(fn), fn + ".png") for fn in GLITCH_FPS)
                 )
+
+                tree_lights_imgs = {}
+                for fn in TREE_LIGHTS_FPS:
+                    k = fn.rpartition("/")[-1]
+                    raw_disp = store.MASImageData(zip_file.read(fn), fn + ".png")
+                    tree_lights_imgs[k] = raw_disp
 
                 # Audio is being loaded right away
                 isly_data = IslandsDataDefinition.getDataFor("other_isly")
                 if isly_data:
-                    for fn, fp in isly_data.fp_map.iteritems():
-                        audio_data = store.MASAudioData(zip_file.read(fp), fp + ".ogg")
+                    for fn, fp in isly_data.fp_map.items():
+                        audio_data = AudioData(zip_file.read(fp), fp + ".ogg")
                         setattr(store.audio, "isld_isly_" + fn, audio_data)
 
         except Exception as e:
@@ -1086,7 +1166,15 @@ init -25 python in mas_island_event:
 
         else:
             # We loaded the images, now create dynamic displayables
-            _build_displayables(island_map, decal_map, bg_map, overlay_map, interior_map, glitch_frames)
+            _build_displayables(
+                island_map,
+                decal_map,
+                bg_map,
+                overlay_map,
+                interior_map,
+                glitch_frames,
+                tree_lights_imgs
+            )
 
         return True
 
@@ -1108,7 +1196,7 @@ init -25 python in mas_island_event:
 
             precip_map = {}
 
-            for p_type, suffix in precip_to_suffix_map.iteritems():
+            for p_type, suffix in precip_to_suffix_map.items():
                 k = main_key + suffix
                 if k in img_map:
                     precip_map[p_type] = img_map[k]
@@ -1161,7 +1249,8 @@ init -25 python in mas_island_event:
         bg_imgs_maps,
         overlay_imgs_maps,
         interior_imgs_map,
-        glitch_frames
+        glitch_frames,
+        tree_lights_imgs
     ):
         """
         Takes multiple maps with images and builds displayables from them, sets global vars
@@ -1175,30 +1264,32 @@ init -25 python in mas_island_event:
             overlay_imgs_maps - the map from overlay ids to raw images map
             interior_imgs_map - the map from the interior stuff to the raw images map
             glitch_frames - tuple of glitch raw anim frames
+            tree_lights_imgs - map of images for the tree lights, format:
+                img_name: disp
         """
         global island_disp_map, decal_disp_map, other_disp_map
         global bg_disp_map, overlay_disp_map, interior_disp_map
 
         # Build the islands
-        for island_name, img_map in island_imgs_maps.iteritems():
+        for island_name, img_map in island_imgs_maps.items():
             disp = _build_ifwd(img_map)
             partial_disp = IslandsDataDefinition.getDataFor(island_name).partial_disp
             island_disp_map[island_name] = partial_disp(disp)
 
         # Build the decals
-        for decal_name, img_map in decal_imgs_maps.iteritems():
+        for decal_name, img_map in decal_imgs_maps.items():
             disp = _build_ifwd(img_map)
             partial_disp = IslandsDataDefinition.getDataFor(decal_name).partial_disp
             decal_disp_map[decal_name] = partial_disp(disp)
 
         # Build the bg
-        for bg_name, img_map in bg_imgs_maps.iteritems():
+        for bg_name, img_map in bg_imgs_maps.items():
             disp = _build_ifwd(img_map)
             partial_disp = IslandsDataDefinition.getDataFor(bg_name).partial_disp
             bg_disp_map[bg_name] = partial_disp(disp)
 
         # Build the overlays
-        for overlay_name, img_map in overlay_imgs_maps.iteritems():
+        for overlay_name, img_map in overlay_imgs_maps.items():
             disp = _build_fwd(img_map)
             partial_disp = IslandsDataDefinition.getDataFor(overlay_name).partial_disp
             if partial_disp is not None:
@@ -1206,7 +1297,7 @@ init -25 python in mas_island_event:
             overlay_disp_map[overlay_name] = disp
 
         # Build the interior
-        for name, img_map in interior_imgs_map.iteritems():
+        for name, img_map in interior_imgs_map.items():
             interior_disp_map[name] = img_map
 
         if interior_disp_map:
@@ -1244,6 +1335,23 @@ init -25 python in mas_island_event:
         glitch_disp = Transform(child=glitch_frames[0], function=_glitch_transform_func)
         partial_disp = IslandsDataDefinition.getDataFor("decal_glitch").partial_disp
         decal_disp_map["decal_glitch"] = partial_disp(glitch_disp)
+
+        # Build tree lights disp
+        tree_lights_frames = tuple(
+            tree_lights_imgs.pop("n_" + i)# don't need these in the map anymore
+            for i in "012"
+        )
+        def _tree_lights_transform_func(transform, st, at):
+            next_child = random.choice(tree_lights_frames)
+            transform.child = next_child
+            return 0.4
+
+        tree_lights_night_disp = Transform(child=tree_lights_frames[0], function=_tree_lights_transform_func)
+        tree_lights_imgs["n"] = tree_lights_night_disp
+
+        tree_lights_disp = _build_ifwd(tree_lights_imgs)
+        partial_disp = IslandsDataDefinition.getDataFor("decal_tree_lights").partial_disp
+        decal_disp_map["decal_tree_lights"] = partial_disp(tree_lights_disp)
 
         # Build chibi disp
         partial_disp = IslandsDataDefinition.getDataFor("other_shimeji").partial_disp
@@ -1365,6 +1473,7 @@ init -25 python in mas_island_event:
         _unlock("other_shimeji")
         if not renpy.seen_label("mas_monika_islands_final_reveal"):
             _unlock("decal_glitch")
+
         _unlock("decal_pumpkins")
         _unlock("decal_skull")
 
@@ -1383,23 +1492,33 @@ init -25 python in mas_island_event:
         # This requires the 4th isld
         if _is_unlocked("island_4"):
             _unlock("decal_bloodfall")
+
         # This requires the 5th isld
         if _is_unlocked("island_5"):
             _unlock("decal_gravestones")
 
     def __unlocks_for_lvl_6():
         _unlock("decal_bushes")
+
         # Unlock everything from lvl 3
         _unlock("island_4")
         _unlock("island_5")
 
     def __unlocks_for_lvl_7():
         _unlock("island_3")
+
         # Unlock only one, the rest at lvl 7
         _unlock_one("decal_bookshelf", "decal_tree")
+
         # These require the tree
         if _is_unlocked("decal_tree"):
             _unlock_one(*("decal_ghost_" + i for i in "012"))
+            _unlock("decal_tree_lights")
+
+        # This requires the bookshelf
+        if _is_unlocked("decal_bookshelf"):
+            _unlock("decal_bookshelf_lantern")
+
         # Unlock everything from lvl 4
         _unlock("island_7")
         _unlock("island_6")
@@ -1408,18 +1527,30 @@ init -25 python in mas_island_event:
         # Unlock everything from lvl 7
         _unlock("decal_bookshelf")
         _unlock("decal_tree")
+
         # These require the tree
         for i in "012":
             _unlock("decal_haunted_tree_" + i)
+        _unlock("decal_tree_lights")
+
+        # This requires the bookshelf
+        _unlock("decal_bookshelf_lantern")
 
     def _final_unlocks():
         # TODO: update monika_why_spaceroom
         # NOTE: NO SANITY CHECKS, use carefully
         _unlock("other_isly")
         _unlock("decal_house")
+
         # These requires the house
         _unlock("decal_jack")
         _unlock("decal_webs")
+        _unlock("decal_circle_garland")
+        _unlock("decal_hanging_lantern")
+        _unlock("decal_rectangle_garland")
+        _unlock("decal_wreath")
+
+        # This should be removed once we have the house
         _lock("decal_glitch")
 
     def __unlocks_for_lvl_9():
@@ -1602,6 +1733,7 @@ init -25 python in mas_island_event:
         global SHIMEJI_CHANCE
 
         enable_o31_deco = persistent._mas_o31_in_o31_mode and not is_winter_weather()
+        enable_d25_deco = persistent._mas_d25_in_d25_mode and is_winter_weather()
 
         def _reset_parallax_disp(disp):
             # Just in case we always remove all decals and readd them as needed
@@ -1621,7 +1753,7 @@ init -25 python in mas_island_event:
         # Add all unlocked islands
         sub_displayables = [
             _reset_parallax_disp(disp)
-            for key, disp in island_disp_map.iteritems()
+            for key, disp in island_disp_map.items()
             if _is_unlocked(key)
         ]
 
@@ -1638,7 +1770,7 @@ init -25 python in mas_island_event:
             )
         )
 
-        # Now add all unlocked O31 decals
+        # Add all unlocked O31 decals
         if enable_o31_deco:
             # Basic decals
             isld_to_decals_map = {
@@ -1653,7 +1785,7 @@ init -25 python in mas_island_event:
                 ),
                 "island_5": ("decal_gravestones",)
             }
-            for isld, decals in isld_to_decals_map.iteritems():
+            for isld, decals in isld_to_decals_map.items():
                 island_disp_map[isld].add_decals(
                     *(decal_disp_map[key] for key in decals if _is_unlocked(key))
                 )
@@ -1674,6 +1806,21 @@ init -25 python in mas_island_event:
             if store.mas_current_background.isFltNight() and _is_unlocked("decal_bloodfall"):
                 island_disp_map["island_4"].add_decals(decal_disp_map["decal_bloodfall"])
 
+        # Add all unlocked D25 decals
+        if enable_d25_deco:
+            isld_1_d25_decals = (
+                "decal_bookshelf_lantern",
+                "decal_circle_garland",
+                "decal_hanging_lantern",
+                "decal_rectangle_garland",
+                "decal_tree_lights",
+                "decal_wreath"
+            )
+            island_disp_map["island_1"].add_decals(
+                *(decal_disp_map[key] for key in isld_1_d25_decals if _is_unlocked(key))
+            )
+
+        # Add chibi
         if _is_unlocked("other_shimeji") and random.random() <= SHIMEJI_CHANCE:
             shimeji_disp = other_disp_map["other_shimeji"]
             _reset_parallax_disp(shimeji_disp)

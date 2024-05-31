@@ -8,7 +8,6 @@ define mas_rev_unseen = []
 define mas_rev_seen = []
 define mas_rev_mostseen = []
 define testitem = 0
-define mas_did_monika_battery = False
 define mas_sensitive_limit = 3
 
 init -2 python in mas_topics:
@@ -663,7 +662,7 @@ init python in mas_bookmarks_derand:
         #Firstly, let's get our derandom keys
         derand_keys = [
             label_prefix_data["derand_persist_key"]
-            for label_prefix_data in label_prefix_map.itervalues()
+            for label_prefix_data in label_prefix_map.values()
             if "derand_persist_key" in label_prefix_data
         ]
 
@@ -756,7 +755,7 @@ label mas_rerandom:
 
     show monika at t11
     python:
-        for ev_label in topics_to_rerandom.iterkeys():
+        for ev_label in topics_to_rerandom.keys():
             #Get the ev
             rerand_ev = mas_getEV(ev_label)
 
@@ -8426,35 +8425,35 @@ label monika_wolf:
     m 1ekbsa "You're my [hero] after all~"
     return
 
-label monika_battery:
-    if mas_did_monika_battery:
-       jump monika_close_game_battery
-    else:
-       jump monika_complain_battery
+# label monika_battery:
+#     if mas_did_monika_battery:
+#        jump monika_close_game_battery
+#     else:
+#        jump monika_complain_battery
 
-label monika_complain_battery:
-    $ mas_did_monika_battery = True
-    m 1euc "Umm, [player]..."
-    m 1eua "It looks like your computer's battery is about to run out..."
-    m 1eka "Can you charge it for me?"
-    m 1lksdlc "I don't want us to be separated, or worse..."
-    m 2ekc "It'd be really unpleasant for me if I suddenly lose consciousness."
-    m 2eka "So please charge your computer, okay?"
-    m 3eka "...or at least let me know when you're going."
-    m 1hua "Thank you, [player]~"
-    return
+# label monika_complain_battery:
+#     $ mas_did_monika_battery = True
+#     m 1euc "Umm, [player]..."
+#     m 1eua "It looks like your computer's battery is about to run out..."
+#     m 1eka "Can you charge it for me?"
+#     m 1lksdlc "I don't want us to be separated, or worse..."
+#     m 2ekc "It'd be really unpleasant for me if I suddenly lose consciousness."
+#     m 2eka "So please charge your computer, okay?"
+#     m 3eka "...or at least let me know when you're going."
+#     m 1hua "Thank you, [player]~"
+#     return
 
-label monika_close_game_battery:
-    $ mas_loseAffection()
-    m 1lksdlc "[player]..."
-    m 1ekc "I'm sorry, but I'm gonna have to close the game before the battery runs out."
-    m 3eka "So...I'll just close the game for now until you can charge your computer.{w=3.0} {nw}"
+# label monika_close_game_battery:
+#     $ mas_loseAffection()
+#     m 1lksdlc "[player]..."
+#     m 1ekc "I'm sorry, but I'm gonna have to close the game before the battery runs out."
+#     m 3eka "So...I'll just close the game for now until you can charge your computer.{w=3.0} {nw}"
 
-    $ is_charging = battery.is_charging()
-    if is_charging:
-       jump monika_system_charging
-    $ persistent.closed_self = True
-    jump _quit
+#     $ is_charging = battery.is_charging()
+#     if is_charging:
+#         jump monika_system_charging
+#     $ persistent.closed_self = True
+#     jump _quit
 
 label monika_system_charging:
     $ mas_gainAffection()
@@ -11751,7 +11750,7 @@ label monika_justice:
                         m 3tku "You expect me to believe that after all we've been through?"
                         m 1tsb "That all this time, you thought that I deserved hate from those other people?"
                         show monika 5hubfa at t11 zorder MAS_MONIKA_Z with dissolve_monika
-                        m 5hubfa "Ehehe, You're so cute, [player]~"
+                        m 5hubfa "Ehehe, you're so cute, [player]~"
 
                     else:
                         m 1euc "..."
@@ -12472,7 +12471,7 @@ label monika_player_appearance:
                         "I don't want to talk about it.":
                             $ persistent._mas_pm_no_hair_no_talk = True
 
-                            m 1ekd "I understand, [player]"
+                            m 1ekd "I understand, [player]."
                             m 1eka "I want you to know that I don't care how much hair you have, you'll always be beautiful to me."
                             m "If you ever feel insecure or feel like talking about it, I'm always here to listen."
 
@@ -15814,7 +15813,7 @@ label monika_using_pcs_healthily:
     m 2hksdlb "...Keep your keyboard and mouse within easy reach, though!"
     m 4eub "Of course, lighting is important too! {w=0.3}{nw}"
     extend 2eua "Try to keep the room well-lit, but not so much that light is glaring off the screen."
-    m 4eud "In addition, remember to take frequent breaks. {w=0.3}Look away from the screen, {w=0.2}ideally at something far away, {w=0.2}and perhaps do a few stretches. "
+    m 4eud "In addition, remember to take frequent breaks. {w=0.3}Look away from the screen, {w=0.2}ideally at something far away, {w=0.2}and perhaps do a few stretches."
     m 2eud "Since it's important to stay hydrated too, you could always fetch some fresh water while you're up from your desk."
     m 4eksdlc "Above all else, if you ever start to feel unwell, just stop what you're doing, rest, and then make sure everything is okay before you continue. "
     m 4eua "...And that's about it."

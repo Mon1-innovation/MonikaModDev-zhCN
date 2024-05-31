@@ -31,7 +31,6 @@ init 10 python:
 
         if key is None:
             key = datetime.date.today()
-
         persistent._mas_event_clothes_map[key] = clothes.name
 
         #We also unlock the event clothes selector here
@@ -340,9 +339,9 @@ init 501 python:
     )
 
 init python:
-    MAS_O31_COSTUME_CG_MAP = {
-        mas_clothes_marisa: "o31mcg",
-        mas_clothes_rin: "o31rcg"
+    MAS_O31_COSTUME_CG_MAP: dict[str, str] = {
+        mas_clothes_marisa.name: "o31mcg",
+        mas_clothes_rin.name: "o31rcg"
     }
 
 #Functions
@@ -535,8 +534,8 @@ init -10 python:
 
             if wearing_costume:
                 #Check if the current costume is in the cg map, and if so, prep the cg
-                if monika_chr.clothes in MAS_O31_COSTUME_CG_MAP:
-                    store.mas_o31_event.cg_decoded = store.mas_o31_event.decodeImage(MAS_O31_COSTUME_CG_MAP[monika_chr.clothes])
+                if monika_chr.clothes.name in MAS_O31_COSTUME_CG_MAP:
+                    store.mas_o31_event.cg_decoded = store.mas_o31_event.decodeImage(MAS_O31_COSTUME_CG_MAP[monika_chr.clothes.name])
 
                 return monika_chr.clothes
             return None
@@ -561,8 +560,8 @@ init -10 python:
             random_outfit = random.choice(selection_pool)
 
         #Setup the image decode
-        if random_outfit in MAS_O31_COSTUME_CG_MAP:
-            store.mas_o31_event.cg_decoded = store.mas_o31_event.decodeImage(MAS_O31_COSTUME_CG_MAP[random_outfit])
+        if random_outfit.name in MAS_O31_COSTUME_CG_MAP:
+            store.mas_o31_event.cg_decoded = store.mas_o31_event.decodeImage(MAS_O31_COSTUME_CG_MAP[random_outfit.name])
 
         #And return the outfit
         return random_outfit
@@ -1116,7 +1115,7 @@ label greeting_o31_briaryoung_shuchiin_academy_uniform:
 
     m 2hub "Welcome back!"
     m 2eub "Well, what do you think?"
-    m 7tuu "I thought Instead of being president, I could be the secretary for today..."
+    m 7tuu "I thought instead of being president, I could be the secretary for today..."
 
     if mas_isMoniAff(higher=True):
         m 3rtu "Or maybe even a love detective, but that's probably a waste, I've already found that..."
@@ -1296,7 +1295,7 @@ label mas_o31_lingerie:
     python:
         curr_song = songs.current_track
         mas_play_song(None)
-        mas_display_notif("M̷̢͘ô̴͎ṇ̵͐i̴͎͂k̸̗̂ả̴̫", ["C̸̳̓ą̵́n̷̳̎ ̸̖̊y̴̦͝õ̷̯ų̷͌ ̴̼͘h̷̭̚e̴̪͝a̴̙̐ŕ̵̖ ̴̠́m̸̰̂ě̵̬?̷̮̐"], "Topic Alerts")
+        mas_display_notif("M̷̢͘ô̴͎ṇ̵͐i̴͎͂k̸̗̂ả̴̫", ["C̸̳̓ą̵́n̷̳̎ ̸̖̊y̴̦͝õ̷̯ų̷͌ ̴̼͘h̷̭̚e̴̪͝a̴̙̐ŕ̵̖ ̴̠́m̸̰̂ě̵̬?̷̮̐"], "Topic Alerts", flash_window=True)
 
     scene black
     pause 2.0
@@ -1350,7 +1349,7 @@ label mas_o31_lingerie_end:
         mas_lockEVL("greeting_o31_lingerie", "GRE")
 
         # restart song/sounds that were playing before event
-        if globals().get("curr_song", -1) is not -1 and curr_song != store.songs.FP_MONIKA_LULLABY:
+        if globals().get("curr_song", -1) != -1 and curr_song != store.songs.FP_MONIKA_LULLABY:
             mas_play_song(curr_song, 1.0)
         else:
             mas_play_song(None, 1.0)
@@ -2128,7 +2127,7 @@ init -10 python in mas_d25_utils:
 
         # save remaining d25 gifts and delete the packages
         # they will be reacted to later
-        for c_gift_name, gift_name in d25_map.iteritems():
+        for c_gift_name, gift_name in d25_map.items():
             #Only add if the gift isn't already stored under the tree
             if c_gift_name not in store.persistent._mas_d25_gifts_given:
                 store.persistent._mas_d25_gifts_given.append(c_gift_name)
@@ -2137,7 +2136,7 @@ init -10 python in mas_d25_utils:
             store.mas_docking_station.destroyPackage(gift_name)
 
         # set all excluded and generic gifts to react now
-        for c_gift_name, mas_gift in found_map.iteritems():
+        for c_gift_name, mas_gift in found_map.items():
             store.persistent._mas_filereacts_reacted_map[c_gift_name] = mas_gift
 
         # register these gifts
@@ -6013,6 +6012,42 @@ init 20 python:
     #" # I need this to keep syntax highlighting on vim
     )
 
+    mas_poem_pbday_5 = MASPoem(
+        poem_id = "poem_pbday_5",
+        category = "pbday",
+        prompt = "Birthdays",
+        title = " My dearest [player],",
+        text = """\
+ Some birthdays are wonderful, chock-full of fun
+ with laughter and smiles from everyone.
+ Some birthdays, you plan everything to the letter
+ but at the end you feel like it could've been better.
+ Some birthdays are a peaceful night at home alone,
+ some birthdays you find yourself worked to the bone.
+
+ As each one ticks down, a joy or a chore,
+ you might find yourself wondering what they're for.
+ The answer is different for everyone on Earth,
+ except maybe the fact that they're about your birth.
+ But if you feel fatigued on your special day,
+ there's a few things I feel that I should say.
+
+ Each one is a milestone, a sign of your growth.
+ Not just for you--but for us both!
+ Each one is a chance to make you feel special.
+ If not that, an invitation to be sentimental.
+ But most of all, I want you to use your voice.
+ If we party or we stay in, it'll all be your choice!
+
+ We'll celebrate together in our own special way.
+ I love you, my [player], and happy birthday.
+
+ Forever yours,
+ Monika
+"""
+    #" # I need this to keep syntax highlighting on vim
+    )
+
 
 ######################## Start [HOL050]
 #Vday
@@ -6029,7 +6064,7 @@ default persistent._mas_f14_on_date = None
 ##Did we do a dockstat fare over all of f14?
 default persistent._mas_f14_gone_over_f14 = None
 #Valentine's Day
-define mas_f14 = datetime.date(datetime.date.today().year,2,14)
+define mas_f14 = datetime.date(datetime.date.today().year, 2, 14)
 
 #Is it vday?
 init -10 python:
@@ -6956,6 +6991,27 @@ init 20 python:
 """
     )
 
+    mas_poem_vday_6 = MASPoem(
+        poem_id="poem_f14_6",
+        category="f14",
+        prompt="Forget-me-not",
+        title=" My dearest [player],",
+        text="""\
+ All the flowers know are their vase.
+ A few cups of soil, and a pretty case of porcelain.
+ They will never leave without help, even if they someday outgrow it.
+
+ Flowers need more than their vase.
+ Water from the skies, or a helping hand.
+ And without sight of the sky above, the world apart, they would someday wither.
+
+ This gardener gives all this and more.
+ It's said a flower blooms brighter when spoken to with love.
+ Even trapped in this vase, maybe it isn't a curse to know more.
+
+ Forget-me-not.
+"""
+    )
 
 #######################[HOL050] dockstat farwell###############################
 label bye_f14:
@@ -7331,7 +7387,7 @@ image chibi_peek = MASFilterSwitch("mod_assets/other/chibi_peek.png")
 label mas_bday_surprise_party_hint:
     #Set up letters
     python:
-        persistent._mas_bday_hint_filename = "For " + player + ".txt"
+        persistent._mas_bday_hint_filename = mas_utils.sanitize_filename("For {0}.txt".format(player))
         if mas_isMoniNormal(higher=True):
             message = """\
 [player],

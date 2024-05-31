@@ -60,7 +60,7 @@ label mas_gender:
     #Unlock the gender redo event
     $ mas_unlockEVL("monika_gender_redo","EVE")
     # set pronouns
-    call mas_set_gender
+    $ mas_set_pronouns()
 
     #Set up the preferredname topic
     python:
@@ -161,7 +161,7 @@ label monika_gender_redo:
     m 5hubsa "I'll always love you for who you are~"
 
     # set pronouns
-    call mas_set_gender
+    $ mas_set_pronouns()
     return "love"
 
 label mas_gender_neither:
@@ -975,16 +975,22 @@ init 5 python:
     )
 
 label mas_unlock_hangman:
-    m 1eua "So, [player]..."
+    m 1eua "Hey, [player]..."
 
     if store.mas_games._total_games_played() > 49:
-        m 3eub "Since you seem to love playing pong so much, I figured you might like to play other games with me as well!"
+        m 3eub "Since you seem to love playing with me so much, I figured you might like to play other games with me as well!"
 
-    elif renpy.seen_label('game_pong'):
-        m 1eua "I thought that you might be getting bored with Pong."
+    elif renpy.seen_label('game_pong') and not renpy.seen_label('mas_nou'):
+        m 1eksdla "I thought that you might be getting bored with Pong..."
+
+    elif renpy.seen_label('game_pong') and renpy.seen_label('mas_nou'):
+        m 1eksdla "I thought that you might be getting bored with Pong and NOU..."
+
+    elif not renpy.seen_label('game_pong') and renpy.seen_label('mas_nou'):
+        m 1eksdla "I thought that you might be getting bored with NOU..."
 
     else:
-        m 3eua "I know you haven't tried playing Pong with me, yet."
+        m 1lksdla "Since you haven't seemed to be too interested in playing with me yet, I thought maybe you just like different types of games..."
 
     m 1hua "Soooo~"
     m 1hub "I made Hangman!"
@@ -1060,7 +1066,7 @@ init 5 python:
 
 label mas_random_limit_reached:
     #Notif so people don't get stuck here
-    $ mas_display_notif(m_name, ["Hey [player]..."], "Topic Alerts")
+    $ mas_display_notif(m_name, ["Hey [player]..."], "Topic Alerts", flash_window=True)
 
     python:
         limit_quips = [
@@ -1634,7 +1640,7 @@ label mas_corrupted_persistent:
         call mas_showpoem(mas_note_backups_all_good)
 
     window auto
-    $ _gtext = glitchtext(7)
+    $ _gtext = mas_glitchText(7)
 
     m 1ekc "Do you know what this is about?{nw}"
     $ _history_list.pop()

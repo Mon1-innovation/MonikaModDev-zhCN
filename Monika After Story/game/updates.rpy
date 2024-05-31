@@ -332,7 +332,7 @@ init 10 python:
         ]
 
         store.mas_versions.init()
-        ver_list = store.updates.version_updates.keys()
+        ver_list = list(store.updates.version_updates.keys())
 
         if "-" in config.version:
             working_version = config.version[:config.version.index("-")]
@@ -373,6 +373,91 @@ label v0_3_1(version=version): # 0.3.1
     return
 
 # non generic updates go here
+
+# 0.13.0 aka RenPy8/Python3
+label v0_13_0(version="v0_13_0"):
+    python hide:
+        pass
+    return
+
+# 0.12.15
+label v0_12_15(version="v0_12_15"):
+    python hide:
+        pass
+    return
+
+# 0.12.13
+label v0_12_13(version="v0_12_13"):
+    python hide:
+        # 922 nts fix
+        m_bday_nts = mas_getEV("mas_bday_postbday_notimespent")
+        m_bday_hbd = mas_getEV("mas_bday_pool_happy_bday")
+        today = datetime.date.today()
+        curr_year = today.year
+        corr_end_date = mas_monika_birthday+datetime.timedelta(days=8)
+
+        # people with invalid dates will have year mismatches
+        if m_bday_nts.start_date.year != m_bday_nts.end_date.year:
+            # remove this event if in ev list in this case
+            # as it's possible this could trigger after the 1/6 reset if the dates are bad
+            mas_rmallEVL("mas_bday_postbday_notimespent")
+
+            # if we have seen the ev this year or it's past 922 + 8 days the dates should be set to the next year
+            if today > corr_end_date or (m_bday_nts.last_seen and m_bday_nts.last_seen.year == curr_year):
+                mas_setEVLPropValues(
+                    "mas_bday_postbday_notimespent",
+                    start_date = datetime.datetime.combine(mas_monika_birthday.replace(year=curr_year+1)+datetime.timedelta(days=1), datetime.time(hour=1)),
+                    end_date = mas_monika_birthday.replace(year=curr_year+1)+datetime.timedelta(days=8)
+                )
+
+            # if we haven't seen the ev this year and it's prior to the push forward date
+            # the dates should be this year
+            else:
+                mas_setEVLPropValues(
+                    "mas_bday_postbday_notimespent",
+                    start_date = datetime.datetime.combine(mas_monika_birthday+datetime.timedelta(days=1), datetime.time(hour=1)),
+                    end_date = mas_monika_birthday+datetime.timedelta(days=8)
+                )
+
+        # for people who have valid years it's still possible the initial update
+        # never ran if they haven't updated in a long time so we'll run that initial
+        # update correctly this time, ensuring we have the correct dates
+        else:
+            mas_setEVLPropValues(
+                "mas_bday_postbday_notimespent",
+                start_date=datetime.datetime.combine(mas_monika_birthday.replace(year=m_bday_nts.end_date.year)+datetime.timedelta(days=1), datetime.time(hour=1))
+            )
+
+        # similar issue here, end_date could be before the start_date, so we correct
+        if today <= mas_monika_birthday:
+            mas_setEVLPropValues(
+                "mas_bday_pool_happy_bday",
+                start_date=mas_monika_birthday,
+                end_date=datetime.datetime.combine(mas_monika_birthday+datetime.timedelta(days=1), datetime.time(hour=1))
+            )
+
+        else:
+            mas_setEVLPropValues(
+                "mas_bday_pool_happy_bday",
+                start_date=mas_monika_birthday.replace(year=curr_year+1),
+                end_date=datetime.datetime.combine(mas_monika_birthday.replace(year=curr_year+1)+datetime.timedelta(days=1), datetime.time(hour=1))
+            )
+
+        # island d25 deco update
+        isld_p_data = persistent._mas_islands_unlocks
+        if isld_p_data is not None:
+            keys = (
+                "decal_bookshelf_lantern",
+                "decal_circle_garland",
+                "decal_hanging_lantern",
+                "decal_rectangle_garland",
+                "decal_tree_lights",
+                "decal_wreath"
+            )
+            for k in keys:
+                isld_p_data[k] = False
+
+    return
 
 # 0.12.12
 label v0_12_12(version="v0_12_12"):
@@ -452,15 +537,16 @@ label v0_12_8_1(version="v0_12_8_1"):
             conditional="mas_recognizedBday() and not mas_lastSeenInYear('mas_bday_spent_time_with_wrapup')"
         )
 
-        mas_setEVLPropValues(
-            "mas_bday_pool_happy_bday",
-            end_date=datetime.datetime.combine(mas_monika_birthday+datetime.timedelta(days=1), datetime.time(hour=1))
-        )
+        # next 2 entries could cause incorrect years to be set and have been corrected in the update for 0_12_13
+        #mas_setEVLPropValues(
+        #    "mas_bday_pool_happy_bday",
+        #    end_date=datetime.datetime.combine(mas_monika_birthday+datetime.timedelta(days=1), datetime.time(hour=1))
+        #)
 
-        mas_setEVLPropValues(
-            "mas_bday_postbday_notimespent",
-            start_date=datetime.datetime.combine(mas_monika_birthday+datetime.timedelta(days=1), datetime.time(hour=1))
-        )
+        #mas_setEVLPropValues(
+        #    "mas_bday_postbday_notimespent",
+        #    start_date=datetime.datetime.combine(mas_monika_birthday+datetime.timedelta(days=1), datetime.time(hour=1))
+        #)
 
         # transfer history vars
         # only overwrite if not set.
@@ -859,7 +945,7 @@ label v0_11_9_1(version="v0_11_9_1"):
         # We don't use this var anymore
         safeDel("chess_strength")
 
-        for story_type, story_last_seen in persistent._mas_last_seen_new_story.iteritems():
+        for story_type, story_last_seen in persistent._mas_last_seen_new_story.items():
             if story_last_seen is not None:
                 persistent._mas_last_seen_new_story[story_type] = datetime.datetime.combine(
                     story_last_seen, datetime.time()
@@ -1125,7 +1211,7 @@ label v0_11_4(version="v0_11_4"):
 label v0_11_3(version="v0_11_3"):
     python:
         #Rerandom all songs which aren't d25 exclusive
-        for song_ev in mas_songs.song_db.itervalues():
+        for song_ev in mas_songs.song_db.values():
             if (
                 song_ev.eventlabel not in ["mas_song_aiwfc", "mas_song_merry_christmas_baby"]
                 and mas_songs.TYPE_LONG not in song_ev.category
@@ -1141,7 +1227,7 @@ label v0_11_3(version="v0_11_3"):
             persistent._mas_pool_unlocks += store.mas_xp.level() * 4
 
         #Adjust consumables to be at their max stock amount
-        for consumable_id in persistent._mas_consumable_map.iterkeys():
+        for consumable_id in persistent._mas_consumable_map.keys():
             cons = mas_getConsumable(consumable_id)
 
             if cons and cons.getStock() > cons.max_stock_amount:
@@ -1376,7 +1462,7 @@ label v0_11_1(version="v0_11_1"):
 label v0_11_0(version="v0_11_0"):
     python:
         #First, we're fixing the consumables map
-        for cons_id in persistent._mas_consumable_map.iterkeys():
+        for cons_id in persistent._mas_consumable_map.keys():
             persistent._mas_consumable_map[cons_id]["has_restock_warned"] = False
 
         #Let's stock current users on some consumables (assuming they've gifted before)
@@ -1442,7 +1528,7 @@ label v0_11_0(version="v0_11_0"):
             "greeting_hamlet": "store.mas_getAbsenceLength() >= datetime.timedelta(days=7)"
         }
 
-        for gr_label, conditional in new_greetings_conditions.iteritems():
+        for gr_label, conditional in new_greetings_conditions.items():
             gr_ev = mas_getEV(gr_label)
             if gr_ev:
                 gr_ev.conditional = conditional
@@ -1481,7 +1567,7 @@ label v0_11_0(version="v0_11_0"):
             "monika_changename": "mas_preferredname"
         }
 
-        for new_evl, old_evl in topic_transfer_map.iteritems():
+        for new_evl, old_evl in topic_transfer_map.items():
             mas_transferTopicData(new_evl, old_evl, persistent.event_database)
 
             #If we've seen this event before, then we shouldn't allow its conditions to be true again
@@ -1662,7 +1748,7 @@ label v0_10_6(version="v0_10_6"):
                         persistent._mas_history_archives[year]["player_bday.saw_surprise"] = True
 
         #Give unseen fun facts the unlocked prop
-        for ev in mas_fun_facts.fun_fact_db.itervalues():
+        for ev in mas_fun_facts.fun_fact_db.values():
             if ev.shown_count:
                 ev.unlocked = True
 
@@ -1753,7 +1839,7 @@ label v0_10_5(version="v0_10_5"):
             "mas_bad_facts_4": "mas_bad_fact_tree_moss",
         }
 
-        for old_evl, new_evl in fun_facts_evls.iteritems():
+        for old_evl, new_evl in fun_facts_evls.items():
             mas_transferTopicData(
                 new_evl,
                 old_evl,
@@ -1780,7 +1866,7 @@ label v0_10_5(version="v0_10_5"):
             "mas_monika_daynight2": "mas_island_daynight2"
         }
 
-        for old_label, new_label in islands_evs.iteritems():
+        for old_label, new_label in islands_evs.items():
             mas_transferTopicSeen(old_label, new_label)
 
         #Fix these persist vars
@@ -1985,10 +2071,10 @@ label v0_10_3(version="v0_10_3"):
     python:
         #Convert fav/derand dicts to lists based on their keys if needed
         if isinstance(persistent._mas_player_bookmarked, dict):
-            persistent._mas_player_bookmarked = persistent._mas_player_bookmarked.keys()
+            persistent._mas_player_bookmarked = list(persistent._mas_player_bookmarked.keys())
 
         if isinstance(persistent._mas_player_derandomed, dict):
-            persistent._mas_player_derandomed = persistent._mas_player_derandomed.keys()
+            persistent._mas_player_derandomed = list(persistent._mas_player_derandomed.keys())
 
     return
 
@@ -2084,8 +2170,8 @@ label v0_10_2(version="v0_10_2"):
 label v0_10_1(version="v0_10_1"):
     #Fix 922 time spent vars if we're not post 922 (so these vars aren't set when they shouldn't be)
     if datetime.date.today() < mas_monika_birthday:
-       $ persistent._mas_bday_no_time_spent = True
-       $ persistent._mas_bday_no_recognize = True
+        $ persistent._mas_bday_no_time_spent = True
+        $ persistent._mas_bday_no_recognize = True
 
     #Fix all of the topics which are now having actions undone (conditional updates)
     python:
@@ -2505,7 +2591,7 @@ label v0_9_0(version="v0_9_0"):
                 mas_bd_ev.action = EV_ACT_QUEUE
 
         # remove random props from all greetings
-        for gre_label, gre_ev in store.evhand.greeting_database.iteritems():
+        for gre_label, gre_ev in store.evhand.greeting_database.items():
             # hopefully we never use random in greetings ever
             gre_ev.random = False
 
