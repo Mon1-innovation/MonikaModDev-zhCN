@@ -1,11 +1,11 @@
 python early:    
     def android_toast(message):
-        print(title, message)
+        print("android_toast：", message)
         if not renpy.android:
             return
-        from jnius import autoclass
-        Toast = autoclass('android.widget.Toast')
-        Toast.makeText(currentActivity, message, Toast.LENGTH_LONG).show()
+        from jnius import autoclass, cast
+        PYActivity = autoclass("org.renpy.android.PythonSDLActivity")
+        PYActivity.toastError(message)
     if renpy.android:
         p_debug = os.path.exists("/storage/emulated/0/MAS/debug.p")
     else:
