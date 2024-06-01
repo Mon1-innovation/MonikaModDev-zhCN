@@ -1,13 +1,11 @@
 python early:    
-    def android_message(title, message):
+    def android_toast(message):
         print(title, message)
         if not renpy.android:
             return
         from jnius import autoclass
-        # 导入 JOptionPane 类
-        JOptionPane = autoclass('javax.swing.JOptionPane')
-        # 弹出一个消息对话框
-        JOptionPane.showMessageDialog(None, "这是一个弹窗提示！", "提示", JOptionPane.INFORMATION_MESSAGE)
+        Toast = autoclass('android.widget.Toast')
+        Toast.makeText(currentActivity, message, Toast.LENGTH_LONG).show()
     if renpy.android:
         p_debug = os.path.exists("/storage/emulated/0/MAS/debug.p")
     else:
@@ -30,7 +28,7 @@ python early:
                 try:
                     p_perm_dict[i] = renpy.request_permission(i)
                 except Exception:
-                    android_message("无法申请权限 {}，请手动授予权限！".format(i), "申请失败!")
+                    android_toast("无法申请权限 {}，请手动授予权限！".format(i))
         pass
     def p_raise():
         raise Exception("Raise Exception for Debugging")
