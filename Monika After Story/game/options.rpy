@@ -22,6 +22,9 @@ define gui.about = _("")
 
 define build.name = "Monika_After_Story"
 
+## Name of the executables, we must keep it DDLC to obey the guidelines
+define build.executable_name = "DDLC"
+
 ## Preference defaults #########################################################
 
 ## Controls the default text speed. The default, 0, is infinite, while any other
@@ -121,8 +124,8 @@ init python:
     ##This tells Renpy to build an updater file
     build.include_update = True
 
-    ## This is the archive of data for your mod
-    #build.archive(build.name, "all")
+    ## Define the archives to use
+    build.archive("scripts", "all")
 
     ##Add the pictures necessary for the scrollable menu
     #build.classify("game/gui/**",build.name)
