@@ -73,7 +73,7 @@ python early:
     # clear this so no more traceback. We expect node loops anyway
     renpy.execution.check_infinite_loop = dummy
 
-    class MASFormatter(renpy.substitutions.Formatter):
+    class MASFormatter(string.Formatter):
         """
         Our string formatter that uses more
         advanced formatting rules compared to the RenPy one

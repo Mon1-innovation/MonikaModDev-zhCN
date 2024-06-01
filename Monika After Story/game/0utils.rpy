@@ -368,6 +368,8 @@ python early in mas_utils:
     try:
         mas_log = init_mas_log()
     except IOError:
+        from store import android_message
+        android_message("权限出错", "请检查MAS的文件权限")
         raise Exception("\n\nPlease check the file read and write permissions for MAS\n请检查MAS的文件读写权限\n")
 
     # Keep all warnings

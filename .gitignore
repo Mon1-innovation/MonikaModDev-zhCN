@@ -1082,3 +1082,8 @@ Monika After Story/image_cache.txt
 Monika After Story/game/cache/shaders.txt
 navigation.json
 Monika_After_Story-[0-9]*.[0-9]*.[0-9]*-dists
+Monika After Story/android.json
+Monika After Story/android.keystore
+Monika After Story/bundle.keystore
+Monika After Story/project.json
+Monika After Story/update.pem

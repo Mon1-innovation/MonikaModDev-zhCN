@@ -122,7 +122,7 @@ init python:
     ## Classify files as None to exclude them from the built distributions.
 
     ##This tells Renpy to build an updater file
-    build.include_update = True
+    #build.include_update = True
 
     ## Define the archives to use
     build.archive("scripts", "all")

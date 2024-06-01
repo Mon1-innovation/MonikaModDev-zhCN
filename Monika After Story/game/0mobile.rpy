@@ -1,4 +1,13 @@
-python early:
+python early:    
+    def android_message(title, message):
+        print(title, message)
+        if not renpy.android:
+            return
+        from jnius import autoclass
+        # 导入 JOptionPane 类
+        JOptionPane = autoclass('javax.swing.JOptionPane')
+        # 弹出一个消息对话框
+        JOptionPane.showMessageDialog(None, "这是一个弹窗提示！", "提示", JOptionPane.INFORMATION_MESSAGE)
     if renpy.android:
         p_debug = os.path.exists("/storage/emulated/0/MAS/debug.p")
     else:
@@ -10,17 +19,18 @@ python early:
     p_perms = [
         "android.permission.INTERNET",# 开启联网权限 用于备份
         "android.permission.WRITE_EXTERNAL_STORAGE", # 读写权限
-        "android.permission.READ_EXTERNAL_STORAGE"
+        "android.permission.READ_EXTERNAL_STORAGE",
     ]
+    build.android_permissions = p_perms
     # 权限请求
     p_perm_dict = {}
-    def check_perm_request_available():
-        return renpy.version(True)[0] > 6 and renpy.version(True)[1] >= 4 and renpy.version(True)[2] >= 9
     def req_perm():
         for i in p_perms:
-            if check_perm_request_available() and not renpy.check_permission(i):
-                p_perm_dict[i] = renpy.request_permission(i)
-                p_perm_dict[i] = renpy.check_permission(i)
+            if not renpy.check_permission(i):
+                try:
+                    p_perm_dict[i] = renpy.request_permission(i)
+                except Exception:
+                    android_message("无法申请权限 {}，请手动授予权限！".format(i), "申请失败!")
         pass
     def p_raise():
         raise Exception("Raise Exception for Debugging")
