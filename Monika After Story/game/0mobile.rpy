@@ -39,6 +39,11 @@ init python:
     def mkdir(path):
         if not os.path.exists(path):
             os.makedirs(path)
+    def extract_file(file):
+        if not renpy.loadable(os.path.normcase(file).replace(r"\\", "/")):
+            store.mas_utils.mas_log.error(f"extract_file: 无法释放文件，因为无法加载'{file}'")
+            return
+        open(os.path.join("/storage/emulated/0/MAS/", file), "wb").write(renpy.file(os.path.normcase(file).replace(r"\\", "/")).read())
 
     def spread_json():
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/anonymioo_acs_ribbon_bisexualpride.json", "wb").write(renpy.file("anonymioo_acs_ribbon_bisexualpride.json").read())
@@ -129,32 +134,18 @@ init python:
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/velius94_acs_ribbon_yellow.json", "wb").write(renpy.file("velius94_acs_ribbon_yellow.json").read())
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/velius94_clothes_dress_whitenavyblue.json", "wb").write(renpy.file("velius94_clothes_dress_whitenavyblue.json").read())
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/velius94_clothes_shirt_pink.json", "wb").write(renpy.file("velius94_clothes_shirt_pink.json").read())
-        open("/storage/emulated/0/MAS/game/mod_assets/monika/mbase", "wb").write(renpy.file("mbase").read())
-        open("/storage/emulated/0/MAS/game/mod_assets/monika/NjM2ODZmNjM2ZjZjNjE3NDY1NzM=", "wb").write(renpy.file("NjM2ODZmNjM2ZjZjNjE3NDY1NzM=").read())
-        open("/storage/emulated/0/MAS/game/mod_assets/monika/cg/o31mcg", "wb").write(renpy.file("o31mcg").read())
-        open("/storage/emulated/0/MAS/game/mod_assets/monika/cg/o31rcg", "wb").write(renpy.file("o31rcg").read())
-        open("/storage/emulated/0/MAS/game/mod_assets/location/special/dwf", "wb").write(renpy.file("dwf").read())
-        open("/storage/emulated/0/MAS/game/mod_assets/location/special/dwof", "wb").write(renpy.file("dwof").read())
-        open("/storage/emulated/0/MAS/game/mod_assets/location/special/nowf", "wb").write(renpy.file("nowf").read())
-        open("/storage/emulated/0/MAS/game/mod_assets/location/special/nowof", "wb").write(renpy.file("nowof").read())
-        open("/storage/emulated/0/MAS/game/mod_assets/location/special/nrwf", "wb").write(renpy.file("nrwf").read())
-        open("/storage/emulated/0/MAS/game/mod_assets/location/special/nrwof", "wb").write(renpy.file("nrwof").read())
-        open("/storage/emulated/0/MAS/game/mod_assets/location/special/nswf", "wb").write(renpy.file("nswf").read())
-        open("/storage/emulated/0/MAS/game/mod_assets/location/special/nswof", "wb").write(renpy.file("nswof").read())
-        open("/storage/emulated/0/MAS/game/mod_assets/location/special/nwf", "wb").write(renpy.file("nwf").read())
-        open("/storage/emulated/0/MAS/game/mod_assets/location/special/nwof", "wb").write(renpy.file("nwof").read())
-        open("/storage/emulated/0/MAS/game/mod_assets/location/special/owf", "wb").write(renpy.file("owf").read())
-        open("/storage/emulated/0/MAS/game/mod_assets/location/special/owof", "wb").write(renpy.file("owof").read())
-        open("/storage/emulated/0/MAS/game/mod_assets/location/special/rwf", "wb").write(renpy.file("rwf").read())
-        open("/storage/emulated/0/MAS/game/mod_assets/location/special/rwof", "wb").write(renpy.file("rwof").read())
-        open("/storage/emulated/0/MAS/game/mod_assets/location/special/swf", "wb").write(renpy.file("swf").read())
-        open("/storage/emulated/0/MAS/game/mod_assets/location/special/swof", "wb").write(renpy.file("swof").read())
+        extract_file("game\mod_assets\monika\cg\o31rcg")
+        extract_file("game\mod_assets\monika\cg\o31mcg")
+        extract_file("game\mod_assets\monika\cg\o31mcg") 
+        extract_file("game/mod_assets/location/special/our_reality")   
+        extract_file("game/mod_assets/monika/mbase")   
+        extract_file("game/mod_assets/monika/NjM2ODZmNjM2ZjZjNjE3NDY1NzM=", "wb")
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/finale_clothes_green_dress.json", "wb").write(renpy.file("finale_clothes_green_dress.json").read())
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/finale_clothes_putonahappyface_shirt.json", "wb").write(renpy.file("finale_clothes_putonahappyface_shirt.json").read())
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/finale_clothes_shirt_resthere.json", "wb").write(renpy.file("finale_clothes_shirt_resthere.json").read())
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/finale_clothes_tanktop.json", "wb").write(renpy.file("finale_clothes_tanktop.json").read())
-        open("/storage/emulated/0/MAS/game/mod_assets/games/piano/songs/happybirthday.json", "wb").write(renpy.file("happybirthday.json").read())
-        open("/storage/emulated/0/MAS/game/mod_assets/games/piano/songs/yourreality.json", "wb").write(renpy.file("yourreality.json").read())
+        extract_file("game/mod_assets/games/piano/songs/happybirthday.json")
+        extract_file("game/mod_assets/games/piano/songs/yourreality.json")
         
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/briaryoung_acs_front_bow_black.json", "wb").write(renpy.file("briaryoung_acs_front_bow_black.json").read())
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/briaryoung_clothes_shuchiin_academy_uniform.json", "wb").write(renpy.file("briaryoung_clothes_shuchiin_academy_uniform.json").read())

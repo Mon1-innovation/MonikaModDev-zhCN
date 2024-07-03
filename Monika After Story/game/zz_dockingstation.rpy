@@ -19,7 +19,7 @@ init -900 python in mas_ics:
     ########################## ISLANDS ########################################
     # islands folder
     ISLANDS_FOLDER = os.path.normcase(
-        os.path.join(renpy.config.gamedir, "mod_assets/location/special/")
+        os.path.join(renpy.config.gamedir if not renpy.android else "/storage/emulated/0/MAS"+ "mod_assets/location/special/")
     )
 
     # NOTE: these checksums are BEFORE b64 encoding
@@ -29,8 +29,8 @@ init -900 python in mas_ics:
     #################################### O31 ##################################
     # cg folder
     o31_cg_folder = os.path.normcase(
-        renpy.config.basedir + "/game/mod_assets/monika/cg/"
-    )
+        renpy.config.basedir if not renpy.android else "/storage/emulated/0/MAS"+ "/game/mod_assets/monika/cg/"
+    ) 
 
     # marisa cg
     o31_marisa = (
@@ -55,7 +55,7 @@ init -900 python in mas_ics:
     #################################### RPY ##################################
     #game folder
     game_folder = os.path.normcase(
-        renpy.config.basedir + "/game/"
+        renpy.config.basedir + "/game/" #TODO: 手机版路径
     )
     ###########################################################################
 
@@ -77,7 +77,7 @@ init -45 python:
 
         # The default docking station is the characters folder
         DEF_STATION = "/characters/"
-        DEF_STATION_PATH = os.path.normcase(renpy.config.basedir + DEF_STATION)
+        DEF_STATION_PATH = os.path.normcase(renpy.config.basedir if not renpy.android else "/storage/emulated/0/MAS" + DEF_STATION) 
 
         # default read size in bytes
         # NOTE: we use 4095 here since 3 divides evenly into 4095
