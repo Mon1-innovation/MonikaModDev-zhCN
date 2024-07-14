@@ -19,7 +19,7 @@ init -900 python in mas_ics:
     ########################## ISLANDS ########################################
     # islands folder
     ISLANDS_FOLDER = os.path.normcase(
-        os.path.join(renpy.config.gamedir if not renpy.android else "/storage/emulated/0/MAS"+ "mod_assets/location/special/")
+        os.path.join(renpy.config.gamedir if not renpy.android else "/storage/emulated/0/MAS/game/"+ "mod_assets/location/special/")
     )
 
     # NOTE: these checksums are BEFORE b64 encoding

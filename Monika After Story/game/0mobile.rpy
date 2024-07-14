@@ -18,6 +18,7 @@ python early:
         "android.permission.INTERNET",# 开启联网权限 用于备份
         "android.permission.WRITE_EXTERNAL_STORAGE", # 读写权限
         "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.MANAGE_EXTERNAL_STORAGE"
     ]
     build.android_permissions = p_perms
     # 权限请求
@@ -27,6 +28,8 @@ python early:
             if not renpy.check_permission(i):
                 try:
                     p_perm_dict[i] = renpy.request_permission(i)
+                    if not p_perm_dict[i]:
+                        android_toast("无法申请权限 {}".format(i))
                 except Exception:
                     android_toast("无法申请权限 {}，请手动授予权限！".format(i))
         pass
@@ -40,11 +43,21 @@ init python:
         if not os.path.exists(path):
             os.makedirs(path)
     def extract_file(file):
-        if not renpy.loadable(os.path.normcase(file).replace(r"\\", "/")):
+        # 解压文件, 仅限于game目录下的文件
+        if not renpy.loadable(file):
             store.mas_utils.mas_log.error(f"extract_file: 无法释放文件，因为无法加载'{file}'")
             return
-        open(os.path.join("/storage/emulated/0/MAS/", file), "wb").write(renpy.file(os.path.normcase(file).replace(r"\\", "/")).read())
+        
+        # 定义目标路径
+        target_path = os.path.join("/storage/emulated/0/MAS/game", file)
+        target_dir = os.path.dirname(target_path)
 
+        # 创建目标目录（如果不存在）
+        os.makedirs(target_dir, exist_ok=True)
+
+        # 写入文件
+        with open(target_path, "wb") as f:
+            f.write(renpy.file(file).read())
     def spread_json():
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/anonymioo_acs_ribbon_bisexualpride.json", "wb").write(renpy.file("anonymioo_acs_ribbon_bisexualpride.json").read())
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/anonymioo_acs_ribbon_blackandwhite.json", "wb").write(renpy.file("anonymioo_acs_ribbon_blackandwhite.json").read())
@@ -134,18 +147,18 @@ init python:
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/velius94_acs_ribbon_yellow.json", "wb").write(renpy.file("velius94_acs_ribbon_yellow.json").read())
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/velius94_clothes_dress_whitenavyblue.json", "wb").write(renpy.file("velius94_clothes_dress_whitenavyblue.json").read())
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/velius94_clothes_shirt_pink.json", "wb").write(renpy.file("velius94_clothes_shirt_pink.json").read())
-        extract_file("game\mod_assets\monika\cg\o31rcg")
-        extract_file("game\mod_assets\monika\cg\o31mcg")
-        extract_file("game\mod_assets\monika\cg\o31mcg") 
-        extract_file("game/mod_assets/location/special/our_reality")   
-        extract_file("game/mod_assets/monika/mbase")   
-        extract_file("game/mod_assets/monika/NjM2ODZmNjM2ZjZjNjE3NDY1NzM=", "wb")
+        extract_file("mod_assets/monika/cg/o31rcg")
+        extract_file("mod_assets/monika/cg/o31mcg")
+        extract_file("mod_assets/monika/cg/o31mcg") 
+        extract_file("mod_assets/location/special/our_reality")   
+        extract_file("mod_assets/monika/mbase")   
+        extract_file("mod_assets/monika/NjM2ODZmNjM2ZjZjNjE3NDY1NzM=")
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/finale_clothes_green_dress.json", "wb").write(renpy.file("finale_clothes_green_dress.json").read())
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/finale_clothes_putonahappyface_shirt.json", "wb").write(renpy.file("finale_clothes_putonahappyface_shirt.json").read())
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/finale_clothes_shirt_resthere.json", "wb").write(renpy.file("finale_clothes_shirt_resthere.json").read())
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/finale_clothes_tanktop.json", "wb").write(renpy.file("finale_clothes_tanktop.json").read())
-        extract_file("game/mod_assets/games/piano/songs/happybirthday.json")
-        extract_file("game/mod_assets/games/piano/songs/yourreality.json")
+        extract_file("mod_assets/games/piano/songs/happybirthday.json")
+        extract_file("mod_assets/games/piano/songs/yourreality.json")
         
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/briaryoung_acs_front_bow_black.json", "wb").write(renpy.file("briaryoung_acs_front_bow_black.json").read())
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/briaryoung_clothes_shuchiin_academy_uniform.json", "wb").write(renpy.file("briaryoung_clothes_shuchiin_academy_uniform.json").read())
