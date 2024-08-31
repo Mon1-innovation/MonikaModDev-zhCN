@@ -18,7 +18,7 @@ python early:
         "android.permission.INTERNET",# 开启联网权限 用于备份
         "android.permission.WRITE_EXTERNAL_STORAGE", # 读写权限
         "android.permission.READ_EXTERNAL_STORAGE",
-        "android.permission.MANAGE_EXTERNAL_STORAGE"
+        #"android.permission.MANAGE_EXTERNAL_STORAGE"
     ]
     build.android_permissions = p_perms
     # 权限请求
