@@ -1,5 +1,5 @@
 """renpy
-early python:
+python early: 
 """
 import os
 import shutil
@@ -57,57 +57,58 @@ class FileSynchronizer:
     
     def sync(self):
         """
-        同步源目录(self.src_path)到目标目录(self.dst_path)，
-        保持目录结构不变，并删除目标目录中源目录不存在的文件。
+        同步源目录到目标目录。
         
         Args:
             无
         
         Returns:
-            无返回值
-        
-        Raises:
-            无异常抛出
+            无
         
         """
-        if not os.path.exists(self.dst_path):
-            os.makedirs(self.dst_path)
-        
-        for root, _, files in os.walk(self.src_path):
+        rpy_file = []
+        # Sync from source to destination
+        for root, dirs, files in os.walk(self.src_path):
+            print(f"Syncing {root}/{dirs}/{files} to {self.dst_path}...")
             relative_path = os.path.relpath(root, self.src_path)
-            dst_dir = os.path.join(self.dst_path, relative_path)
-            if not os.path.exists(dst_dir):
-                os.makedirs(dst_dir)
+            dst_root = os.path.join(self.dst_path, relative_path)
             
-            for file_name in files:
-                src_file = os.path.join(root, file_name)
-                dst_file = os.path.join(dst_dir, file_name)
-                
-                if os.path.exists(dst_file):
-                    if file_name in self.whitelist and not self.whitelist[file_name]:
-                        continue  # Skip, don't override
-                    if not self.files_are_same(src_file, dst_file):
-                        shutil.copy2(src_file, dst_file)
-                else:
+            # Ensure the destination directories exist
+            if not os.path.exists(dst_root):
+                os.makedirs(dst_root)
+            
+            # Copy files from source to destination and overwrite existing files
+            for file in files:
+                if ".rpy" in file:
+                    rpy_file.append(os.path.join(root, file))
+                src_file = os.path.join(root, file)
+                dst_file = os.path.join(dst_root, file)
+                if not self.whitelist.get(file, False):
                     shutil.copy2(src_file, dst_file)
-        
-        # Delete files in dst_path that are not in src_path and not in the whitelist
-        for root, _, files in os.walk(self.dst_path):
+                    
+        # Remove files and directories from destination that are not in source
+        for root, dirs, files in os.walk(self.dst_path):
             relative_path = os.path.relpath(root, self.dst_path)
-            src_dir = os.path.join(self.src_path, relative_path)
+            src_root = os.path.join(self.src_path, relative_path)
             
-            if os.path.exists(src_dir):
-                for file_name in files:
-                    dst_file = os.path.join(root, file_name)
-                    if file_name not in self.whitelist:
-                        src_file = os.path.join(src_dir, file_name)
-                        if not os.path.exists(src_file):
-                            os.remove(dst_file)
-            else:
-                for file_name in files:
-                    if file_name not in self.whitelist:
-                        os.remove(os.path.join(root, file_name))
+            # Remove files not present in source
+            for file in files:
+                # 如果找到rpyc对应的rpy
+                for item in rpy_file:
+                    if item in file:
+                        continue
+                dst_file = os.path.join(root, file)
+                src_file = os.path.join(src_root, file)
+                if not os.path.exists(src_file) and file not in self.whitelist:
+                    os.remove(dst_file)
+            
+            # Remove empty directories not present in source
+            for dir in dirs:
+                dst_dir = os.path.join(root, dir)
+                src_dir = os.path.join(src_root, dir)
+                if not os.path.exists(src_dir):
+                    shutil.rmtree(dst_dir)
 
 
-syncer = FileSynchronizer("/sdcard/MAS/game/", "/data/data/and.sirp.masmobile/files/game")
-syncer.sync()
+gameSyncer = FileSynchronizer("/storage/emulated/0/MAS/game", "/data/data/and.sirp.masmobile/files/game")
+gameSyncer.add_to_whitelist("masrun")
