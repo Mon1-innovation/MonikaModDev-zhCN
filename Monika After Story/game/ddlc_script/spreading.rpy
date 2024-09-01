@@ -1,17 +1,17 @@
 default persistent.intro801192_read = False
 
-init 5 python:
-    addEvent(
-        Event(
-            persistent.event_database,
-            eventlabel="modass_spr",
-            category=['补丁','模组'],
-            prompt="安装数据包",
-            unlocked=True,
-            pool=True,
-            rules={"no_unlock": None}
-        )
-    )
+#init 5 python:
+#    addEvent(
+#        Event(
+#            persistent.event_database,
+#            eventlabel="modass_spr",
+#            category=['补丁','模组'],
+#            prompt="安装数据包",
+#            unlocked=True,
+#            pool=True,
+#            rules={"no_unlock": None}
+#        )
+#    )
 
 label modass_spr:
     m 2rsc "呃, 数据包么?"
