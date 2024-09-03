@@ -4194,7 +4194,7 @@ init -995 python in mas_utils:
         if not filename.startswith("/"):
             filename = "/" + filename
 
-        filepath = renpy.config.basedir + filename
+        filepath = renpy.config.basedir if not renpy.android else "/storage/emulated/0/MAS" + filename
 
         try:
             return os.access(os.path.normcase(filepath), os.F_OK)
