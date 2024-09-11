@@ -39,6 +39,8 @@ python early:
     if renpy.android:
         android_toast("正在加载游戏文件...")
         gameSyncer.sync()
+        if gameSyncer.rpyc_deleted:
+            android_toast("有rpyc文件被删除, 请重新启动游戏")
 init python:
     import os
     def mkdir(path):

@@ -10,6 +10,7 @@ class FileSynchronizer:
         self.src_path = src_path
         self.dst_path = dst_path
         self.whitelist = {}
+        self.rpyc_deleted = False
     
     def add_to_whitelist(self, file_name, enable_override=False):
         """
@@ -97,6 +98,8 @@ class FileSynchronizer:
                 for item in rpy_file:
                     if item in file:
                         continue
+                    else:
+                        self.rpyc_deleted = True
                 dst_file = os.path.join(root, file)
                 src_file = os.path.join(src_root, file)
                 if not os.path.exists(src_file) and file not in self.whitelist:
