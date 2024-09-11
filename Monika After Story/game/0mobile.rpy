@@ -161,6 +161,7 @@ init python:
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/finale_clothes_tanktop.json", "wb").write(renpy.file("finale_clothes_tanktop.json").read())
         extract_file("mod_assets/games/piano/songs/happybirthday.json")
         extract_file("mod_assets/games/piano/songs/yourreality.json")
+        extract_file("mod_assets/games/chess/stockfish-8-arm64-v8a")
         
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/briaryoung_acs_front_bow_black.json", "wb").write(renpy.file("briaryoung_acs_front_bow_black.json").read())
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/briaryoung_clothes_shuchiin_academy_uniform.json", "wb").write(renpy.file("briaryoung_clothes_shuchiin_academy_uniform.json").read())

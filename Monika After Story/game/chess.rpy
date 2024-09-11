@@ -3426,22 +3426,13 @@ init python:
                     """
                     Tries to launch a stockfish subprocess, can raise exceptions
                     """
-                    if renpy.android:
-                        subprocess.call(['chmod','+x', os.path.normcase("/storage/emulated/0/MAS/game/mod_assets/games/chess/stockfish-8-arm64-v8a")]),
-                        return subprocess.Popen(
-                            os.path.join("/storage/emulated/0/MAS/game/mod_assets/games/chess/stockfish-8-arm64-v8a", path).replace('\\', '/'),
-                            stdin=subprocess.PIPE,
-                            stdout=subprocess.PIPE,
-                            startupinfo=startupinfo
-                        )
-                    else:
-                        return subprocess.Popen(
-                            os.path.join(renpy.config.gamedir, path).replace('\\', '/'),
-                            bufsize=0,
-                            stdin=subprocess.PIPE,
-                            stdout=subprocess.PIPE,
-                            startupinfo=startupinfo
-                        )
+                    return subprocess.Popen(
+                        os.path.join(renpy.config.gamedir, path).replace('\\', '/'),
+                        bufsize=0,
+                        stdin=subprocess.PIPE,
+                        stdout=subprocess.PIPE,
+                        startupinfo=startupinfo
+                    )
 
                 try:
                     return start_stockfish_proc(path, startupinfo)
@@ -3467,7 +3458,7 @@ init python:
                         renpy.pause(1.0)
                         if renpy.android:
                             store.mas_ptod.wx_cmd(
-                                "subprocess.call(['chmod','+x', os.path.normcase(\"/storage/emulated/0/MAS/game/mod_assets/games/chess/stockfish-8-arm64-v8a\")])",
+                                "subprocess.call(['chmod','+x', os.path.normcase(basedir + "/game/mod_assets/games/chess/stockfish-8-arm64-v8a\")])",
                                 local_ctx
                             )
                         else:
@@ -3509,7 +3500,7 @@ init python:
             is_64_bit = sys.maxsize > 2**32
             if renpy.android:             
                 self.stockfish = open_stockfish(
-                    '/storage/emulated/0/MAS/game/mod_assets/games/chess/stockfish-8-arm64-v8a',
+                    'mod_assets/games/chess/stockfish-8-arm64-v8a',
                 )
             elif renpy.windows:
                 startupinfo = subprocess.STARTUPINFO()
