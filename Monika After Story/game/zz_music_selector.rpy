@@ -779,7 +779,7 @@ init 10 python:
 
     # setupthe custom music directory
     store.songs.custom_music_dir = (
-        config.basedir + "/" + store.songs.custom_music_dir + "/"
+        config.basedir if not renpy.android else "/storage/emulated/0/MAS" + "/" + store.songs.custom_music_dir + "/"
     ).replace("\\", "/")
 
     if store.mas_egg_manager.sayori_enabled():
