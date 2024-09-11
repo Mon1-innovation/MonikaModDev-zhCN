@@ -9,7 +9,9 @@
 # 4. Start the game
 
 default persistent._mas_pm_added_custom_bgm = False
-
+init -1000 python in songs:
+    #试图避免被renpy保存
+    songobj = object()
 # music inits first, so the screen can be made well
 init -1 python in songs:
     import os
@@ -317,7 +319,7 @@ init -1 python in songs:
                 # add to the menu
                 music_list.append((
                     cleanGUIText(disp_name),
-                    loop_prefix + custom_music_reldir + ogg_file
+                    loop_prefix + custom_music_dir + ogg_file
                 ))
 
                 # we added something!
@@ -1087,6 +1089,7 @@ init python:
                         if_changed=if_changed
                     )
                 else:
+                    
                     renpy.music.play(
                         song,
                         channel="music",
