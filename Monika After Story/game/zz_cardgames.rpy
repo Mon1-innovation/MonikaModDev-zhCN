@@ -2634,7 +2634,7 @@ init 5 python in mas_nou:
                     total_to_shuffle = total_cards / 2
 
                 # make a list of ids we'll shuffle
-                for i in range(total_to_shuffle):
+                for i in range(int(total_to_shuffle)):
                     id = renpy.random.choice(all_ids)
                     # remove from the available ids list so we don't use it twice
                     all_ids.remove(id)
