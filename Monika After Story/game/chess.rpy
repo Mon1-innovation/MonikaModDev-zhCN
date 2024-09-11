@@ -3422,7 +3422,7 @@ init python:
                     path - filepath to the stockfish application
                     startupinfo - startup flags
                 """
-                def start_stockfish_proc(path: str, startupinfo: subprocess.STARTUPINFO) -> subprocess.Popen:
+                def start_stockfish_proc(path: str, startupinfo) -> subprocess.Popen:
                     """
                     Tries to launch a stockfish subprocess, can raise exceptions
                     """
@@ -3458,7 +3458,7 @@ init python:
                         renpy.pause(1.0)
                         if renpy.android:
                             store.mas_ptod.wx_cmd(
-                                "subprocess.call(['chmod','+x', os.path.normcase(basedir + "/game/mod_assets/games/chess/stockfish-8-arm64-v8a\")])",
+                                "subprocess.call(['chmod','+x', os.path.normcase(basedir + '/game/mod_assets/games/chess/stockfish-8-arm64-v8a')])",
                                 local_ctx
                             )
                         else:
@@ -3500,7 +3500,7 @@ init python:
             is_64_bit = sys.maxsize > 2**32
             if renpy.android:             
                 self.stockfish = open_stockfish(
-                    'mod_assets/games/chess/stockfish-8-arm64-v8a',
+                    'mod_assets/games/chess/stockfish-8-arm64-v8a'
                 )
             elif renpy.windows:
                 startupinfo = subprocess.STARTUPINFO()
