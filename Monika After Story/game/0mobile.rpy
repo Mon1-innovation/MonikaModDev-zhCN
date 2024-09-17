@@ -1,4 +1,5 @@
 python early:    
+    ANDROID_MASBASE = "/storage/emulated/0/MAS/"
     def android_toast(message):
         print("android_toast：", message)
         if not renpy.android:

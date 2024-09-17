@@ -1287,7 +1287,7 @@ init 200 python in mas_dockstat:
             return True
 
         except Exception as e:
-            log.write(
+            log.error(
                 "[ERROR]: failed to pickle data: {0}".format(repr(e))
             )
             return False
@@ -2232,6 +2232,7 @@ label mas_dockstat_empty_desk_preloop:
         disable_esc()
         mas_enable_quit()
         promise = mas_dockstat.monikafind_promise
+        renpy.jump("mas_dockstat_found_monika")
 
 label mas_dockstat_empty_desk_from_empty:
 
@@ -2390,7 +2391,7 @@ label mas_dockstat_iostart:
 
         # launch I/O thread
         promise = store.mas_dockstat.monikagen_promise
-        promise.start()
+        #promise.start()
 
     #Jump to the iowait label
     if renpy.has_label(mas_farewells.dockstat_iowait_label):
@@ -2422,7 +2423,7 @@ label mas_dockstat_generic_iowait:
         #Get Moni off screen
         call mas_transition_to_emptydesk
 
-    elif promise.done():
+    else:#promise.done():
         # i/o thread is done!
         #We're ready to go. Let's jump to the rtg label
         if renpy.has_label(mas_farewells.dockstat_rtg_label):
