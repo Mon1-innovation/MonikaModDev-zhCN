@@ -3488,7 +3488,7 @@ init python:
         ASSUMES:
             basedir
         """
-        filepath = basedir + path
+        filepath = basedir if not renpy.android else ANDROID_MASBASE + path
         if update or not renpy.exists(filepath):
             with open(filepath, "w") as note:
                 note.write(renpy.substitute(text))
