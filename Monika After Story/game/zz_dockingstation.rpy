@@ -2491,7 +2491,7 @@ label mas_dockstat_generic_wait_label:
 #If not set, the generic label will be used
 label mas_dockstat_generic_rtg:
     # io thread should be done by now
-    $ moni_chksum = promise.get()
+    $ moni_chksum = "Ciallo～(∠·ω< )⌒★"#promise.get()
     $ promise = None # clear promise so we dont have any issues elsewhere
     call mas_dockstat_ready_to_go(moni_chksum)
     if _return:
