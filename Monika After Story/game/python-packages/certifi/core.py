@@ -142,7 +142,7 @@ def _check_update(pkg_parent_path):
     """
     # the imports are here since we may not have ssl on start
     import ssl
-    import httplib
+    from http import client as httplib
 
     h_conn = httplib.HTTPSConnection(__CERT_URL)
 
@@ -164,7 +164,9 @@ def _check_update(pkg_parent_path):
             new_cert_hash = hashlib.sha256(cert_data)
 
             with open(where(pkg_parent_path), "r") as curr_cert:
-                curr_cert_hash = hashlib.sha256(curr_cert.read())
+                curr_cert_content = curr_cert.read()
+                # Ensure the content is encoded to bytes
+                curr_cert_hash = hashlib.sha256(curr_cert_content.encode('utf-8'))
 
                 if new_cert_hash.hexdigest() == curr_cert_hash.hexdigest():
                     # current file is exact same so no need to save
@@ -172,10 +174,12 @@ def _check_update(pkg_parent_path):
 
         # save the cert to our location
         with open(where(pkg_parent_path), "w") as new_cert:
-            new_cert.write(cert_data)
+            new_cert.write(cert_data.decode('utf-8'))
 
         return RV_SUCCESS, None
-
+    except ssl.SSLCertVerificationError:
+        raise
+        return RV_ERR, "ssl.SSLCertVerificationError(not planing to fix)"
     except IOError as e:
         # error writing.
         return RV_ERR_CERT_WRITE, e
