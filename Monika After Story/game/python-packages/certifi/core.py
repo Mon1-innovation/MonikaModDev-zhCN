@@ -178,7 +178,6 @@ def _check_update(pkg_parent_path):
 
         return RV_SUCCESS, None
     except ssl.SSLCertVerificationError:
-        raise
         return RV_ERR, "ssl.SSLCertVerificationError(not planing to fix)"
     except IOError as e:
         # error writing.

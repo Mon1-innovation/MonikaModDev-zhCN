@@ -115,3 +115,5 @@ class FileSynchronizer:
 
 gameSyncer = FileSynchronizer("/storage/emulated/0/MAS/game", "/data/user/0/and.sirp.masmobile/files/game")
 gameSyncer.add_to_whitelist("masrun")
+gameSyncer.add_to_whitelist("cacert.pem")
+

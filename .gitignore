@@ -33,7 +33,7 @@ log
 zzzz*
 
 # Build
-cacert.pem
+#cacert.pem
 
 # 运行文件
 Monika After Story/COPYRIGHT.txt
