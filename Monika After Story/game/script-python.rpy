@@ -1547,7 +1547,7 @@ screen mas_py_console_teaching():
             # current line
             if len(store.mas_ptod.cn_line) > 0:
                 text "[store.mas_ptod.cn_line]":
-                    style "mas_py_console_text_cn"
+                    style "mas_py_console_text"
                     anchor (0, 1.0)
                     xpos cn_l_x
                     ypos 433
