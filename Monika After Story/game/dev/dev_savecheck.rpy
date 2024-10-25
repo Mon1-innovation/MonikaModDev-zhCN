@@ -14,11 +14,11 @@ init 5 python:
         )
     )
 
-label dev_monika_affection_check:
+label dev_save_check:
     python:
         res = store.start_persistent_check(persistent)
-        if len(res > 0):
-            renpy.say("You Persistent maybe have a problem/存档保存存在问题, 请查看mas.log")
+        if len(res) > 0:
+            renpy.say(m, "You Persistent maybe have a problem/存档保存存在问题, 请查看mas.log")
         else:
-            renpy.say("No problems found/无问题")
+            renpy.say(m, "No problems found/无问题")
 

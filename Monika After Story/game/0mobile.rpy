@@ -191,15 +191,15 @@ init python:
         problems = []
         def test_save(per):
             from renpy.compat.pickle import dump, dumps, loads
-            data = dumps(renpy.game.per)
+            data = dumps(per)
 
 
-        per2 = renpy.renpy.Persistent()
+        per2 = renpy.persistent.Persistent()
         for k, v in per.__dict__.items():
             try:
                 per2.__dict__[k] = v
                 test_save(per2)
-                store.mas_utils.mas_log.info(f"Persistent check : {k}")
+                store.mas_utils.mas_log.info(f"Persistent check : {k} succeeded")
             except Exception as e:
                 store.mas_utils.mas_log.error(f"Persistent check : {k} failed, {e}")
                 if k in per2.__dict__:
