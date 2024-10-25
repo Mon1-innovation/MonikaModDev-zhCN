@@ -177,3 +177,40 @@ init python:
 
     def spread_readme():
         open("/storage/emulated/0/MAS/characters/Readme.txt", "wb").write(renpy.file("Readme.txt").read())
+
+    import os
+    default_per = "D:\MAS\MAS-PE-Remake\game\saves\persistent"
+    import_per = "D:\MAS\MAS-PE-Remake\game\saves\persistent.bak"
+    
+
+
+    
+    
+
+    def start_persistent_check(per = None):
+        problems = []
+        def test_save(per):
+            from renpy.compat.pickle import dump, dumps, loads
+            data = dumps(renpy.game.per)
+
+
+        per2 = renpy.renpy.Persistent()
+        for k, v in per.__dict__.items():
+            try:
+                per2.__dict__[k] = v
+                test_save(per2)
+                store.mas_utils.mas_log.info(f"Persistent check : {k}")
+            except Exception as e:
+                store.mas_utils.mas_log.error(f"Persistent check : {k} failed, {e}")
+                if k in per2.__dict__:
+                    del per2.__dict__[k]
+                    problems.append(k)
+        
+        if len(problems) > 0:
+            store.mas_utils.mas_log.error(f"Persistent check found errors on keys : {problems}")
+            renpy.notify("Persistent Error Key List:\n {}".format(problems))
+        else:
+            renpy.notify("Persistent Check Successful")
+        return problems
+                
+            
