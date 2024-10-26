@@ -187,7 +187,7 @@ init python:
     
     
 
-    def start_persistent_check(per = None):
+    def start_persistent_check(per:renpy.persistent.Persistent):
         problems = []
         def test_save(per):
             from renpy.compat.pickle import dump, dumps, loads
