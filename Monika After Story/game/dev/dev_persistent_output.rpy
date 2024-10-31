@@ -17,7 +17,7 @@ label dev_persistent_in_output:
         "导入":
             $ exist = os.path.exists(os.path.join(ANDROID_MASBASE,"characters", "persistent"))
             if not exist:
-                m "你还没有存档哦~, 先把存档放在[os.path.join(ANDROID_MASBASE,"characters", "persistent")]吧."
+                m "你还没有存档哦~, 先把存档放在[os.path.join(ANDROID_MASBASE, 'characters', 'persistent')]吧."
                 return
             python:
                 renpy.persistent.load(os.path.join(ANDROID_MASBASE,"characters", "persistent"))
