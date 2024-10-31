@@ -29,7 +29,7 @@ init -900 python in mas_ics:
     #################################### O31 ##################################
     # cg folder
     o31_cg_folder = os.path.normcase(
-        renpy.config.basedir if not renpy.android else "/storage/emulated/0/MAS"+ "/game/mod_assets/monika/cg/"
+        renpy.config.basedir + "/game/mod_assets/monika/cg/"
     ) 
 
     # marisa cg
