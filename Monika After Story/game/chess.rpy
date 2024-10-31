@@ -952,7 +952,7 @@ label mas_chess_remenu:
         return
 
     #We're changing the main group of settings we wish to change
-    elif _return in menu_contents.keys():
+    elif _return in list(menu_contents.keys()):
         $ _history_list.pop()
         $ menu_category = _return
 

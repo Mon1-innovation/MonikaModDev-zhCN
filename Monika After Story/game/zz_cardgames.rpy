@@ -5380,11 +5380,11 @@ init -10 python in mas_cardgames:
         # Fill the map with the sprites (or use the def as a fallback)
         fb = sprites_map.get(store.mas_background.MBG_DEF)
         if renpy.android:
-            for bg_id in store.mas_background.BACKGROUND_MAP.keys(): 
+            for bg_id in list(store.mas_background.BACKGROUND_MAP.keys()):
                 DESK_SPRITES_MAP[bg_id] = MASFilterSwitch(DESK_SPRITES_PATH + "spaceroom.png")
             DESK_SPRITES_MAP['spaceroom'] = MASFilterSwitch(DESK_SPRITES_PATH + "spaceroom.png")
             return
-        for bg_id in store.mas_background.BACKGROUND_MAP.keys():
+        for bg_id in list(store.mas_background.BACKGROUND_MAP.keys()):
             if bg_id not in DESK_SPRITES_MAP:
                 filename = sprites_map.get(bg_id, fb)
                 DESK_SPRITES_MAP[bg_id] = MASFilterSwitch(DESK_SPRITES_PATH + filename)

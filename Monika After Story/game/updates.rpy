@@ -1227,7 +1227,7 @@ label v0_11_3(version="v0_11_3"):
             persistent._mas_pool_unlocks += store.mas_xp.level() * 4
 
         #Adjust consumables to be at their max stock amount
-        for consumable_id in persistent._mas_consumable_map.keys():
+        for consumable_id in list(persistent._mas_consumable_map.keys()):
             cons = mas_getConsumable(consumable_id)
 
             if cons and cons.getStock() > cons.max_stock_amount:
@@ -1462,7 +1462,7 @@ label v0_11_1(version="v0_11_1"):
 label v0_11_0(version="v0_11_0"):
     python:
         #First, we're fixing the consumables map
-        for cons_id in persistent._mas_consumable_map.keys():
+        for cons_id in list(persistent._mas_consumable_map.keys()):
             persistent._mas_consumable_map[cons_id]["has_restock_warned"] = False
 
         #Let's stock current users on some consumables (assuming they've gifted before)

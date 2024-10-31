@@ -645,7 +645,7 @@ init python in mas_bookmarks_derand:
                 - label_prefix if test_string starts with a prefix in list_prefixes
                 - empty string otherwise
         """
-        list_prefixes = label_prefix_map.keys()
+        list_prefixes = list(label_prefix_map.keys())
 
         for label_prefix in list_prefixes:
             if test_str.startswith(label_prefix):
@@ -755,7 +755,7 @@ label mas_rerandom:
 
     show monika at t11
     python:
-        for ev_label in topics_to_rerandom.keys():
+        for ev_label in list(topics_to_rerandom.keys()):
             #Get the ev
             rerand_ev = mas_getEV(ev_label)
 
