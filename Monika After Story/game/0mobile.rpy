@@ -63,6 +63,11 @@ init python:
         # 写入文件
         with open(target_path, "wb") as f:
             f.write(renpy.file(file).read())
+
+    def firstrun_spread():
+        spread_json()
+        android_toast("数据文件已安装, 推荐重启游戏再游玩")
+
     def spread_json():
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/anonymioo_acs_ribbon_bisexualpride.json", "wb").write(renpy.file("anonymioo_acs_ribbon_bisexualpride.json").read())
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/anonymioo_acs_ribbon_blackandwhite.json", "wb").write(renpy.file("anonymioo_acs_ribbon_blackandwhite.json").read())
@@ -166,6 +171,7 @@ init python:
         extract_file("mod_assets/games/piano/songs/yourreality.json")
         extract_file("mod_assets/games/chess/stockfish-8-arm64-v8a")
         extract_file("python-packages/certifi/cacert.pem")
+        extract_file("audio.rpa")
         
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/briaryoung_acs_front_bow_black.json", "wb").write(renpy.file("briaryoung_acs_front_bow_black.json").read())
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/briaryoung_clothes_shuchiin_academy_uniform.json", "wb").write(renpy.file("briaryoung_clothes_shuchiin_academy_uniform.json").read())
@@ -173,6 +179,7 @@ init python:
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/finale_clothes_sweatervest_blue.json", "wb").write(renpy.file("finale_clothes_sweatervest_blue.json").read())
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/finale_clothes_turtleneck_sweater_beige.json", "wb").write(renpy.file("finale_clothes_turtleneck_sweater_beige.json").read())
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/multimokia_clothes_wine_asymmetrical_pullover.json", "wb").write(renpy.file("multimokia_clothes_wine_asymmetrical_pullover.json").read())
+        gameSyncer.sync()
 
 
     def spread_readme():

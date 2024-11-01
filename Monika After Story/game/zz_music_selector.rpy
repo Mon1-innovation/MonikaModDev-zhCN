@@ -1089,7 +1089,6 @@ init python:
                         if_changed=if_changed
                     )
                 else:
-                    
                     renpy.music.play(
                         song,
                         channel="music",

@@ -161,7 +161,6 @@ image warning:
 image tos = "bg/warning.png"
 image tos2 = "bg/warning2.png"
 
-
 label splashscreen:
     python:
         _mas_AffStartup()
@@ -195,7 +194,7 @@ label splashscreen:
         menu:
             "By playing [config.name] you agree that you have completed Doki Doki Literature Club and accept any spoilers contained within."
             "I agree.":
-                pass
+                $ firstrun_spread()
         scene tos2
         with Dissolve(1.5)
         pause 1.0
