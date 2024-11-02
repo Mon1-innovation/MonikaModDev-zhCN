@@ -1064,13 +1064,13 @@ init -10 python in mas_selspr:
             # we want to remove what is excess from the desired map
             if use_old:
                 old_map_view = list(old_map.keys())
-                remove_keys = new_map_view - old_map_view
+                remove_keys = [item for item in new_map_view if item not in old_map_view]
                 remove_map = new_map
                 add_map = old_map
 
             else:
                 old_map_view = list(prev_map.keys())
-                remove_keys = old_map_view - new_map_view
+                remove_keys = [item for item in old_map_view if item not in new_map_view]
                 remove_map = prev_map
                 add_map = new_map
 
