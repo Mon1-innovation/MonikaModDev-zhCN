@@ -39,11 +39,16 @@ python early:
     req_perm()
     if renpy.android:
         android_toast("正在加载游戏文件...")
-        gameSyncer.sync()
-        if gameSyncer.rpyc_deleted:
-            android_toast("有rpyc文件被删除, 请重新启动游戏")
+        restart = gameSyncer.sync()
+        if gameSyncer.restart_required:
+            android_toast("检测到文件修改, 正在重载脚本")
 init python:
     import os
+    @store.mas_submod_utils.functionplugin("ch30_preloop", priority=-10000)
+    def _gamesync_restartcheck():
+        if gameSyncer.restart_required:
+            renpy.full_restart()
+            renpy.reload_script()
     def mkdir(path):
         if not os.path.exists(path):
             os.makedirs(path)

@@ -10,8 +10,21 @@ class FileSynchronizer:
         self.src_path = src_path
         self.dst_path = dst_path
         self.whitelist = {}
-        self.rpyc_deleted = False
+        self.blacklist_fileext = [".rpyc"]
+        self.restart_required = False
+        self.important_fileext = [".rpy", ".rpa"]
+    def is_important_file(self, filename):
+        # Extract the file extension
+        _, ext = os.path.splitext(filename)
+        # Check if the extension is in the list of important extensions
+        return ext in self.important_fileext
     
+    def is_blacklisted(self, filename):
+        # Extract the file extension
+        _, ext = os.path.splitext(filename)
+        # Check if the extension is in the blacklist
+        return ext in self.blacklist_fileext
+
     def add_to_whitelist(self, file_name, enable_override=False):
         """
         将文件添加到白名单中。
@@ -64,13 +77,13 @@ class FileSynchronizer:
             无
         
         Returns:
-            无
+            是否有文件被更改
         
         """
         rpy_file = []
         # Sync from source to destination
         for root, dirs, files in os.walk(self.src_path):
-            print(f"Syncing {root}/{dirs}/{files} to {self.dst_path}...")
+            print(f"Syncing {root}/{dirs} to {self.dst_path}...")
             relative_path = os.path.relpath(root, self.src_path)
             dst_root = os.path.join(self.dst_path, relative_path)
             
@@ -85,6 +98,13 @@ class FileSynchronizer:
                 src_file = os.path.join(root, file)
                 dst_file = os.path.join(dst_root, file)
                 if not self.whitelist.get(file, False):
+                    if self.is_blacklisted(src_file):
+                        continue
+                    if self.is_important_file(src_file):
+                        if not os.path.exists(dst_file):
+                            self.restart_required = True
+                        elif not self.files_are_same(src_file, dst_file):
+                            self.restart_required = True
                     shutil.copy2(src_file, dst_file)
                     
         # Remove files and directories from destination that are not in source
@@ -97,13 +117,13 @@ class FileSynchronizer:
                 # 如果找到rpyc对应的rpy
                 for item in rpy_file:
                     if item in file:
-                        continue
-                    else:
-                        self.rpyc_deleted = True
+                        continue # 跳过这个rpyc
                 dst_file = os.path.join(root, file)
                 src_file = os.path.join(src_root, file)
                 if not os.path.exists(src_file) and file not in self.whitelist:
                     os.remove(dst_file)
+                    if '.rpa' in dst_file or '.rpyc' in dst_file:
+                        self.restart_required = True
             
             # Remove empty directories not present in source
             for dir in dirs:
@@ -111,6 +131,8 @@ class FileSynchronizer:
                 src_dir = os.path.join(src_root, dir)
                 if not os.path.exists(src_dir):
                     shutil.rmtree(dst_dir)
+        return self.restart_required
+
 
 
 gameSyncer = FileSynchronizer("/storage/emulated/0/MAS/game", "/data/user/0/and.sirp.masmobile/files/game")
