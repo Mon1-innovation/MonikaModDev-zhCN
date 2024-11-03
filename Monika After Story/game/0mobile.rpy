@@ -40,6 +40,8 @@ python early:
     if renpy.android:
         android_toast("正在加载游戏文件...")
         restart = gameSyncer.sync()
+        if gameSyncer.rpy_deleted:
+            android_toast("有rpyc被删除, 可能需要手动重启")
         if gameSyncer.restart_required:
             android_toast("检测到文件修改, 正在重载脚本")
 init python:

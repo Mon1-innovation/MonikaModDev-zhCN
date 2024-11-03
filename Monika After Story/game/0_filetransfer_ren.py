@@ -12,7 +12,8 @@ class FileSynchronizer:
         self.whitelist = {}
         self.blacklist_fileext = [".rpyc"]
         self.restart_required = False
-        self.important_fileext = [".rpy", ".rpa"]
+        self.rpy_deleted = False
+        self.important_fileext = [".rpy", ".rpa", ".rpyc"]
     def is_important_file(self, filename):
         # Extract the file extension
         _, ext = os.path.splitext(filename)
@@ -95,6 +96,7 @@ class FileSynchronizer:
             for file in files:
                 if ".rpy" in file:
                     rpy_file.append(os.path.join(root, file))
+                    print(f"rpy_file added {file}")
                 src_file = os.path.join(root, file)
                 dst_file = os.path.join(dst_root, file)
                 if not self.whitelist.get(file, False):
@@ -102,29 +104,44 @@ class FileSynchronizer:
                         continue
                     if self.is_important_file(src_file):
                         if not os.path.exists(dst_file):
+                            print(f"Important file added: {src_file}")
                             self.restart_required = True
                         elif not self.files_are_same(src_file, dst_file):
+                            print(f"Important file changed: {src_file}")
                             self.restart_required = True
                     shutil.copy2(src_file, dst_file)
                     
-        # Remove files and directories from destination that are not in source
         for root, dirs, files in os.walk(self.dst_path):
             relative_path = os.path.relpath(root, self.dst_path)
-            src_root = os.path.join(self.src_path, relative_path)
+            src_root = os.path.join(self.src_path, relative_path.replace("/./", "/"))
             
             # Remove files not present in source
             for file in files:
-                # 如果找到rpyc对应的rpy
-                for item in rpy_file:
-                    if item in file:
-                        continue # 跳过这个rpyc
                 dst_file = os.path.join(root, file)
                 src_file = os.path.join(src_root, file)
-                if not os.path.exists(src_file) and file not in self.whitelist:
+                if not os.path.exists(src_file):
+                    print(f"File not found in source: {dst_file}")
+                
+                # Check if file should be skipped due to rpyc and rpy logic
+                should_skip = False
+                for item in rpy_file:
+                    if item in file:
+                        should_skip = True
+                        print(f"Skipping {file} due to match with {item}")
+                        break
+                
+                # If should_skip is True, continue to the next file
+                if should_skip:
+                    continue
+
+                # Check if the source file doesn't exist and if it's not whitelisted
+                if not os.path.exists(src_file) and not file in self.whitelist:
                     os.remove(dst_file)
-                    if '.rpa' in dst_file or '.rpyc' in dst_file:
+                    print(f"Removed file: {dst_file}")
+                    if self.is_important_file(dst_file):
                         self.restart_required = True
-            
+                        self.rpy_deleted = True
+                        print(f"Important file removed: {dst_file}")            
             # Remove empty directories not present in source
             for dir in dirs:
                 dst_dir = os.path.join(root, dir)
