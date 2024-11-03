@@ -130,6 +130,8 @@ init python in mas_windowutils:
 
     else:
         store.mas_windowreacts.can_do_windowreacts = False
+        store.mas_windowreacts.can_show_notifs = False
+
 
 
     #Fallback Const Defintion
