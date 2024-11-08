@@ -6305,7 +6305,7 @@ init -10 python in mas_cardgames:
                 card.stack.cards.remove(card)
 
             card.stack = self
-            self.cards.insert(index, card)
+            self.cards.insert(int(index), card)
 
             self.table.stacks.remove(self)
             self.table.stacks.append(self)
