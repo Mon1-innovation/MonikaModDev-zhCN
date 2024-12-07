@@ -210,12 +210,13 @@ label splashscreen:
 
 #    $ basedir = config.basedir.replace('\\', '/')
 #   NOTE: this keeps screwing with my syntax coloring
-    python:
-        basedir = config.basedir.replace("\\", "/")
-
-        # dump verseion to a firstrun-style file
-        with open(basedir + "/game/masrun", "w") as versfile:
-            versfile.write(config.name + "|" + config.version + "\n")
+#    python:
+#        basedir = config.basedir.replace("\\", "/")
+#
+#        # dump verseion to a firstrun-style file
+#        with open(basedir + "/game/masrun", "w") as versfile:
+#            versfile.write(config.name + "|" + config.version + "\n")
+        
 
 
     #Check for game updates before loading the game or the splash screen
