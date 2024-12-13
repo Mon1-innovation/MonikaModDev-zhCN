@@ -125,9 +125,9 @@ class FileSynchronizer:
                 # Check if file should be skipped due to rpyc and rpy logic
                 should_skip = False
                 for item in rpy_file:
-                    if item in file:
+                    if item in dst_file:
                         should_skip = True
-                        print(f"Skipping {file} due to match with {item}")
+                        print(f"Skipping '{dst_file}' because find source file '{item}'")
                         break
                 
                 # If should_skip is True, continue to the next file
@@ -136,12 +136,15 @@ class FileSynchronizer:
 
                 # Check if the source file doesn't exist and if it's not whitelisted
                 if not os.path.exists(src_file) and not file in self.whitelist:
-                    os.remove(dst_file)
-                    print(f"Removed file: {dst_file}")
                     if self.is_important_file(dst_file):
                         self.restart_required = True
                         self.rpy_deleted = True
-                        print(f"Important file removed: {dst_file}")            
+                        print(f"Important file removed: {dst_file}")    
+                    else:
+                        print(f"Removed file: {dst_file}")   
+                    os.remove(dst_file)
+                    
+     
             # Remove empty directories not present in source
             for dir in dirs:
                 dst_dir = os.path.join(root, dir)
