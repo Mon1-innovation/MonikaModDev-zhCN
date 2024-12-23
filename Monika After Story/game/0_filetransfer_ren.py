@@ -4,7 +4,7 @@ python early:
 import os
 import shutil
 import hashlib
-
+import time
 class FileSynchronizer:
     def __init__(self, src_path, dst_path):
         self.src_path = os.path.normpath(src_path)
@@ -81,6 +81,7 @@ class FileSynchronizer:
             是否有文件被更改
         
         """
+        start_time = time.time()
         rpy_file = []
         # Sync from source to destination
         for root, dirs, files in os.walk(self.src_path):
@@ -159,7 +160,7 @@ class FileSynchronizer:
                 src_dir = os.path.join(src_root, dir)
                 if not os.path.exists(src_dir):
                     shutil.rmtree(dst_dir)
-        print("Sync complete. {}".format('Restart required.' if self.restart_required else "No restart needed."))
+        print("Sync complete in {}s. {}".format(time.time() - start_time ,'Restart required.' if self.restart_required else "No restart needed."))
         return self.restart_required
 
 
