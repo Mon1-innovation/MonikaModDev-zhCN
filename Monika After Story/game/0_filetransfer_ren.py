@@ -7,8 +7,8 @@ import hashlib
 
 class FileSynchronizer:
     def __init__(self, src_path, dst_path):
-        self.src_path = src_path
-        self.dst_path = dst_path
+        self.src_path = os.path.normpath(src_path)
+        self.dst_path = os.path.normpath(dst_path)
         self.whitelist = {}
         self.blacklist_fileext = [".rpyc"]
         self.restart_required = False
@@ -94,14 +94,22 @@ class FileSynchronizer:
             
             # Copy files from source to destination and overwrite existing files
             for file in files:
+                if ".rpyc" in file:
+                    print(f"rpyc file: {os.path.join(root, file)}")
                 if ".rpy" in file:
-                    rpy_file.append(os.path.join(root, file))
-                    print(f"rpy_file added {file}")
+                    res = os.path.join(root, file)[len(self.src_path):]
+                    #if ".rpyc" in file:
+                    #    res = res[:-1]
+                    rpy_file.append(res)
+                    print(f"rpy_file added {res}")
                 src_file = os.path.join(root, file)
                 dst_file = os.path.join(dst_root, file)
                 if not self.whitelist.get(file, False):
                     if self.is_blacklisted(src_file):
-                        continue
+                        # 仅在源码存在的情况下忽略rpyc
+                        if os.path.exists(src_file[:-1]) and ".rpyc" in src_file:
+                            print(f"Skipping blacklisted file: {src_file}")
+                            continue
                     if self.is_important_file(src_file):
                         if not os.path.exists(dst_file):
                             print(f"Important file added: {src_file}")
@@ -151,6 +159,7 @@ class FileSynchronizer:
                 src_dir = os.path.join(src_root, dir)
                 if not os.path.exists(src_dir):
                     shutil.rmtree(dst_dir)
+        print("Sync complete. {}".format('Restart required.' if self.restart_required else "No restart needed."))
         return self.restart_required
 
 
