@@ -15,6 +15,7 @@ python early:
     renpy.config.developer = p_debug
     renpy.config.debug = p_debug
     renpy.config.console = p_debug
+    renpy.config.save_on_mobile_background = False
     p_perms = [
         "android.permission.INTERNET",# 开启联网权限 用于备份
         "android.permission.WRITE_EXTERNAL_STORAGE", # 读写权限
