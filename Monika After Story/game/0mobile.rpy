@@ -240,7 +240,7 @@ init 5 python:
         )
     )            
 label p_outper:
-    "正在导出存档"
+    "即将导出存档"
     "注意：只导出自动备份的文件（.bak）文件"
     python:
         import shutil
