@@ -286,7 +286,8 @@ init -2000 python:
             store.persistent = load_persistent(os.path.join(ANDROID_MASBASE, 'saves', 'persistent'))
             os.remove(os.path.join(ANDROID_MASBASE, 'saves', 'persistent'))
         except Exception as e:
+            import time
             android_toast("导入存档失败")
             store.mas_per_check.early_log.error("Error while loading persistent data: {}".format(e))
-            os.rename(os.path.join(ANDROID_MASBASE, 'saves', 'persistent'), os.path.join(ANDROID_MASBASE, 'saves', 'persistent_bad'))
+            os.rename(os.path.join(ANDROID_MASBASE, 'saves', 'persistent'), os.path.join(ANDROID_MASBASE, 'saves', 'persistent_bad{}'.format(time.time())))
 
