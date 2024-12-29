@@ -229,3 +229,54 @@ init python:
         return problems
                 
             
+label p_outper:
+    "正在导出存档"
+    "注意：只导出自动备份的文件（.bak）文件"
+    python:
+        import shutil
+        import os
+
+        source_folder = renpy.config.savedir
+        destination_folder = os.path.join(ANDROID_MASBASE, 'saves')
+
+        # 如果目标文件夹不存在，则创建
+        if not os.path.exists(destination_folder):
+            os.makedirs(destination_folder)
+
+        for filename in os.listdir(source_folder):
+            if filename.endswith('.bak'):
+                shutil.copy2(os.path.join(source_folder, filename), destination_folder)
+
+    
+    "存档已导出至[destination_folder]"
+    "如需要重新导入, 请将persistent放置至[destination_folder]下并重启游戏"
+    return
+
+init -2000 python:
+    import store
+    def load_persistent(filename):
+        from renpy.compat.pickle import dump, dumps, loads
+        import zlib
+
+        if not os.path.exists(filename):
+            return None
+        try:
+            with open(filename, "rb") as f:
+                do = zlib.decompressobj()
+                s = do.decompress(f.read())
+
+        except Exception as e:
+            raise e
+        return loads(s)
+
+    import os
+    if os.path.exists(os.path.join(ANDROID_MASBASE, 'saves', 'persistent')):
+        try:
+            android_toast("导入存档成功")
+            store.persistent = load_persistent(os.path.join(ANDROID_MASBASE, 'saves', 'persistent'))
+            os.remove(os.path.join(ANDROID_MASBASE, 'saves', 'persistent'))
+        except Exception as e:
+            android_toast("导入存档失败")
+            store.mas_per_check.early_log.error("Error while loading persistent data: {}".format(e))
+            os.rename(os.path.join(ANDROID_MASBASE, 'saves', 'persistent'), os.path.join(ANDROID_MASBASE, 'saves', 'persistent_bad'))
+

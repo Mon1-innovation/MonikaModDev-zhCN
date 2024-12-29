@@ -13,6 +13,16 @@ init 5 python:
             unlocked=True
         )
     )
+    addEvent(
+        Event(
+            persistent.event_database,
+            eventlabel="p_outper",
+            category=["dev"],
+            prompt="PERSISTENT OUTPUT/存档导出",
+            pool=True,
+            unlocked=True
+        )
+    )
 
 label dev_save_check:
     m "嗯...是觉着存档有什么问题吧? 要不要我给你看一下?{nw}"
