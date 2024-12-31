@@ -2189,7 +2189,7 @@ screen name_input(message, ok_action):
                 style "confirm_prompt"
                 xalign 0.5
 
-            input default "" value VariableInputValue("player") length 12 allow "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+            input default "" value VariableInputValue("player") length 12
 
             hbox:
                 xalign 0.5
