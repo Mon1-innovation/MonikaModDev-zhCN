@@ -6193,7 +6193,7 @@ init 21 python:
         if mas_isMoniHappy(lower=True) or not persistent._mas_player_nicknames:
             return _default
 
-        nickname_pool = persistent._mas_player_nicknames + [player]
+        nickname_pool = list(persistent._mas_player_nicknames) + [player]
 
         #If we have some exclusions, we should factor them in
         if exclude_names:
