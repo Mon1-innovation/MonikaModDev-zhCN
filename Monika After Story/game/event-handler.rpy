@@ -2595,7 +2595,7 @@ init python:
         ASSUMES:
             persistent.event_list
         """
-        MASEventList.push(*args, **kwargs)
+        MASEventList.push(event_label, skipeval, notify)
 
 
     @store.mas_utils.deprecated(use_instead="MASEventList.queue")
