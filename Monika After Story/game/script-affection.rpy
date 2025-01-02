@@ -174,7 +174,7 @@ init -900 python in mas_affection:
         LOVE: 0.15
     }
 
-    __STRUCT = struct.Struct(__STRUCT_FMT)
+    __STRUCT = struct.Struct(str(__STRUCT_FMT))
 
     # compare functions for affection / group
     def _compareAff(aff_1, aff_2):
@@ -3488,7 +3488,7 @@ init python:
         ASSUMES:
             basedir
         """
-        filepath = basedir + path
+        filepath = basedir if not renpy.android else ANDROID_MASBASE + path
         if update or not renpy.exists(filepath):
             with open(filepath, "w") as note:
                 note.write(renpy.substitute(text))

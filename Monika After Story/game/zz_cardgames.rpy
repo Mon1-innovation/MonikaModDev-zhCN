@@ -29,7 +29,7 @@ init 5 python in mas_nou:
         Null
     )
     from store.mas_cardgames import *
-
+    import store
 
     ASSETS = "mod_assets/games/nou/"
 
@@ -651,10 +651,28 @@ init 5 python in mas_nou:
             """
             Resets sfx data
             """
-            cls.SFX_SHUFFLE = []
-            cls.SFX_MOVE = []
-            cls.SFX_DRAW = []
-            cls.SFX_PLAY = []
+            if not renpy.android:
+                cls.SFX_SHUFFLE = []
+                cls.SFX_MOVE = []
+                cls.SFX_DRAW = []
+                cls.SFX_PLAY = []
+            else:
+                cls.SFX_SHUFFLE = ['mod_assets/games/nou/sfx/shuffle_0.mp3']
+                cls.SFX_MOVE = ['mod_assets/games/nou/sfx/move_deck_0.mp3']
+                cls.SFX_DRAW = ['mod_assets/games/nou/sfx/slide_0.mp3',
+                    'mod_assets/games/nou/sfx/slide_1.mp3',
+                    'mod_assets/games/nou/sfx/slide_2.mp3',
+                    'mod_assets/games/nou/sfx/slide_3.mp3',
+                    'mod_assets/games/nou/sfx/slide_4.mp3',
+                    'mod_assets/games/nou/sfx/slide_5.mp3']
+                cls.SFX_PLAY = ['mod_assets/games/nou/sfx/shove_0.mp3',
+                    'mod_assets/games/nou/sfx/shove_1.mp3',
+                    'mod_assets/games/nou/sfx/shove_2.mp3',
+                    'mod_assets/games/nou/sfx/shove_3.mp3',
+                    'mod_assets/games/nou/sfx/place_0.mp3',
+                    'mod_assets/games/nou/sfx/place_1.mp3',
+                    'mod_assets/games/nou/sfx/place_2.mp3',
+                    'mod_assets/games/nou/sfx/place_3.mp3']
 
         @classmethod
         def _load_sfx(cls):
@@ -662,11 +680,14 @@ init 5 python in mas_nou:
             'Loads' sound assets from the disk
             This should be called on init, but after class creation
             """
-            nou_ma_dir = os.path.join(ASSETS, "sfx")
-            nou_sfx = os.listdir(os.path.join(config.gamedir, nou_ma_dir))
+            if not renpy.android:
+                nou_ma_dir = os.path.join(ASSETS, "sfx")
+                nou_sfx = os.listdir(os.path.join(config.gamedir, nou_ma_dir))
 
             cls._reset_sfx()
 
+            if renpy.android:
+                return
             name_to_sfx_list_map = {
                 "shuffle": cls.SFX_SHUFFLE,
                 "move": cls.SFX_MOVE,
@@ -674,7 +695,7 @@ init 5 python in mas_nou:
                 "place": cls.SFX_PLAY,
                 "shove": cls.SFX_PLAY
             }
-
+            
             for f in nou_sfx:
                 if not f.endswith(cls.SFX_EXT):
                     continue
@@ -2613,7 +2634,7 @@ init 5 python in mas_nou:
                     total_to_shuffle = total_cards / 2
 
                 # make a list of ids we'll shuffle
-                for i in range(total_to_shuffle):
+                for i in range(int(total_to_shuffle)):
                     id = renpy.random.choice(all_ids)
                     # remove from the available ids list so we don't use it twice
                     all_ids.remove(id)
@@ -5358,7 +5379,12 @@ init -10 python in mas_cardgames:
 
         # Fill the map with the sprites (or use the def as a fallback)
         fb = sprites_map.get(store.mas_background.MBG_DEF)
-        for bg_id in store.mas_background.BACKGROUND_MAP.keys():
+        if renpy.android:
+            for bg_id in list(store.mas_background.BACKGROUND_MAP.keys()):
+                DESK_SPRITES_MAP[bg_id] = MASFilterSwitch(DESK_SPRITES_PATH + "spaceroom.png")
+            DESK_SPRITES_MAP['spaceroom'] = MASFilterSwitch(DESK_SPRITES_PATH + "spaceroom.png")
+            return
+        for bg_id in list(store.mas_background.BACKGROUND_MAP.keys()):
             if bg_id not in DESK_SPRITES_MAP:
                 filename = sprites_map.get(bg_id, fb)
                 DESK_SPRITES_MAP[bg_id] = MASFilterSwitch(DESK_SPRITES_PATH + filename)
@@ -6279,7 +6305,7 @@ init -10 python in mas_cardgames:
                 card.stack.cards.remove(card)
 
             card.stack = self
-            self.cards.insert(index, card)
+            self.cards.insert(int(index), card)
 
             self.table.stacks.remove(self)
             self.table.stacks.append(self)

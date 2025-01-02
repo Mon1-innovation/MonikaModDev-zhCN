@@ -245,23 +245,26 @@ init -1 python in mas_hangman:
         easy_list = all_hm_words[EASY_MODE]
 
         # lets start with Non Monika words
-        with open(renpy.config.gamedir + "/" + EASY_LIST, "r") as poemwords:
-            for line in poemwords:
-                line = line.strip()
+        print(EASY_LIST)
+        poemwords = renpy.open_file(EASY_LIST, encoding="utf-8")
+        for line in poemwords:
+            line = line.strip()
 
-                #Ignore line if commented/empty
-                if line == '' or line[0] == '#':
-                    continue
+            #Ignore line if commented/empty
+            if line == '' or line[0] == '#':
+                continue
 
-                # add the word
-                splitword = line.split(',')
-                easy_list.append(store.MASPoemWord(
-                    splitword[0],
-                    float(splitword[1]),
-                    float(splitword[2]),
-                    float(splitword[3]),
-                    0
-                ))
+            # add the word
+            splitword = line.split(",")
+            easy_list.append(store.MASPoemWord(
+                splitword[0],
+                float(splitword[1]),
+                float(splitword[2]),
+                float(splitword[3]),
+                0
+            ))
+        if not renpy.android:
+            poemwords.close()
 
 
         # now for monika words

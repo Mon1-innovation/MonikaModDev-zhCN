@@ -9522,8 +9522,8 @@ python early:
                 # self.down_eyes_code: self.down_eyes_img
             }
 
-            for first_img_code in img_map.keys():
-                for second_img_code in img_map.keys():
+            for first_img_code in list(img_map.keys()):
+                for second_img_code in list(img_map.keys()):
                     if first_img_code != second_img_code:
                         self.transform_map[(first_img_code, second_img_code)] = _MASMoniFollowTransformDissolve(
                             time=MASMoniFollowTransform.DIS_DUR,

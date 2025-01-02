@@ -285,7 +285,7 @@ python early:
             img = renpy.substitute(img)
 
         args = []
-        for flt in store.mas_sprites.FILTERS.keys():
+        for flt in list(store.mas_sprites.FILTERS.keys()):
 
             # condition
             args.append("store.mas_sprites.get_filter() == '{0}'".format(flt))
@@ -352,7 +352,7 @@ python early:
         if filterize_def:
 
             # default should be filterized
-            for flt in store.mas_sprites.FILTERS.keys():
+            for flt in list(store.mas_sprites.FILTERS.keys()):
 
                 # only use the filtesr we have not already added
                 if flt not in flt_pairs:
