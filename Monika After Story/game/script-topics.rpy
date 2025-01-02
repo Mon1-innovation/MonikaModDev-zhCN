@@ -9289,7 +9289,7 @@ label monika_explain:
     $ _history_list.pop()
     menu:
         m "I'll wait until you're ready.{fast}"
-        "Start.":
+        "Start.{#monika_explain}":
             pass
     m 1hua "Hello! My name is Monika."
     m "[player]'s faithful girlfriend!"
