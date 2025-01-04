@@ -1099,7 +1099,7 @@ init python:
                         if_changed=if_changed
                         )
             except Exception as e:
-                raise Exception(song +"读取异常：{}".format(e))
+                raise Exception(str(song) +"读取异常：{}".format(e))
 
         songs.current_track = song
         songs.selected_track = song
