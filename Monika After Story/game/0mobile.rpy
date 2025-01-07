@@ -180,6 +180,7 @@ init python:
         extract_file("mod_assets/games/chess/stockfish-8-arm64-v8a")
         extract_file("python-packages/certifi/cacert.pem")
         extract_file("audio.rpa")
+        extract_file(".nomedia")
         
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/briaryoung_acs_front_bow_black.json", "wb").write(renpy.file("briaryoung_acs_front_bow_black.json").read())
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/briaryoung_clothes_shuchiin_academy_uniform.json", "wb").write(renpy.file("briaryoung_clothes_shuchiin_academy_uniform.json").read())
