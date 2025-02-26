@@ -132,3 +132,51 @@ class FileSynchronizer:
 gameSyncer = FileSynchronizer("/storage/emulated/0/MAS/game", "/data/user/0/and.sirp.masmobile/files/game")
 gameSyncer.add_to_whitelist("masrun")
 gameSyncer.add_to_whitelist("cacert.pem")
+
+
+
+gameSyncer = FileSynchronizer(r"E:\MAS_Cn001280\MAS_CN0012F0\game", r"E:\MAS_Cn001280\MAS_CN0012F0\test")
+
+# 用于存储每次同步的时间
+times = []
+
+def clear_folder(folder_path):
+    # 检查文件夹是否存在
+    if os.path.exists(folder_path):
+        # 遍历文件夹中的所有文件和子文件夹
+        for filename in os.listdir(folder_path):
+            file_path = os.path.join(folder_path, filename)
+            try:
+                # 检查是否是文件夹并删除
+                if os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+                else:
+                    os.remove(file_path)
+            except Exception as e:
+                print(f"Error deleting {file_path}: {e}")
+
+# 同步10次
+for _ in range(10):
+    #clear_folder(gameSyncer.dst_path)
+    start_time = time.time()
+    gameSyncer.sync()
+    end_time = time.time()
+
+    # 计算单次同步花费的时间
+    elapsed_time = end_time - start_time
+    times.append(elapsed_time)
+
+# 计算平均时间和总计时间
+total_time = sum(times)
+average_time = total_time / len(times)
+
+print(f"总计时间: {total_time:.2f} 秒")
+print(f"平均时间: {average_time:.2f} 秒")
+
+#优化前：
+#完全复制 41.40
+#无更新 248.20
+#
+#优化后：
+#完全复制 41.08
+#无更新 23.62
