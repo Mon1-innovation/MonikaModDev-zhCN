@@ -262,6 +262,27 @@ label p_outper:
     "存档已导出至[destination_folder]"
     "如需要重新导入, 请将persistent放置至[destination_folder]下并重启游戏"
     return
+label hide_all_dev:
+    python:
+        for evlabel in persistent.event_database:
+            ev = mas_getEV(evlabel)
+            if ev:
+                if ev.category:
+                    for c in ev.category:
+                        if "dev" in c:
+                            mas_lockEvent(ev)
+    return
+
+label show_all_dev:
+    python:
+        for evlabel in persistent.event_database:
+            ev = mas_getEV(evlabel)
+            if ev:
+                if ev.category:
+                    for c in ev.category:
+                        if "dev" in c:
+                            mas_unlockEvent(ev)
+    return
 
 init -2000 python:
     import store
