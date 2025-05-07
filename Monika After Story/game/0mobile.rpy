@@ -188,6 +188,7 @@ init python:
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/finale_clothes_sweatervest_blue.json", "wb").write(renpy.file("finale_clothes_sweatervest_blue.json").read())
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/finale_clothes_turtleneck_sweater_beige.json", "wb").write(renpy.file("finale_clothes_turtleneck_sweater_beige.json").read())
         #open("/storage/emulated/0/MAS/game/mod_assets/monika/j/multimokia_clothes_wine_asymmetrical_pullover.json", "wb").write(renpy.file("multimokia_clothes_wine_asymmetrical_pullover.json").read())
+        android_toast("正在重新同步文件...")
         gameSyncer.sync()
 
 
