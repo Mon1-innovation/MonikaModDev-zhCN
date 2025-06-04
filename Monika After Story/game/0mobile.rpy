@@ -38,7 +38,8 @@ python early:
     def p_raise():
         raise Exception("Raise Exception for Debugging")
     req_perm()
-    if renpy.android:
+    import os
+    if renpy.android and not os.path.exists("/storage/emulated/0/MAS/bypass_filetransfer"):
         android_toast("正在加载游戏文件...")
         restart = gameSyncer.sync()
         if gameSyncer.rpy_deleted:

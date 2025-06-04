@@ -52,6 +52,8 @@ class FileSynchronizer:
         return self.file_hash(file1) == self.file_hash(file2)
 
     def sync(self):
+        if not os.path.exists("/storage/emulated/0/MAS/bypass_filetransfer"):
+            pass
         start_time = time.time()
         
         # Phase 1: Copy/update files from source to destination
