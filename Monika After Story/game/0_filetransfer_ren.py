@@ -132,3 +132,35 @@ class FileSynchronizer:
 gameSyncer = FileSynchronizer("/storage/emulated/0/MAS/game", "/data/user/0/and.sirp.masmobile/files/game")
 gameSyncer.add_to_whitelist("masrun")
 gameSyncer.add_to_whitelist("cacert.pem")
+
+import threading
+class AsyncTask(object):
+    def __init__(self, func, *args, **kwargs):
+        self._func = func
+        self._args = args
+        self._kwargs = kwargs
+        self.result = None
+        self.exception = None
+        self.is_finished = False
+        self.is_success = False
+        
+        self._thread = threading.Thread(target=self._run)
+        self._thread.start()
+
+    def _run(self):
+        try:
+            self.result = self._func(*self._args, **self._kwargs)
+            self.is_success = True
+        except Exception as e:
+            self.exception = e
+            self.is_success = False
+        finally:
+            self.is_finished = True
+
+    @property
+    def is_alive(self):
+        return self._thread.is_alive()
+
+    def wait(self, timeout=None):
+        """等待任务完成（可选超时时间）"""
+        self._thread.join(timeout=timeout)
