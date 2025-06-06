@@ -39,20 +39,26 @@ python early:
         raise Exception("Raise Exception for Debugging")
     req_perm()
     import os
+    gamesyncTask = None
     if renpy.android and not os.path.exists("/storage/emulated/0/MAS/bypass_filetransfer"):
         android_toast("正在加载游戏文件...")
-        restart = gameSyncer.sync()
-        if gameSyncer.rpy_deleted:
-            android_toast("有rpyc被删除, 可能需要手动重启")
-        if gameSyncer.restart_required:
-            android_toast("检测到文件修改, 正在重载脚本")
+        gamesyncTask = AsyncTask(gameSyncer.sync)
 init python:
     import os
     @store.mas_submod_utils.functionplugin("ch30_preloop", priority=-10000)
     def _gamesync_restartcheck():
-        if gameSyncer.restart_required:
-            renpy.full_restart()
-            renpy.reload_script()
+        if not renpy.android:
+            return
+        if not gamesyncTask.is_finished:
+            android_toast("等待文件加载完成...")
+            gamesyncTask.wait()
+            
+        if gamesyncTask.is_success:
+            if gameSyncer.rpy_deleted:
+                android_toast("检测到文件修改, 正在重载脚本")
+            if gameSyncer.restart_required:
+                renpy.full_restart()
+                renpy.reload_script()
     def mkdir(path):
         if not os.path.exists(path):
             os.makedirs(path)
