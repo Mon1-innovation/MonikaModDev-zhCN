@@ -43,6 +43,18 @@ python early:
     if renpy.android and not os.path.exists("/storage/emulated/0/MAS/bypass_filetransfer"):
         android_toast("正在加载游戏文件...")
         gamesyncTask = AsyncTask(gameSyncer.sync)
+
+    def scan_outer_resource(add, seen):
+        files = game_files
+        if renpy.android:
+            outer = "/storage/emulated/0/MAS/"
+        else:
+            outer = "D:/6_Project/KojiRenpyBox/CDD/dammu"
+        print("Outer\\"", outer, "\\"Scaned:")
+        for each in walkdir(outer):
+            add(outer, each, files, seen)
+            print("    ", outer, " - ", each)
+    renpy.scandirfiles_callbacks.append(scan_outer_resource)
 init python:
     import os
     @store.mas_submod_utils.functionplugin("ch30_preloop", priority=-10000)
