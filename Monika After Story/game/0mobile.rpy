@@ -47,7 +47,7 @@ init python:
     import os
     @store.mas_submod_utils.functionplugin("ch30_preloop", priority=-10000)
     def _gamesync_restartcheck():
-        if not renpy.android:
+        if not renpy.android or not gamesyncTask:
             return
         if not gamesyncTask.is_finished:
             android_toast("等待文件加载完成...")
