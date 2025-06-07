@@ -49,8 +49,8 @@ python early:
         if renpy.android:
             outer = "/storage/emulated/0/MAS/"
         else:
-            outer = "D:/6_Project/KojiRenpyBox/CDD/dammu"
-        print("Outer\\"", outer, "\\"Scaned:")
+            return
+        print("Outer\\", outer, "\\Scaned:")
         for each in walkdir(outer):
             add(outer, each, files, seen)
             print("    ", outer, " - ", each)
