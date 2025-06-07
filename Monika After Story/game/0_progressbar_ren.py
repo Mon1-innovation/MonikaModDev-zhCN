@@ -1,5 +1,5 @@
 """renpy
-init -999 python: 
+init python early: 
     if renpy.android:
         pass
 """
@@ -48,6 +48,7 @@ class AndroidProgressDialog:
         self.max_value = max_value
         self.dialog = None
         self.text_view = None
+        self.title_view = None
         self.progress_bar = None
 
         self._create_dialog()
@@ -77,13 +78,13 @@ class AndroidProgressDialog:
             layout.setBackground(background)
 
             # 自定义标题
-            title_view = self.TextView(context)
-            title_view.setText(safe_java_string(self.title))
-            title_view.setTextSize(20)
-            title_view.setTextColor(self.Color.BLACK)
-            title_view.setTypeface(None, 1)  # BOLD
-            title_view.setPadding(0, 0, 0, int(12 * scale))
-            layout.addView(title_view)
+            self.title_view = self.TextView(context)
+            self.title_view.setText(safe_java_string(self.title))
+            self.title_view.setTextSize(20)
+            self.title_view.setTextColor(self.Color.BLACK)
+            self.title_view.setTypeface(None, 1)  # BOLD
+            self.title_view.setPadding(0, 0, 0, int(12 * scale))
+            layout.addView(self.title_view)
 
             # 消息文本
             self.text_view = self.TextView(context)
@@ -142,11 +143,13 @@ class AndroidProgressDialog:
             print(f"[ProgressDialog] Error creating dialog: {str(e)}")
 
     @run_on_ui_thread
-    def update(self, value, message=None):
+    def update(self, value, message=None, title=None):
         try:
             self.progress_bar.setProgress(value)
             if message and self.text_view:
                 self.text_view.setText(safe_java_string(message))
+            if title and self.title_view:
+                self.dialog.setTitle(safe_java_string(title))
         except Exception as e:
             print(f"[ProgressDialog] Error updating dialog: {str(e)}")
 
@@ -174,11 +177,11 @@ def show_progress_example():
         message="正在加载数据...",
         max_value=100
     )
-    
+    import time
     # 模拟进度更新
     for i in range(1, 101):
-        renpy.pause(0.05)  # 短暂暂停
-        
+          # 短暂暂停
+        time.sleep(0.03)
         # 每10%更新一次消息
         message = None
         if i % 10 == 0:

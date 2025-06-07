@@ -16,6 +16,11 @@ class FileSynchronizer:
         self.rpy_deleted = False
         self.important_fileext = [".rpy", ".rpa", ".rpyc"]
 
+        # For GUI feedback
+        self.current_step = ""              # "copying", "deleting", etc.
+        self.current_step_description = ""  # current file or directory being processed
+        self.current_progress = 0.0         # Progress in percentage or file count fraction
+
     def is_important_file(self, filename):
         _, ext = os.path.splitext(filename)
         return ext in self.important_fileext
@@ -35,81 +40,93 @@ class FileSynchronizer:
         return hash_func.hexdigest()
 
     def files_are_same(self, file1, file2):
-        """Optimized comparison with metadata check first"""
         if not os.path.exists(file2):
             return False
-            
+
         stat1 = os.stat(file1)
         stat2 = os.stat(file2)
-        
-        # First check size and modification time
-        if stat1.st_size != stat2.st_size:
+
+        if stat1.st_size != stat2.st_size or stat1.st_mtime != stat2.st_mtime:
             return False
-        if stat1.st_mtime != stat2.st_mtime:
-            return False
-            
-        # Fallback to content hash
+
         return self.file_hash(file1) == self.file_hash(file2)
 
     def sync(self):
-        if not os.path.exists("/storage/emulated/0/MAS/bypass_filetransfer"):
-            pass
+        self.current_step = ""              # "copying", "deleting", etc.
+        self.current_step_description = ""  # current file or directory being processed
+        self.current_progress = 0.0         # Progress in percentage or file count fraction
+
         start_time = time.time()
-        
-        # Phase 1: Copy/update files from source to destination
+
+        # === Phase 1: Copy/update files ===
+        self.current_step = "复制新增文件[1/2]"
+        all_files_to_copy = []
+        for src_root, dirs, files in os.walk(self.src_path):
+            for file in files:
+                all_files_to_copy.append(os.path.join(src_root, file))
+
+        copied_count = 0
+        total_files_to_copy = len(all_files_to_copy)
+
         for src_root, dirs, files in os.walk(self.src_path):
             relative_path = os.path.relpath(src_root, self.src_path)
             dst_root = os.path.join(self.dst_path, relative_path)
 
-            # Create directory structure first
             if not os.path.exists(dst_root):
                 os.makedirs(dst_root, exist_ok=True)
 
             for file in files:
                 src_file = os.path.join(src_root, file)
                 dst_file = os.path.join(dst_root, file)
-                
-                # Skip whitelisted files
+
+                self.current_step_description = f"正在处理 {src_file}"
+
                 if self.whitelist.get(file, False):
                     continue
-                
-                # Handle blacklisted files
+
                 if self.is_blacklisted(src_file):
                     base_name = os.path.splitext(src_file)[0]
-                    src_rpy = f"{base_name}.rpy"
-                    if os.path.exists(src_rpy):
+                    if os.path.exists(f"{base_name}.rpy"):
                         continue
 
-                # Skip unchanged files
                 if os.path.exists(dst_file) and self.files_are_same(src_file, dst_file):
                     continue
-                
-                # Handle important files
+
                 if self.is_important_file(src_file):
                     change_type = "changed" if os.path.exists(dst_file) else "added"
                     print(f"Important file {change_type}: {src_file}")
                     self.restart_required = True
-                
-                # Perform actual copy
+
                 shutil.copy2(src_file, dst_file)
 
-        # Phase 2: Clean up obsolete files in destination
+                copied_count += 1
+                self.current_progress = copied_count / total_files_to_copy if total_files_to_copy > 0 else 1.0
+
+        # === Phase 2: Delete obsolete files ===
+        self.current_step = "移除已删除文件[2/2]"
+        all_files_to_check = []
+        for dst_root, dirs, files in os.walk(self.dst_path):
+            for file in files:
+                all_files_to_check.append(os.path.join(dst_root, file))
+
+        checked_count = 0
+        total_files_to_check = len(all_files_to_check)
+
         for dst_root, dirs, files in os.walk(self.dst_path, topdown=False):
             relative_path = os.path.relpath(dst_root, self.dst_path)
             src_root = os.path.normpath(os.path.join(self.src_path, relative_path))
 
-            # Clean files
             for file in files:
                 dst_file = os.path.join(dst_root, file)
                 src_file = os.path.join(src_root, file)
-                
-                # Handle .rpyc files with existing .rpy
+
+                self.current_step_description = f"正在检查 {dst_file}"
+
                 if file.endswith(".rpyc"):
                     src_rpy = os.path.join(src_root, file[:-1])
                     if os.path.exists(src_rpy):
                         continue
-                
-                # Delete if source file missing and not whitelisted
+
                 if not os.path.exists(src_file) and not self.whitelist.get(file, False):
                     if self.is_important_file(dst_file):
                         self.restart_required = True
@@ -119,18 +136,23 @@ class FileSynchronizer:
                         print(f"Removing obsolete file: {dst_file}")
                     os.remove(dst_file)
 
-            # Clean directories
+                checked_count += 1
+                self.current_progress = checked_count / total_files_to_check if total_files_to_check > 0 else 1.0
+
+            # Delete empty directories
             for dir in dirs:
                 dst_dir = os.path.join(dst_root, dir)
                 src_dir = os.path.join(src_root, dir)
                 if not os.path.exists(src_dir):
                     shutil.rmtree(dst_dir, ignore_errors=True)
 
+        self.current_step = "done"
+        self.current_step_description = "Sync completed"
+        self.current_progress = 1.0
+
         print(f"Sync completed in {time.time()-start_time:.2f}s. "
               f"{'Restart required' if self.restart_required else 'No changes detected'}")
         return self.restart_required
-
-
 gameSyncer = FileSynchronizer("/storage/emulated/0/MAS/game", "/data/user/0/and.sirp.masmobile/files/game")
 gameSyncer.add_to_whitelist("masrun")
 gameSyncer.add_to_whitelist("cacert.pem")
@@ -154,8 +176,11 @@ class AsyncTask(object):
             self.result = self._func(*self._args, **self._kwargs)
             self.is_success = True
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             self.exception = e
             self.is_success = False
+
         finally:
             self.is_finished = True
 

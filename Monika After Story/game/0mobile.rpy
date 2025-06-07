@@ -43,6 +43,22 @@ python early:
     if renpy.android and not os.path.exists("/storage/emulated/0/MAS/bypass_filetransfer"):
         android_toast("正在加载游戏文件...")
         gamesyncTask = AsyncTask(gameSyncer.sync)
+        def _progress_process():
+            import time
+            bar = AndroidProgressDialog(
+                title="游戏文件加载中",
+                message="正在加载游戏文件...",
+                max_value=100
+            )
+            while not gamesyncTask.is_finished:
+                time.sleep(0.05)
+                bar.update(
+                    title = gameSyncer.current_step,
+                    message = gameSyncer.current_step_description,
+                    value=int((gameSyncer.current_progress * 100)),
+                )
+            bar.dismiss()
+        AsyncTask(_progress_process())
 
     def scan_outer_resource(add, seen):
         files = game_files
@@ -55,17 +71,23 @@ python early:
             add(outer, each, files, seen)
             print("    ", outer, " - ", each)
     renpy.loader.scandirfiles_callbacks.append(scan_outer_resource)
+
+    progress_task = None
+
+  
 init python:
     import os
+    
     @store.mas_submod_utils.functionplugin("ch30_preloop", priority=-10000)
     def _gamesync_restartcheck():
         if not renpy.android or not gamesyncTask:
             return
         if not gamesyncTask.is_finished:
             android_toast("等待文件加载完成...")
-            gamesyncTask.wait()
-            
+            #if renpy.android and gamesyncTask:
+            #    _progress_process()
         if gamesyncTask.is_success:
+            del progress_task
             if gameSyncer.rpy_deleted:
                 android_toast("检测到文件修改, 正在重载脚本")
             if gameSyncer.restart_required:
