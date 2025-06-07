@@ -263,12 +263,16 @@ init -45 python:
             if len(ext_filter) > 0 and not ext_filter.startswith("."):
                 ext_filter = "." + ext_filter
 
-            return [
-                package
-                for package in os.listdir(self.station)
-                if package.endswith(ext_filter)
-                and not os.path.isdir(self._trackPackage(package))
-            ]
+            try:
+                return [
+                    package
+                    for package in os.listdir(self.station)
+                    if package.endswith(ext_filter)
+                    and not os.path.isdir(self._trackPackage(package))
+                ]
+            except Exception as e:
+                store.mas_utils.mas_log.error("getPackageList failed for station {}:{}".format(self.station, repr(e)))
+                return []
 
 
         def getPackage(self, package_name, log=None):
