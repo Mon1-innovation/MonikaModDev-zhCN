@@ -54,7 +54,7 @@ python early:
         for each in walkdir(outer):
             add(outer, each, files, seen)
             print("    ", outer, " - ", each)
-    renpy.scandirfiles_callbacks.append(scan_outer_resource)
+    renpy.loader.scandirfiles_callbacks.append(scan_outer_resource)
 init python:
     import os
     @store.mas_submod_utils.functionplugin("ch30_preloop", priority=-10000)
