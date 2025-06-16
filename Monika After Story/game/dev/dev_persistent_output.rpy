@@ -4,7 +4,7 @@ init 5 python:
             persistent.event_database,
             eventlabel="dev_persistent_in_output",
             category=["dev"],
-            prompt="PERSISTENT IN/OUTPUT/存档导入导出",
+            prompt="存档导入导出",
             pool=True,
             unlocked=True
         )
@@ -35,4 +35,29 @@ label dev_persistent_in_output:
             m "好吧."
             return
     
+    return
+
+init 5 python:
+    addEvent(
+        Event(
+            persistent.event_database,
+            eventlabel="dev_persistent_in_output",
+            category=["dev"],
+            prompt="将存档导出为旧版本可用存档",
+            pool=True,
+            unlocked=True
+        )
+    )
+
+label dev_oldver_persistent:
+    "你仍然需要根据说明在PC端安装补丁才能使用存档!"
+    call p_confirm_calllabel("generate_old_version_persistent")
+    if not _result:
+        return
+    python:
+        import shutil
+        shutil.copyfile(renpy.config.savedir + "/persistent", os.path.join(ANDROID_MASBASE,"characters", "persistent"))
+        android_toast("导出成功")
+        renpy.quit()
+
     return

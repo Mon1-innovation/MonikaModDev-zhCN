@@ -304,6 +304,18 @@ label p_outper:
     "存档已导出至[destination_folder]"
     "如需要重新导入, 请将persistent放置至[destination_folder]下并重启游戏"
     return
+label p_confirm_calllabel(alabel):
+    $ result = renpy.confirm("确认执行 [alabel] 吗?")
+    if result:
+        $ renpy.call(alabel)
+    return result
+label generate_old_version_persistent:
+    python:
+        del persistent._voice_mute
+        del persistent._mas_acs_pre_list
+        del persistent._mas_windowreacts_notif_filters
+        renpy.save_persistent()
+        renpy.quit()
 label hide_all_dev:
     python:
         for evlabel in persistent.event_database:
