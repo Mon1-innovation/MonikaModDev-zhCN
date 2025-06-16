@@ -315,7 +315,6 @@ label generate_old_version_persistent:
         del persistent._mas_acs_pre_list
         del persistent._mas_windowreacts_notif_filters
         renpy.save_persistent()
-        renpy.quit()
 label hide_all_dev:
     python:
         for evlabel in persistent.event_database:
