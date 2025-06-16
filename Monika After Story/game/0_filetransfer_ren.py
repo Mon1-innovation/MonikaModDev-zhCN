@@ -81,6 +81,7 @@ class FileSynchronizer:
 
                 self.current_step_description = f"正在处理 {src_file}"
                 copied_count += 1
+                self.current_progress = copied_count / total_files_to_copy if total_files_to_copy > 0 else 1.0
                 if self.whitelist.get(file, False):
                     continue
 
@@ -100,7 +101,7 @@ class FileSynchronizer:
                 shutil.copy2(src_file, dst_file)
 
                 
-                self.current_progress = copied_count / total_files_to_copy if total_files_to_copy > 0 else 1.0
+                
 
         # === Phase 2: Delete obsolete files ===
         self.current_step = "移除已删除文件[2/2]"
@@ -122,6 +123,7 @@ class FileSynchronizer:
 
                 self.current_step_description = f"正在检查 {dst_file}"
                 checked_count += 1
+                self.current_progress = checked_count / total_files_to_check if total_files_to_check > 0 else 1.0
                 if file.endswith(".rpyc"):
                     src_rpy = os.path.join(src_root, file[:-1])
                     if os.path.exists(src_rpy):
@@ -137,7 +139,7 @@ class FileSynchronizer:
                     os.remove(dst_file)
 
                 
-                self.current_progress = checked_count / total_files_to_check if total_files_to_check > 0 else 1.0
+                
 
             # Delete empty directories
             for dir in dirs:
