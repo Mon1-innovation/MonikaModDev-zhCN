@@ -41,6 +41,7 @@ class AndroidProgressDialog:
         self.ColorDrawable = autoclass("android.graphics.drawable.ColorDrawable")
         self.LayoutParamsType = autoclass("android.view.WindowManager$LayoutParams")
         self.android_R_attr = autoclass("android.R$attr")
+        self.ObjectAnimator = autoclass("android.animation.ObjectAnimator")
 
         # 存储参数
         self.title = title
@@ -111,14 +112,25 @@ class AndroidProgressDialog:
             self.progress_bar.setMax(self.max_value)
             self.progress_bar.setProgress(0)
 
-            # 扁平蓝色进度条
+            # 自定义圆角进度 drawable
             progress_drawable = self.GradientDrawable()
             progress_drawable.setShape(self.GradientDrawable.RECTANGLE)
             progress_drawable.setColor(self.Color.parseColor("#2196F3"))  # Material Blue
-            progress_drawable.setCornerRadius(4 * scale)
+            progress_drawable.setCornerRadius(50 * scale)  # 更明显的圆角
 
+            # ClipDrawable 保留
             clip = self.ClipDrawable(progress_drawable, self.Gravity.START, self.ClipDrawable.HORIZONTAL)
+            clip.setLevel(10000)  # 让圆角在初始化时完整可见
+
+            # 设置为进度条 drawable
             self.progress_bar.setProgressDrawable(clip)
+
+            # 设置背景为圆角浅灰
+            bg_drawable = self.GradientDrawable()
+            bg_drawable.setShape(self.GradientDrawable.RECTANGLE)
+            bg_drawable.setColor(self.Color.parseColor("#E0E0E0"))
+            bg_drawable.setCornerRadius(50 * scale)
+            self.progress_bar.setBackground(bg_drawable)
             self.progress_bar.setBackgroundColor(self.Color.parseColor("#E0E0E0"))  # 浅灰背景
 
             layout.addView(self.progress_bar)
@@ -145,14 +157,21 @@ class AndroidProgressDialog:
     @run_on_ui_thread
     def update(self, value, message=None, title=None):
         try:
-            self.progress_bar.setProgress(value)
+            # 平滑过渡进度条值（动画）
+            current_progress = self.progress_bar.getProgress()
+            animator = self.ObjectAnimator.ofInt(self.progress_bar, "progress", current_progress, value)
+            animator.setDuration(50)  # 300ms 动画时间
+            animator.start()
+
             if message and self.text_view:
                 self.text_view.setText(safe_java_string(message))
+
             if title and self.title_view:
-                self.dialog.setTitle(safe_java_string(title))
+                self.title_view.setText(safe_java_string(title))
+
         except Exception as e:
             print(f"[ProgressDialog] Error updating dialog: {str(e)}")
-
+            
     @run_on_ui_thread
     def dismiss(self):
         if not renpy.android or not self.dialog:
