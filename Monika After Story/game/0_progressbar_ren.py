@@ -160,7 +160,7 @@ class AndroidProgressDialog:
             # 平滑过渡进度条值（动画）
             current_progress = self.progress_bar.getProgress()
             animator = self.ObjectAnimator.ofInt(self.progress_bar, "progress", current_progress, value)
-            animator.setDuration(50)  # 300ms 动画时间
+            animator.setDuration(50)  # ms 动画时间
             animator.start()
 
             if message and self.text_view:
