@@ -12,5 +12,7 @@ init 5 python:
 
 label dev_demote_aff_version:
     "回退好感度版本将重新读取你的旧版本好感等级, 并覆盖你当前的好感值"
+    if not persistent._mas_affection:
+        "{color=red}!!警告: 当前存档没有旧版本好感数据, 执行后将重置你的好感值为0!!!{/color}"
     call p_confirm_calllabel("demote_aff_version")
     return
