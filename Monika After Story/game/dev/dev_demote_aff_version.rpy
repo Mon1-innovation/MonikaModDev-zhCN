@@ -14,8 +14,9 @@ label dev_demote_aff_version:
     "回退好感度版本将重新读取你的旧版本好感等级, 并覆盖你当前的好感值"
     if not persistent._mas_affection:
         "{color=red}!!警告: 当前存档没有旧版本好感数据, 执行后将重置你的好感值为0!!!{/color}"
-    else if persistent._mas_affection.get("affection", 0.0) < 0.1:
+    elif persistent._mas_affection.get("affection", 0.0) < 0.1:
         "{color=red}!!警告: 当前存档没有旧版本好感数据, 执行后将重置你的好感值为0!!!{/color}"
-    "好感迁移将以你的旧版好感值[persistent._mas_affection.get('affection', 0.0)]进行计算"
+    else:
+        "好感迁移将以你的旧版好感值[persistent._mas_affection.get('affection', 0.0)]进行计算"
     call p_confirm_calllabel("demote_aff_version")
     return
