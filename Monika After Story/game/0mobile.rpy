@@ -305,19 +305,26 @@ label p_outper:
     "如需要重新导入, 请将persistent放置至[destination_folder]下并重启游戏"
     return
 label p_confirm_calllabel(alabel):
-    $ result = renpy.confirm("确认执行 [alabel] 吗?")
-    if result:
-        $ renpy.call(alabel)
+    menu:
+        "你确定要执行这个操作吗?"
+        "是":
+            $ _result = True
+            call alabel
+        "否":
+            $ _result = False
+            m "好吧."
     return result
 label generate_old_version_persistent:
     python:
         del persistent._voice_mute
         del persistent._mas_acs_pre_list
         del persistent._mas_windowreacts_notif_filters
+        persistent.closed_self = True
         renpy.save_persistent()
 label demote_aff_version:
     python:
         persistent._mas_affection_version = 1
+        persistent.closed_self = True
         renpy.save_persistent()
         renpy.quit()
     return
