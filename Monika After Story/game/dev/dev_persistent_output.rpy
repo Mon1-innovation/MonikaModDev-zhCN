@@ -3,7 +3,7 @@ init 5 python:
         Event(
             persistent.event_database,
             eventlabel="dev_persistent_in_output",
-            category=["dev"],
+            category=["dev", "维护功能"],
             prompt="存档导入导出",
             pool=True,
             unlocked=True

@@ -277,18 +277,7 @@ init python:
         else:
             renpy.notify("Persistent Check Successful")
         return problems
-
-init 5 python:  
-    addEvent(
-        Event(
-            persistent.event_database,
-            eventlabel="p_outper",
-            category=["维护功能"],
-            prompt="存档导出",
-            pool=True,
-            unlocked=True
-        )
-    )            
+         
 label p_outper:
     "即将导出存档"
     python:
