@@ -796,7 +796,7 @@ init -900 python in mas_affection:
             return
 
         new_data = list()
-
+        log.info(f"Transferring affection from v1({old_data.get('affection', 0.0)}) to v2")
         aff = old_data.get("affection", 0.0)
         if aff >= 1000000:
             aff = 0.0

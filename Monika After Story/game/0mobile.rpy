@@ -1,5 +1,9 @@
 python early:    
+    import os
+
     ANDROID_MASBASE = "/storage/emulated/0/MAS/"
+    #config.savedir = os.path.join(ANDROID_MASBASE, "saves")
+
     def android_toast(message):
         print("android_toast：", message)
         if not renpy.android:
@@ -77,7 +81,10 @@ python early:
   
 init python:
     import os
-    
+    def _restart_mas():
+        renpy.full_restart()
+        renpy.reload_script()
+        android_toast("已软重启游戏, 如果回到主菜单是正常现象")
     @store.mas_submod_utils.functionplugin("ch30_preloop", priority=-10000)
     def _gamesync_restartcheck():
         if not renpy.android or not gamesyncTask:
@@ -277,14 +284,13 @@ init 5 python:
             persistent.event_database,
             eventlabel="p_outper",
             category=["维护功能"],
-            prompt="PERSISTENT OUTPUT/存档导出",
+            prompt="存档导出",
             pool=True,
             unlocked=True
         )
     )            
 label p_outper:
     "即将导出存档"
-    "注意：只导出自动备份的文件（.bak）文件"
     python:
         import shutil
         import os
@@ -306,14 +312,13 @@ label p_outper:
     return
 label p_confirm_calllabel(alabel):
     menu:
-        "你确定要执行这个操作吗?"
+        "你确定要执行操作 [alabel] 吗?"
         "是":
-            $ _result = True
-            call alabel
+            $ _return = True
+            $ renpy.call(alabel)
         "否":
-            $ _result = False
-            m "好吧."
-    return result
+            $ _return = False
+    return _return
 label generate_old_version_persistent:
     python:
         del persistent._voice_mute
@@ -321,12 +326,13 @@ label generate_old_version_persistent:
         del persistent._mas_windowreacts_notif_filters
         persistent.closed_self = True
         renpy.save_persistent()
+    return
 label demote_aff_version:
     python:
         persistent._mas_affection_version = 1
         persistent.closed_self = True
         renpy.save_persistent()
-        renpy.quit()
+        _restart_mas()
     return
 label hide_all_dev:
     python:

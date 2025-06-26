@@ -21,14 +21,19 @@ label dev_persistent_in_output:
                 return
             python:
                 renpy.persistent.load(os.path.join(ANDROID_MASBASE,"characters", "persistent"))
+                persistent.closed_self = True
                 renpy.save_persistent()
                 android_toast("导入成功")
                 os.remove(os.path.join(ANDROID_MASBASE,"characters", "persistent"))
                 renpy.quit()
         "导出":
+            call p_outper
             python:
                 import shutil
-                shutil.copyfile(renpy.config.savedir + "/persistent", os.path.join(ANDROID_MASBASE,"characters", "persistent"))
+                persistent.closed_self = True
+                renpy.save_persistent()
+                shutil.copyfile(renpy.config.savedir + "/persistent", os.path.join(ANDROID_MASBASE,"saves", "persistent_current"))
+                persistent.closed_self = False
                 android_toast("导出成功")
                 
         "取消":
@@ -41,7 +46,7 @@ init 5 python:
     addEvent(
         Event(
             persistent.event_database,
-            eventlabel="dev_persistent_in_output",
+            eventlabel="dev_oldver_persistent",
             category=["dev"],
             prompt="将存档导出为旧版本可用存档",
             pool=True,
@@ -52,12 +57,15 @@ init 5 python:
 label dev_oldver_persistent:
     "你仍然需要根据说明在PC端安装补丁才能使用存档!"
     call p_confirm_calllabel("generate_old_version_persistent")
-    if not _result:
+    if _return is False:
         return
     python:
         import shutil
+        persistent.closed_self = True
+        renpy.save_persistent()
         shutil.copyfile(renpy.config.savedir + "/persistent", os.path.join(ANDROID_MASBASE,"characters", "persistent"))
         android_toast("导出成功")
+        renpy.pause(1.0)
         renpy.quit()
 
     return
