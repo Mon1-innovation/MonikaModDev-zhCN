@@ -355,7 +355,27 @@ label show_all_dev:
                         if "dev" in c:
                             mas_unlockEvent(ev)
     return
-
+init 5 python:  
+    addEvent(
+        Event(
+            persistent.event_database,
+            eventlabel="hide_all_dev",
+            category=["维护功能"],
+            prompt="隐藏所有开发者话题",
+            pool=True,
+            unlocked=True
+        )
+    )   
+    addEvent(
+        Event(
+            persistent.event_database,
+            eventlabel="show_all_dev",
+            category=["维护功能"],
+            prompt="显示所有开发者话题",
+            pool=True,
+            unlocked=True
+        )
+    )  
 init -2000 python:
     import store
     def load_persistent(filename):
