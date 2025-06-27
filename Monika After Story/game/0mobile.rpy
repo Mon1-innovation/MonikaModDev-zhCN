@@ -78,7 +78,55 @@ python early:
 
     progress_task = None
 
-  
+    def _error_copyer():
+        # 目标目录（游戏根目录下的error_logs文件夹）
+        dest_dir = os.path.join(ANDROID_MASBASE, "log")
+
+        try:
+            # 确保目标目录存在
+            os.makedirs(dest_dir, exist_ok=True)
+            
+            # 获取当前时间戳
+            timestamp = time.strftime("%Y%m%d-%H%M%S")
+            
+            # 要复制的文件列表
+            log_files = [
+                ("error.txt", f"error-{timestamp}.txt"),
+                ("log.txt", f"log-{timestamp}.txt"),
+                ("traceback.txt", f"traceback-{timestamp}.txt")
+            ]
+            
+            # 复制文件
+            for src_name, dest_name in log_files:
+                src_path = os.path.join(config.logdir, src_name)
+                dest_path = os.path.join(dest_dir,  src_name)
+                
+                if os.path.exists(src_path):
+                    shutil.copy2(src_path, dest_path)
+
+        except Exception as e:
+            print(f"日志保存失败: {str(e)}")
+    
+    original_report_exception = renpy.renpy.error.report_exception
+    def new_report_exception(*args, **kwargs):
+        def nonehandler(param):
+            return
+        res = original_report_exception(*args, **kwargs)
+        if renpy.android:
+            _error_copyer()
+        if renpy.is_init_phase():
+            import time
+            android_toast("检测到在初始化阶段发生异常, 请查看log以获取详细信息")
+            window = AndroidAlertDialog(
+                title="抱歉, 但是游戏发生了异常...",
+                message=res[0],
+                positive_text="10秒后游戏将自动退出嘞...",
+                negative_text=":)",
+                on_result=nonehandler
+            )
+            window.AsyncTaskerCheck.wait()
+        return res
+    renpy.renpy.error.report_exception = new_report_exception
 init python:
     import os
     def _restart_mas():

@@ -28,8 +28,10 @@ class OnClickListener(PythonJavaClass):
     @java_method('(Landroid/content/DialogInterface;I)V')
     def onClick(self, dialog, which):
         self.callback(which)
-
+import time
 class AndroidAlertDialog:
+    
+    MAX_WAITTIME = 10
     def __init__(self, title, message, positive_text="确定", negative_text="取消", on_result=None):
         self.title = title
         self.message = message
@@ -39,7 +41,17 @@ class AndroidAlertDialog:
         self.finished = False
         self.dialog = None
         self._create_dialog()
+        self.AsyncTaskerCheck = AsyncTask(self.checker)
+        self.starttime = time.time()
 
+    def checker(self):
+        """检查对话框是否已完成"""
+        while not self.finished:
+            time.sleep(0.1)
+            if (time.time()-self.starttime) > self.MAX_WAITTIME:
+                break
+        return True
+        
     @run_on_ui_thread
     def _create_dialog(self):
         try:
