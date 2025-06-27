@@ -111,20 +111,17 @@ python early:
     
     original_report_exception = renpy.renpy.error.report_exception
     def new_report_exception(*args, **kwargs):
-        def nonehandler(param):
-            return
         res = original_report_exception(*args, **kwargs)
         if renpy.android:
             _error_copyer()
         if renpy.is_init_phase():
             import time
-            android_toast("检测到在初始化阶段发生异常, 请查看log以获取详细信息")
+            android_toast("检测到在初始化阶段发生异常, 请查看log文件夹以获取详细信息")
             window = AndroidAlertDialog(
                 title="抱歉, 但是游戏发生了异常...",
-                message=res[0],
-                positive_text="10秒后游戏将自动退出嘞...",
-                negative_text=":)",
-                on_result=nonehandler
+                message=res[0]+"\n将在10秒后自动退出...",
+                positive_text="",
+                negative_text="关闭",
             )
             window.AsyncTaskerCheck.wait()
         return res

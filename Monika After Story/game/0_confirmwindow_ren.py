@@ -32,7 +32,7 @@ import time
 class AndroidAlertDialog:
     
     MAX_WAITTIME = 10
-    def __init__(self, title, message, positive_text="确定", negative_text="取消", on_result=None):
+    def __init__(self, title, message, positive_text="确定", negative_text="取消"):
         self.title = title
         self.message = message
         self.positive_text = positive_text
@@ -188,6 +188,5 @@ Ren'Py Version: Ren'Py 6.99.12.4.2187
         message=text,
         positive_text="是的",
         negative_text="取消",
-        on_result=result_handler
     )
     return d.result  # 返回对话框结果，True 或 False

@@ -1,3 +1,9 @@
+"""renpy
+init python early: 
+    if renpy.android:
+        pass
+"""
+
 from jnius import autoclass, cast
 from android_runnable import run_on_ui_thread
 
