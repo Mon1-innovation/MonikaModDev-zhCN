@@ -14,7 +14,7 @@ class FileSynchronizer:
         self.blacklist_fileext = [".rpyc"]
         self.restart_required = False
         self.rpy_deleted = False
-        self.important_fileext = [".rp"]
+        self.important_fileext = [".rpy", ".rpyc", ".rpym", ".rpa", ".rpyb"]
 
         # For GUI feedback
         self.current_step = ""              # "copying", "deleting", etc.
