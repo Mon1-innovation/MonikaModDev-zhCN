@@ -37,7 +37,14 @@ python early:
                     if not p_perm_dict[i]:
                         android_toast("无法申请权限 {}".format(i))
                 except Exception:
-                    android_toast("无法申请权限 {}，请手动授予权限！".format(i))
+                    
+                    window = AndroidAlertDialog(
+                        title="抱歉, 但是你好像没有授权MAS必要的权限...",
+                        message="MAS运行需要以下权限才能正常工作:\n 外部存储读写权限\n用于对MAS文件夹进行操作\n\n联网权限\n允许相关子模组连接网络\n\n请在设置中打开以上权限",
+                        positive_text="",
+                        negative_text="关闭",
+                    )
+                    window.AsyncTaskerCheck.wait()
         pass
     def p_raise():
         raise Exception("Raise Exception for Debugging")
