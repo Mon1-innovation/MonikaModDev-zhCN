@@ -46,6 +46,8 @@ python early:
     gamesyncTask = None
     if renpy.android and not os.path.exists("/storage/emulated/0/MAS/bypass_filetransfer"):
         android_toast("正在加载游戏文件...")
+        if os.path.exists("/storage/emulated/0/MAS/pure_sync"):
+            gameSyncer.pure_sync = True
         gamesyncTask = AsyncTask(gameSyncer.sync)
         def _progress_process():
             import time
@@ -64,17 +66,17 @@ python early:
             bar.dismiss()
         AsyncTask(_progress_process())
 
-    def scan_outer_resource(add, seen):
-        files = game_files
-        if renpy.android:
-            outer = "/storage/emulated/0/MAS/"
-        else:
-            return
-        print("Outer\\", outer, "\\Scaned:")
-        for each in walkdir(outer):
-            add(outer, each, files, seen)
-            print("    ", outer, " - ", each)
-    renpy.loader.scandirfiles_callbacks.append(scan_outer_resource)
+    #def scan_outer_resource(add, seen):
+    #    files = game_files
+    #    if renpy.android:
+    #        outer = "/storage/emulated/0/MAS/"
+    #    else:
+    #        return
+    #    print("Outer\\", outer, "\\Scaned:")
+    #    for each in walkdir(outer):
+    #        add(outer, each, files, seen)
+    #        print("    ", outer, " - ", each)
+    #renpy.loader.scandirfiles_callbacks.append(scan_outer_resource)
 
     progress_task = None
 
@@ -142,6 +144,8 @@ init python:
             #if renpy.android and gamesyncTask:
             #    _progress_process()
         if gamesyncTask.is_success:
+            if os.path.exists("/storage/emulated/0/MAS/pure_sync"):
+                os.remove("/storage/emulated/0/MAS/pure_sync")
             del progress_task
             if gameSyncer.rpy_deleted:
                 android_toast("检测到文件修改, 正在重载脚本")

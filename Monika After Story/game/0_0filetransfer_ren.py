@@ -14,12 +14,13 @@ class FileSynchronizer:
         self.blacklist_fileext = [".rpyc"]
         self.restart_required = False
         self.rpy_deleted = False
-        self.important_fileext = [".rpy", ".rpa", ".rpyc"]
+        self.important_fileext = [".rp"]
 
         # For GUI feedback
         self.current_step = ""              # "copying", "deleting", etc.
         self.current_step_description = ""  # current file or directory being processed
         self.current_progress = 0.0         # Progress in percentage or file count fraction
+        self.pure_sync = False  # 是否纯同步模式
 
     def is_important_file(self, filename):
         _, ext = os.path.splitext(filename)
@@ -58,6 +59,13 @@ class FileSynchronizer:
 
         start_time = time.time()
 
+
+        if self.pure_sync:
+            self.current_step = "清空文件夹[0/2]"
+            self.current_progress = 0.0
+            if os.path.exists(self.dst_path):
+                shutil.rmtree(self.dst_path)
+
         # === Phase 1: Copy/update files ===
         self.current_step = "复制新增文件[1/2]"
         all_files_to_copy = []
@@ -83,6 +91,9 @@ class FileSynchronizer:
                 copied_count += 1
                 self.current_progress = copied_count / total_files_to_copy if total_files_to_copy > 0 else 1.0
                 if self.whitelist.get(file, False):
+                    continue
+                
+                if self.is_important_file(src_file):
                     continue
 
                 if self.is_blacklisted(src_file):
