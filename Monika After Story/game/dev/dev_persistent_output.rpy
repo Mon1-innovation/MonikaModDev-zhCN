@@ -63,7 +63,7 @@ label dev_oldver_persistent:
         import shutil
         persistent.closed_self = True
         renpy.save_persistent()
-        shutil.copyfile(renpy.config.savedir + "/persistent", os.path.join(ANDROID_MASBASE,"characters", "persistent"))
+        shutil.copyfile(renpy.config.savedir + "/persistent", os.path.join(ANDROID_MASBASE,"save", "persistent_compatible"))
         android_toast("导出成功")
         renpy.pause(1.0)
         renpy.quit()
