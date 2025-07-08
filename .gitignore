@@ -951,6 +951,8 @@ Monika After Story/game/gui/font/SentyPea.ttf
 Monika After Story/game/gui/font/SentyTEA.ttf
 Monika After Story/game/gui/font/wqywmh.ttf
 Monika After Story/game/gui/font/wrht.ttf
+
+**/tl/**
 Monika After Story/game/tl/chinese/chess.rpy
 Monika After Story/game/tl/chinese/common.rpy
 Monika After Story/game/tl/chinese/definitions.rpy
@@ -1074,3 +1076,10 @@ Monika After Story/game/tl/chinese/str_replace/zz_selector.rpy
 Monika After Story/game/tl/chinese/str_replace/zz_spriteobjects.rpy
 Monika After Story/game/tl/chinese/str_replace/zz_windowutils.rpy
 Monika After Story/log/cn_patch.log
+Monika After Story/game/tl/chinese/config_pythonov/0_audiofix.rpy
+Monika After Story/game/tl/chinese/config_pythonov/error_handing.rpy
+Monika After Story/game/tl/chinese/config_pythonov/zz_pianokeys.rpy
+Monika After Story/game/tl/chinese/label_ov/screen_ov.rpy
+Monika After Story/game/tl/chinese/label_ov/hooks/hooks.rpy
+Monika After Story/game/tl/chinese/mod_assets/updateavailable_d.png
+Monika After Story/game/tl/chinese/mod_assets/updateavailable.png
