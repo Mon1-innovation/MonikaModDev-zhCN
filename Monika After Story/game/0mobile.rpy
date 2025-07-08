@@ -118,6 +118,10 @@ python early:
     
     original_report_exception = renpy.renpy.error.report_exception
     def new_report_exception(*args, **kwargs):
+        isunbounderror = False
+        if args[0] is not None:
+            if isinstance(args[0], UnboundLocalError):
+                isunbounderror = True
         res = original_report_exception(*args, **kwargs)
         if renpy.android:
             _error_copyer()
@@ -126,7 +130,7 @@ python early:
             android_toast("检测到在初始化阶段发生异常, 请查看log文件夹以获取详细信息")
             window = AndroidAlertDialog(
                 title="抱歉, 但是游戏发生了异常...",
-                message=res[0]+"\n将在10秒后自动退出...",
+                message=res[0] + "通常这重启即可解决\n" if isunbounderror else "" +"\n将在10秒后自动退出...",
                 positive_text="",
                 negative_text="关闭",
             )
