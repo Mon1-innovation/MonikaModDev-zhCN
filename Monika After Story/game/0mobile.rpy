@@ -130,7 +130,7 @@ python early:
             android_toast("检测到在初始化阶段发生异常, 请查看log文件夹以获取详细信息")
             window = AndroidAlertDialog(
                 title="抱歉, 但是游戏发生了异常...",
-                message=res[0] + "通常这重启即可解决\n" if isunbounderror else "" +"\n将在10秒后自动退出...",
+                message=res[0] + "\n通常这重启即可解决" if isunbounderror else "" +"\n将在10秒后自动退出...",
                 positive_text="",
                 negative_text="关闭",
             )
