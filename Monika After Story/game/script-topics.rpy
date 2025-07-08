@@ -17090,6 +17090,7 @@ default persistent._mas_pm_swear_frequency = None
 
 label monika_curse_words:
     m 3etc "Say [player], do you swear often?{nw}"
+    $ _history_list.pop()
     menu:
         m "Say [player], do you swear often?{fast}"
 
