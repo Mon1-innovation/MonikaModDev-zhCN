@@ -119,7 +119,7 @@ python early:
     original_report_exception = renpy.renpy.error.report_exception
     def new_report_exception(*args, **kwargs):
         isunbounderror = False
-        if args[0] is not None:
+        if args and len(args) > 0:
             if isinstance(args[0], UnboundLocalError):
                 isunbounderror = True
         res = original_report_exception(*args, **kwargs)
