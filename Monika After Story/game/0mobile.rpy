@@ -117,9 +117,10 @@ python early:
             print(f"日志保存失败: {str(e)}")
     
     original_report_exception = renpy.renpy.error.report_exception
+    from builtins import UnboundLocalError
     def new_report_exception(*args, **kwargs):
         isunbounderror = False
-        if args and len(args) > 0:
+        if args:
             if isinstance(args[0], UnboundLocalError):
                 isunbounderror = True
         res = original_report_exception(*args, **kwargs)
