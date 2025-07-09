@@ -117,28 +117,22 @@ python early:
             print(f"日志保存失败: {str(e)}")
     
     original_report_exception = renpy.renpy.error.report_exception
-    from builtins import UnboundLocalError
     def new_report_exception(*args, **kwargs):
-        isunbounderror = False
-        if args:
-            if isinstance(args[0], UnboundLocalError):
-                isunbounderror = True
         res = original_report_exception(*args, **kwargs)
         if renpy.android:
             _error_copyer()
-        if renpy.is_init_phase():
+        if renpy.is_init_phase() and renpy.android:
             import time
             android_toast("检测到在初始化阶段发生异常, 请查看log文件夹以获取详细信息")
             window = AndroidAlertDialog(
                 title="抱歉, 但是游戏发生了异常...",
-                message=res[0] + "\n通常这重启即可解决" if isunbounderror else "" +"\n将在10秒后自动退出...",
+                message=res[0]+"\n将在10秒后自动退出...",
                 positive_text="",
                 negative_text="关闭",
             )
             window.AsyncTaskerCheck.wait()
         return res
-    if renpy.android:
-        renpy.renpy.error.report_exception = new_report_exception
+    renpy.renpy.error.report_exception = new_report_exception
 init python:
     import os
     def _restart_mas():
