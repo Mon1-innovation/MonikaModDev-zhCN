@@ -134,6 +134,7 @@ python early:
         return res
     renpy.renpy.error.report_exception = new_report_exception
 init python:
+    cn_debuging = p_debug
     import os
     def _restart_mas():
         renpy.full_restart()
