@@ -136,7 +136,8 @@ python early:
             )
             window.AsyncTaskerCheck.wait()
         return res
-    renpy.renpy.error.report_exception = new_report_exception
+    if renpy.android:
+        renpy.renpy.error.report_exception = new_report_exception
 init python:
     import os
     def _restart_mas():
