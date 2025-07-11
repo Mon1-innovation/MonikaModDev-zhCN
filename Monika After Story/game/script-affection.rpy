@@ -796,6 +796,11 @@ init -900 python in mas_affection:
             return
 
         new_data = list()
+        #旧版本好感为0时 直接更换版本
+        if old_data.get("affection", 0.0) == 0.0:
+            log.info(f"Prevent transferring affection from v1({old_data.get('affection', 0.0)}) to v2 because it is 0")
+            persistent._mas_affection_version += 1
+            return
         log.info(f"Transferring affection from v1({old_data.get('affection', 0.0)}) to v2")
         aff = old_data.get("affection", 0.0)
         if aff >= 1000000:
