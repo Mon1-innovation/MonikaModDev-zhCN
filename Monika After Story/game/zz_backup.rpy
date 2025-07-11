@@ -29,6 +29,7 @@ python early in mas_per_check:
     import renpy
     import store
     import store.mas_utils as mas_utils
+    import traceback
 
     early_log = store.mas_logging.init_log("early", header=False)
 
@@ -393,7 +394,7 @@ python early in mas_per_check:
 
             # regular corruption flow
             mas_corrupted_per = True
-            early_log.error("persistent was corrupted! : " +repr(e))
+            early_log.error("persistent was corrupted! : \n" + traceback.format_exc())
             # " this comment is to fix syntax highlighting issues on vim
 
         # if we got here, we had a corrupted persistent.

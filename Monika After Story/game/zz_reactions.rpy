@@ -698,7 +698,7 @@ init -11 python in mas_filereacts:
         good = 0
         bad = 0
         neutral = 0
-        for _key in stats.keys():
+        for _key in list(stats.keys()):
             if _key in good_gifts:
                 good = good + stats[_key]
             if _key in bad_gifts:

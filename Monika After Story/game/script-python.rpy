@@ -897,9 +897,9 @@ define mas_ptod.font = mas_ui.MONO_FONT
 #   this style has a slow_cps of 30
 #
 # console_Text font is gui/font/F25_BankPrinter.ttf
-style mas_py_console_text is console_text:
+style mas_py_console_text:# is console_text:
     font mas_ptod.font
-style mas_py_console_text_cn is console_text_console:
+style mas_py_console_text_cn:# is console_text_console:
     font mas_ptod.font
 
 # images for console stuff
@@ -1547,7 +1547,7 @@ screen mas_py_console_teaching():
             # current line
             if len(store.mas_ptod.cn_line) > 0:
                 text "[store.mas_ptod.cn_line]":
-                    style "mas_py_console_text_cn"
+                    style "mas_py_console_text"
                     anchor (0, 1.0)
                     xpos cn_l_x
                     ypos 433
