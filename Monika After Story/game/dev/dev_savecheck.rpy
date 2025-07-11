@@ -8,7 +8,7 @@ init 5 python:
             persistent.event_database,
             eventlabel="dev_save_check",
             category=["dev"],
-            prompt="PERSISTENT CHECK/存档检测",
+            prompt="存档检测",
             pool=True,
             unlocked=True
         )
