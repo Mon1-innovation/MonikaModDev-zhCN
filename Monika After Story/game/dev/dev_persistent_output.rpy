@@ -20,9 +20,8 @@ label dev_persistent_in_output:
                 m "你还没有存档哦~, 先把存档放在[os.path.join(ANDROID_MASBASE, 'characters', 'persistent')]吧."
                 return
             python:
-                renpy.persistent.load(os.path.join(ANDROID_MASBASE,"characters", "persistent"))
-                persistent.closed_self = True
-                renpy.save_persistent()
+                import shutil
+                shutil.copyfile(os.path.join(ANDROID_MASBASE,"characters", "persistent"), renpy.config.savedir + "/persistent")
                 android_toast("导入成功")
                 os.remove(os.path.join(ANDROID_MASBASE,"characters", "persistent"))
                 renpy.quit()

@@ -442,8 +442,12 @@ init -2000 python:
     import os
     if os.path.exists(os.path.join(ANDROID_MASBASE, 'saves', 'persistent')):
         try:
+#            newpersistent = load_persistent(os.path.join(ANDROID_MASBASE, 'saves', 'persistent'))
+#            renpy.game.persistent = newpersistent
+#            renpy.save_persistent()
+            import shutil
+            shutil.copyfile(os.path.join(ANDROID_MASBASE,"saves", "persistent"), renpy.config.savedir + "/persistent")
             android_toast("导入存档成功")
-            store.persistent = load_persistent(os.path.join(ANDROID_MASBASE, 'saves', 'persistent'))
             os.remove(os.path.join(ANDROID_MASBASE, 'saves', 'persistent'))
         except Exception as e:
             import time
