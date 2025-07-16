@@ -2,6 +2,8 @@ python early:
     import os
 
     ANDROID_MASBASE = "/storage/emulated/0/MAS/"
+    ANDROID_DEFBASEDIR = renpy.config.basedir
+    ANDROID_FTSKIPED = False
     #config.savedir = os.path.join(ANDROID_MASBASE, "saves")
 
     def android_toast(message):
@@ -72,6 +74,10 @@ python early:
                 )
             bar.dismiss()
         AsyncTask(_progress_process())
+    else if renpy.android and os.path.exists("/storage/emulated/0/MAS/bypass_filetransfer"):
+        ANDROID_FTSKIPED = True
+        renpy.config.basedir = ANDROID_MASBASE
+
 
     #def scan_outer_resource(add, seen):
     #    files = game_files

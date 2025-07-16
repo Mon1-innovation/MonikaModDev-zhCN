@@ -40,6 +40,8 @@ init python in mas_chess:
     import store.mas_ui as mas_ui
     import store
     import random
+    from store import ANDROID_DEFBASEDIR as ANDROID_DEFBASEDIR
+    from store import ANDROID_FTSKIPED as ANDROID_FTSKIPED
 
     if renpy.android:
         CHESS_SAVE_PATH = "/storage/emulated/0/MAS/chess_game/"
@@ -3447,7 +3449,7 @@ init python:
 
                         store.mas_ptod.rst_cn()
                         local_ctx = {
-                            "basedir": renpy.config.basedir
+                            "basedir": renpy.config.basedir if not ANDROID_FTSKIPED else ANDROID_DEFBASEDIR
                         }
                         renpy.show("monika", at_list=[t22])
                         renpy.show_screen("mas_py_console_teaching")
