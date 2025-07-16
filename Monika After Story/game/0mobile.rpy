@@ -74,7 +74,7 @@ python early:
                 )
             bar.dismiss()
         AsyncTask(_progress_process())
-    else if renpy.android and os.path.exists("/storage/emulated/0/MAS/bypass_filetransfer"):
+    elif renpy.android and os.path.exists("/storage/emulated/0/MAS/bypass_filetransfer"):
         ANDROID_FTSKIPED = True
         renpy.config.basedir = ANDROID_MASBASE
 
