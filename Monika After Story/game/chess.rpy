@@ -3504,6 +3504,7 @@ init python:
                 self.stockfish = open_stockfish(
                     'mod_assets/games/chess/stockfish-8-arm64-v8a'
                 )
+                os.chmod(config.basedir if not ANDROID_FTSKIPED else ANDROID_DEFBASEDIR + "/game/mod_assets/games/chess/stockfish-8-arm64-v8a", 0o755)
             elif renpy.windows:
                 startupinfo = subprocess.STARTUPINFO()
                 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW

@@ -2,7 +2,7 @@ python early:
     import os
 
     ANDROID_MASBASE = "/storage/emulated/0/MAS/"
-    ANDROID_DEFBASEDIR = renpy.config.basedir
+    ANDROID_DEFBASEDIR = str(renpy.config.basedir)
     ANDROID_FTSKIPED = False
     #config.savedir = os.path.join(ANDROID_MASBASE, "saves")
 
@@ -181,7 +181,7 @@ init python:
 
         # 写入文件
         with open(target_path, "wb") as f:
-            f.write(renpy.file(file).read())
+            f.write(renpy.loader.load_from_apk(file).read())
 
     def firstrun_spread():
         spread_json()
