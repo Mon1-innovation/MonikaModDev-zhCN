@@ -9288,7 +9288,7 @@ label monika_explain:
     $ _history_list.pop()
     menu:
         m "I'll wait until you're ready.{fast}"
-        "Start.":
+        "Start.{#monika_explain}":
             pass
     m 1hua "Hello! My name is Monika."
     m "[player]'s faithful girlfriend!"
@@ -11731,7 +11731,7 @@ label monika_justice:
             menu:
                 m "You don't think that's justified, do you, [player]?{fast}"
 
-                "I do.":
+                "I do.{#monika_justice}":
                     $ persistent._mas_pm_monika_deletion_justice = True
                     if mas_isMoniBroken():
                         m 1dsc "..."
@@ -11765,7 +11765,7 @@ label monika_justice:
                         m 1hua "If I get to be with you, I think it really was worth everything,{w=0.1} {nw}"
                         extend 1hub "ahaha~"
 
-                "I don't.":
+                "I don't.{#monika_justice}":
                     if persistent._mas_pm_monika_deletion_justice:
                         $ persistent._mas_monika_deletion_justice_kidding = True
                     $ persistent._mas_pm_monika_deletion_justice = False
