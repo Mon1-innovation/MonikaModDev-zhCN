@@ -570,7 +570,7 @@ label demo_minigame_pong:
 
             jump demo_minigame_pong
 
-        "No.":
+        "No.{#demo_minigame_pong}":
             if winner == "monika":
                 if renpy.seen_label(store.mas_pong.DLG_WINNER_END):
                     $ end_dialogue = store.mas_pong.DLG_WINNER_FAST
