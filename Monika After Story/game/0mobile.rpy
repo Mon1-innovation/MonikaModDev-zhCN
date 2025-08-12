@@ -411,23 +411,25 @@ label show_all_dev:
 
 label install_submods:
     python:
+        import time
         zip_files = installer.get_zip_files()
         renpy.say(m, f"一共有{len(zip_files)}个压缩包.")
         for zip_file in zip_files:
-            installtask = AsyncTask(installer.install_from_zip, zip_file)
+            installtask = AsyncTask(installer.process_zip, zip_file)
             progress = installer.get_progress()
             installprogress = AndroidProgressDialog(
                 title="处理中", 
                 message="正在加载数据...",
                 max_value=100
             )
-            while(not installtask.is_finished)
+            while not installtask.is_finished:
                 progress = installer.get_progress()
                 installprogress.update(
                     progress['progress_percent'],
-                    message = f"{progress['stage']}:{progress['current_zip']}",
-                    title = f"{progress['processed_files']}/{progress['total_files']}: {progress['current_file']}"
+                    title = f"{progress['stage']}:{progress['current_zip']}",
+                    message = f"{progress['processed_files']}/{progress['total_files']}: {progress['current_file']}"
                 )
+                time.sleep(0.1)
             installprogress.dismiss()
     return
 init 5 python:  

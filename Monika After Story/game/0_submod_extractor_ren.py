@@ -1,6 +1,5 @@
 """renpy
 init python: 
-    import renpy
 """
 import os
 import shutil
@@ -255,21 +254,46 @@ class SubmodInstaller:
             return False
 
     def _unzip(self, file_path, extracted_dir):
-        """解压zip文件"""
-        self.logger.info(f"解压文件: '{file_path}'")
+        """解压zip文件并跟踪进度"""
+        self._update_stage("解压文件", file_path)
         
         try:
             with zipfile.ZipFile(file_path, 'r') as zip_ref:
-                # 先检查是否为有效ZIP文件
-                if zip_ref.testzip() is not None:
-                    self.logger.error("ZIP文件损坏或无效")
-                    return False
+                # 获取ZIP文件总大小
+                total_size = sum(file.file_size for file in zip_ref.infolist())
+                extracted_size = 0
                 
+                # 确保目标目录存在
                 os.makedirs(extracted_dir, exist_ok=True)
-                zip_ref.extractall(extracted_dir)
+                
+                # 逐个文件解压并更新进度
+                for file_info in zip_ref.infolist():
+                    # 更新当前处理文件
+                    self.current_file = file_info.filename
+                    
+                    # 解压单个文件
+                    zip_ref.extract(file_info, extracted_dir)
+                    
+                    # 更新已解压大小
+                    extracted_size += file_info.file_size
+                    
+                    # 计算解压进度百分比
+                    unzip_percent = (extracted_size / total_size) * 100 if total_size > 0 else 0
+                    
+                    # 更新解压进度状态
+                    self.unzip_progress = {
+                        "current_file": file_info.filename,
+                        "total_size": total_size,
+                        "extracted_size": extracted_size,
+                        "progress_percent": unzip_percent
+                    }
+            
+            # 解压完成后重置状态
+            self.unzip_progress = None
             return True
+            
         except Exception as e:
-            self.logger.error(f"解压失败: '{e}'")
+            mas_submod_utils.submod_log.error(f"解压失败: '{e}'")
             return False
 
     def _move_files(self, file_path, success, file_name):
