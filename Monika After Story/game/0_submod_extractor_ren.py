@@ -363,7 +363,7 @@ class SubmodInstaller:
 ## 使用示例
 ## 创建安装器实例（参数可自定义）
 installer = SubmodInstaller(
-    dp_basedir=renpy.config.basedir,  # 可选
+    dp_basedir=ANDROID_MASBASE,  # 可选
     join_dir_max=6  # 可选
 )
 installer.logger = store.mas_submod_utils.submod_log
