@@ -408,6 +408,28 @@ label show_all_dev:
                         if "dev" in c:
                             mas_unlockEvent(ev)
     return
+
+label install_submods:
+    python:
+        zip_files = installer.get_zip_files()
+        renpy.say(m, f"一共有{len(zip_files)}个压缩包.")
+        for zip_file in zip_files:
+            installtask = AsyncTask(installer.install_from_zip, zip_file)
+            progress = installer.get_progress()
+            installprogress = AndroidProgressDialog(
+                title="处理中", 
+                message="正在加载数据...",
+                max_value=100
+            )
+            while(not installtask.is_finished)
+                progress = installer.get_progress()
+                installprogress.update(
+                    progress['progress_percent'],
+                    message = f"{progress['stage']}:{progress['current_zip']}",
+                    title = f"{progress['processed_files']}/{progress['total_files']}: {progress['current_file']}"
+                )
+            installprogress.dismiss()
+    return
 init 5 python:  
     addEvent(
         Event(
@@ -425,6 +447,16 @@ init 5 python:
             eventlabel="show_all_dev",
             category=["维护功能"],
             prompt="显示所有开发者话题",
+            pool=True,
+            unlocked=True
+        )
+    )  
+    addEvent(
+        Event(
+            persistent.event_database,
+            eventlabel="install_submods",
+            category=["维护功能"],
+            prompt="尝试安装子模组",
             pool=True,
             unlocked=True
         )

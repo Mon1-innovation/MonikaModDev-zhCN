@@ -5,7 +5,7 @@ init 5 python:
         Event(
             persistent.event_database,
             eventlabel="modass_spr",
-            category=['补丁','模组'],
+            category=["维护功能"],
             prompt="安装数据包",
             unlocked=True,
             pool=True,
