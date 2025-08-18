@@ -140,6 +140,26 @@ python early:
             window.AsyncTaskerCheck.wait()
         return res
     renpy.renpy.error.report_exception = new_report_exception
+
+    # 检查是否试图安装PC版本
+    import os
+    paths = [
+        os.path.join(ANDROID_MASBASE, "game", "zz_windowutils.rpyc"),
+        os.path.join(ANDROID_MASBASE, "python-packages", "pywintypes27.dll"),
+        os.path.join(ANDROID_MASBASE, "python-packages", "pythoncomloader27.dll"),
+        os.path.join(ANDROID_MASBASE, "python-packages", "pythoncom27.dll")
+    ]
+    for path in paths:
+        if os.path.exists(path):
+            window = AndroidAlertDialog(
+                title="抱歉, 但是你似乎尝试在手机版中安装PC版本...",
+                message="手机端和PC端是完全独立的两个版本.\n因为手机端使用更新的Renpy引擎, 所以不支持PC端的代码.\nPC版本也未对手机做任何兼容, 所以你无法打开游戏.\n请删除 MAS/game 文件夹后再启动游戏.",
+                positive_text="",
+                negative_text="关闭",
+            )
+            window.AsyncTaskerCheck.wait()
+        renpy.quit()
+    
 init python:
     cn_debuging = p_debug
     import os
