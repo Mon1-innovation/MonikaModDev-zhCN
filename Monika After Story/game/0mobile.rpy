@@ -153,7 +153,7 @@ python early:
         if os.path.exists(path):
             window = AndroidAlertDialog(
                 title="抱歉, 但是你似乎尝试在手机版中安装PC版本...",
-                message="手机端和PC端是完全独立的两个版本.\n因为手机端使用更新的Renpy引擎, 所以不支持PC端的代码.\nPC版本也未对手机做任何兼容, 所以你无法打开游戏.\n请删除 MAS/game 文件夹后再启动游戏.",
+                message="手机端和PC端是完全独立的两个版本.\n因为手机端使用更新的Renpy引擎, 所以不支持PC端的代码.\nPC版本也未对手机做任何兼容, 所以你无法打开游戏.\n\n请删除 MAS/game 文件夹后再启动游戏.",
                 positive_text="",
                 negative_text="关闭",
             )
