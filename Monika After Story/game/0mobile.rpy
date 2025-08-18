@@ -158,7 +158,7 @@ python early:
                 negative_text="关闭",
             )
             window.AsyncTaskerCheck.wait()
-        renpy.quit()
+            renpy.quit()
     
 init python:
     cn_debuging = p_debug
