@@ -2717,6 +2717,7 @@ screen twopane_scrollable_menu(prev_items, main_items, left_area, left_align, ri
                     yfill False
                     mousewheel True
                     arrowkeys True
+                    draggable True
 
                     vbox:
                         for ev in flt_evs:
@@ -2768,6 +2769,7 @@ screen twopane_scrollable_menu(prev_items, main_items, left_area, left_align, ri
                     yfill False
                     mousewheel True
                     arrowkeys True
+                    draggable True
 
                     vbox:
                         for i_caption, i_label in prev_items:
@@ -2808,6 +2810,7 @@ screen twopane_scrollable_menu(prev_items, main_items, left_area, left_align, ri
                         yfill False
                         mousewheel True
                         arrowkeys True
+                        draggable True
 
                         vbox:
                             for i_caption, i_label in main_items:
