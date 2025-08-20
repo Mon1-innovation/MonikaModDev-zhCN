@@ -2941,6 +2941,7 @@ screen mas_gen_scrollable_menu(items, display_area, scroll_align, *args):
                 id "viewport"
                 yfill False
                 mousewheel True
+                draggable True
 
                 vbox:
                     for item_prompt, item_value, is_italic, is_bold in items:
@@ -3028,6 +3029,7 @@ screen mas_check_scrollable_menu(
                 id "viewport"
                 yfill False
                 mousewheel True
+                draggable True
 
                 vbox:
                     for button_prompt, button_key, start_selected, true_value, false_value in items:
