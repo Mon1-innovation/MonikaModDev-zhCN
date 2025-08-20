@@ -3397,7 +3397,6 @@ screen mas_selector_sidebar(items, mailbox, confirm, cancel, restore, remover=No
             draggable False
             arrowkeys False
             mousewheel "horizontal"
-            draggable True
             # I have no idea why, but this must be 5 px shorter
             xsize 195
             ysize 38
