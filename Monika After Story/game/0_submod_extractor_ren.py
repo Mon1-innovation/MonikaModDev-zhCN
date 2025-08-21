@@ -14,7 +14,7 @@ class simplelogger:
     def error(msg, *args, **kwargs):
         print(f"[ERROR] {msg}", *args, **kwargs)
     
-    def warn(msg, *args, **kwargs):
+    def warning(msg, *args, **kwargs):
         print(f"[WARN] {msg}", *args, **kwargs)
     
     def debug(msg, *args, **kwargs):
