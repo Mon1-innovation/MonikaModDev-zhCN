@@ -1661,7 +1661,7 @@ screen preferences():
             hbox:
                 #We disable updating on the main menu because it causes graphical issues
                 #due to the spaceroom not being loaded in
-                if not main_menu:
+                if not main_menu and not renpy.android:
                     textbutton _("Update Version"):
                         action Function(renpy.call_in_new_context, 'forced_update_now')
                         style "navigation_button"

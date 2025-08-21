@@ -1,3 +1,7 @@
+"""renpy
+init python: 
+"""
+
 import os
 import shutil
 import zipfile
