@@ -530,8 +530,8 @@ def create_uninstaller_example():
 #create_uninstaller_example()
 
 # 实例化卸载器（根据需要调整参数）
-#uninstaller = SubmodUninstaller(
-#    dp_basedir=ANDROID_MASBASE,  # 可选
-#    join_dir_max=6  # 可选
-#)
-# uninstaller.logger = store.mas_submod_utils.submod_log
+uninstaller = SubmodUninstaller(
+    dp_basedir=ANDROID_MASBASE,  # 可选
+    join_dir_max=6  # 可选
+)
+uninstaller.logger = store.mas_submod_utils.submod_log

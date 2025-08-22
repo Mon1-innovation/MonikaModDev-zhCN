@@ -433,7 +433,11 @@ label install_submods:
     python:
         import time
         zip_files = installer.get_zip_files()
-        renpy.say(m, f"一共有{len(zip_files)}个压缩包.")
+        zip_uninstall_files = uninstaller.get_zip_files()
+
+        renpy.say(m, f"一共有{len(zip_files)}个压缩包待安装, {len(zip_uninstall_files)}个压缩包待卸载.")
+
+    python:
         for zip_file in zip_files:
             installtask = AsyncTask(installer.process_zip, zip_file)
             progress = installer.get_progress()
@@ -451,6 +455,24 @@ label install_submods:
                 )
                 time.sleep(0.1)
             installprogress.dismiss()
+    python:
+        for zip_file in zip_uninstall_files:
+            uninstaltask = AsyncTask(uninstaller.process_zip, zip_file)
+            progress = uninstaller.get_progress()
+            uninstallprogress = AndroidProgressDialog(
+                title="处理中", 
+                message="正在加载数据...",
+                max_value=100
+            )
+            while not uninstaltask.is_finished:
+                progress = uninstaller.get_progress()
+                uninstallprogress.update(
+                    progress['progress_percent'],
+                    title = f"{progress['stage']}:{progress['current_zip']}",
+                    message = f"{progress['processed_files']}/{progress['total_files']}: {progress['current_file']}"
+                )
+                time.sleep(0.1)
+            uninstallprogress.dismiss()
     return
 label create_hint_file:
     $ target_file = ""
@@ -522,7 +544,7 @@ init 5 python:
             persistent.event_database,
             eventlabel="install_submods",
             category=["维护功能"],
-            prompt="尝试安装子模组",
+            prompt="子模组安装&卸载",
             pool=True,
             unlocked=True
         )
