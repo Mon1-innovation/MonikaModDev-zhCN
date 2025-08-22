@@ -452,6 +452,50 @@ label install_submods:
                 time.sleep(0.1)
             installprogress.dismiss()
     return
+label create_hint_file:
+    $ target_file = ""
+    python:
+        import os
+        def create_hint_file(target_file):
+            hint_file = os.path.join(ANDROID_MASBASE, target_file)
+            if not os.path.exists(hint_file):
+                with open(hint_file, "w") as f:
+                    pass
+        def delete_hint_file(target_file):
+            hint_file = os.path.join(ANDROID_MASBASE, target_file)
+            if os.path.exists(hint_file):
+                os.remove(hint_file)
+        hint_files = [
+            {"name": "bypass_filetransfer", "description": "该文件可以禁用文件同步, basedir将改为外置MAS目录, 这可能有助于精灵包等外部文件加载, 但也可能导致预料之外的问题"},
+            {"name": "pure_sync", "description": "该文件可以完全重新同步文件"},
+            {"name": "debug.p", "description": "该文件可以开启开发者模式"},
+            {"name": "算了", "description": "好吧~"}
+        ]
+        # 构建菜单项
+        menu_items = []
+        for f in hint_files:
+            menu_items.append((f['name'], f['name']))
+        
+        # 显示菜单
+        choice = renpy.display_menu(menu_items)
+                
+        target_file = choice
+        
+        # 显示对应文件的描述
+        for f in hint_files:
+            if f['name'] == target_file:
+                renpy.say(None, f['description'])
+                break
+    if target_file == "算了":
+        return
+    menu:
+        "你要创建还是删除[target_file]?"
+        "创建":
+            $ create_hint_file(target_file)
+        "删除":
+            $ delete_hint_file(target_file)
+    "完成了"
+    return
 init 5 python:  
     addEvent(
         Event(
@@ -479,6 +523,16 @@ init 5 python:
             eventlabel="install_submods",
             category=["维护功能"],
             prompt="尝试安装子模组",
+            pool=True,
+            unlocked=True
+        )
+    )  
+    addEvent(
+        Event(
+            persistent.event_database,
+            eventlabel="create_hint_file",
+            category=["维护功能"],
+            prompt="创建标识文件",
             pool=True,
             unlocked=True
         )
