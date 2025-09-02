@@ -4,6 +4,7 @@ python early:
     ANDROID_MASBASE = "/storage/emulated/0/MAS/"
     ANDROID_DEFBASEDIR = str(renpy.config.basedir)
     ANDROID_FTSKIPED = False
+    ANDROID_SAVEDIR_CHANGED = False
     #config.savedir = os.path.join(ANDROID_MASBASE, "saves")
 
     def android_toast(message):
@@ -47,6 +48,7 @@ python early:
                         negative_text="关闭",
                     )
                     window.AsyncTaskerCheck.wait()
+                    renpy.quit()
         pass
     def p_raise():
         raise Exception("Raise Exception for Debugging")
@@ -77,6 +79,10 @@ python early:
     elif renpy.android and os.path.exists("/storage/emulated/0/MAS/bypass_filetransfer"):
         ANDROID_FTSKIPED = True
         renpy.config.basedir = ANDROID_MASBASE
+    
+    if not os.path.exists("/storage/emulated/0/MAS/use_android_savedir") and renpy.check_permission("android.permission.WRITE_EXTERNAL_STORAGE"):
+        renpy.config.savedir = os.path.join(ANDROID_MASBASE, "saves")
+        ANDROID_SAVEDIR_CHANGED = True
 
 
     #def scan_outer_resource(add, seen):
@@ -363,6 +369,9 @@ init python:
         return problems
          
 label p_outper:
+    if ANDROID_SAVEDIR_CHANGED:
+        "存档文件夹已被修改, 直接使用 MAS/saves 下的文件即可"
+        return
     "即将导出存档"
     python:
         import shutil
@@ -491,6 +500,7 @@ label create_hint_file:
             {"name": "bypass_filetransfer", "description": "该文件可以禁用文件同步, basedir将改为外置MAS目录, 这可能有助于精灵包等外部文件加载, 但也可能导致预料之外的问题"},
             {"name": "pure_sync", "description": "该文件可以完全重新同步文件"},
             {"name": "debug.p", "description": "该文件可以开启开发者模式"},
+            {"name": "use_android_savedir", "description": "该文件可以将存档文件夹修改为Android数据文件夹下的默认位置"},
             {"name": "算了", "description": "好吧~"}
         ]
         # 构建菜单项
@@ -577,7 +587,7 @@ init -2000 python:
         return loads(s)
 
     import os
-    if os.path.exists(os.path.join(ANDROID_MASBASE, 'saves', 'persistent')):
+    if os.path.exists(os.path.join(ANDROID_MASBASE, 'saves', 'persistent')) and not ANDROID_SAVEDIR_CHANGED:
         try:
 #            newpersistent = load_persistent(os.path.join(ANDROID_MASBASE, 'saves', 'persistent'))
 #            renpy.game.persistent = newpersistent
