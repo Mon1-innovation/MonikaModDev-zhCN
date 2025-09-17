@@ -795,7 +795,7 @@ label bye_prompt_sleep_goodnight_kiss(chance=3):
         menu:
             m "Think I could...get a goodnight kiss?{fast}"
 
-            "Sure, [m_name].":
+            "Sure, [m_name].{#bye_prompt_sleep_goodnight_kiss_1}":
                 $ got_goodnight_kiss = True
                 show monika 6ekbsu at t11 zorder MAS_MONIKA_Z with dissolve_monika
                 pause 2.0
@@ -804,7 +804,7 @@ label bye_prompt_sleep_goodnight_kiss(chance=3):
                 show monika 1hubfa at t11 zorder MAS_MONIKA_Z with dissolve_monika
                 m 1hubfa "Sleep tight!"
 
-            "Maybe another time...":
+            "Maybe another time...{#bye_prompt_sleep_goodnight_kiss_1}":
                 if random.randint(1, 3) == 1:
                     m 3rkblp "Aww, come on...{w=0.3}{nw}"
                     extend 3nublu "I know you want to~"
@@ -814,7 +814,7 @@ label bye_prompt_sleep_goodnight_kiss(chance=3):
                     menu:
                         m "Can I please get a goodnight kiss?{fast}"
 
-                        "Okay.":
+                        "Okay.{#bye_prompt_sleep_goodnight_kiss_1_1}":
                             $ got_goodnight_kiss = True
                             show monika 6ekbsu at t11 zorder MAS_MONIKA_Z with dissolve_monika
                             pause 2.0
@@ -822,7 +822,7 @@ label bye_prompt_sleep_goodnight_kiss(chance=3):
                             m 6ekbfa "Sweet dreams, [player]~"
                             m 6hubfb "Sleep tight!"
 
-                        "No.":
+                        "No.{#bye_prompt_sleep_goodnight_kiss_1_1}":
                             $ mas_loseAffection(1.5)
                             m 1lkc "..."
                             m 7dkd "Fine..."
@@ -1142,7 +1142,7 @@ label bye_long_absence:
             m 2hua "Make me proud, [player]!"
             $ persistent._mas_greeting_type = store.mas_greetings.TYPE_LONG_ABSENCE
             return 'quit'
-        "No.":
+        "No.{#bye_long_absence_l1}":
             $ mas_absence_counter = True
             m 1hua "That's great!"
             m 1eka "I was honestly worried I wouldn't have enough time to ready myself for your absence."
@@ -1348,14 +1348,14 @@ label bye_prompt_game:
         $ _history_list.pop()
         menu:
             m "Can't you just leave me here in the background while you play?{fast}"
-            "Yes.":
+            "Yes.{#bye_prompt_game_1}":
                 if mas_isMoniNormal(higher=True):
                     m 3sub "Really?"
                     m 1hubsb "Yay!"
                 else:
                     m 2eka "Okay..."
                 jump monika_idle_game.skip_intro
-            "No.":
+            "No.{#bye_prompt_game_1}":
                 if mas_isMoniNormal(higher=True):
                     m 2ekc "Aww..."
                     m 3ekc "Alright [player], but you better come back soon."
