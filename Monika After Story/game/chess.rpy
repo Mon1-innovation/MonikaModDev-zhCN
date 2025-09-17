@@ -40,8 +40,13 @@ init python in mas_chess:
     import store.mas_ui as mas_ui
     import store
     import random
+    from store import ANDROID_DEFBASEDIR as ANDROID_DEFBASEDIR
+    from store import ANDROID_FTSKIPED as ANDROID_FTSKIPED
 
-    CHESS_SAVE_PATH = "/chess_games/"
+    if renpy.android:
+        CHESS_SAVE_PATH = "/storage/emulated/0/MAS/chess_game/"
+    else: 
+        CHESS_SAVE_PATH = "/chess_games/"
     CHESS_SAVE_EXT = ".pgn"
     CHESS_SAVE_NAME = "abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ-_0123456789"
     CHESS_PROMPT_FORMAT = "{0} | {1} | Turn: {2} | You: {3}"
@@ -545,7 +550,7 @@ init python in mas_chess:
 
         Chess960 rules are basically:
         1. One rook must stay on the left side of king, and another one stay on the right side.
-           Due to this, the king can never be placed on a-file or h-file.
+            Due to this, the king can never be placed on a-file or h-file.
         2. Bishops must stay on different color square.
         3. Pawns must stay like the normal chess game.
         4. The position of player A's pieces must be the 'reversed version' of player B's.
@@ -949,7 +954,7 @@ label mas_chess_remenu:
         return
 
     #We're changing the main group of settings we wish to change
-    elif _return in menu_contents.keys():
+    elif _return in list(menu_contents.keys()):
         $ _history_list.pop()
         $ menu_category = _return
 
@@ -1948,13 +1953,16 @@ init python:
     import random
     import pygame
     import threading
-    import StringIO
+    from io import StringIO
     import os
 
     #Only add the chess_games folder if we can even do chess
     if mas_games.is_platform_good_for_chess():
         try:
-            file_path = os.path.normcase(config.basedir + mas_chess.CHESS_SAVE_PATH)
+            if renpy.android:
+                file_path = os.path.normcase(mas_chess.CHESS_SAVE_PATH)
+            else:
+                file_path = os.path.normcase(config.basedir + mas_chess.CHESS_SAVE_PATH)
 
             if not os.access(file_path, os.F_OK):
                 os.mkdir(file_path)
@@ -2024,7 +2032,7 @@ init python:
         BUTTON_INDICATOR_X = int(BOARD_X_POS + BOARD_WIDTH + BUTTON_INDICATOR_X_SPACING)
 
         #Indicator Y position
-        INDICATOR_Y = int(BOARD_Y_POS + ((BOARD_HEIGHT - INDICATOR_HEIGHT)/ 2))
+        INDICATOR_Y = int(BOARD_Y_POS + ((BOARD_HEIGHT - INDICATOR_HEIGHT)// 2))
 
         #Absolute indicator position
         INDICATOR_POS = (BUTTON_INDICATOR_X, INDICATOR_Y)
@@ -2332,7 +2340,7 @@ init python:
             self.piece_map = dict()
 
             #And refill it
-            for position, Piece in self.board.piece_map().iteritems():
+            for position, Piece in self.board.piece_map().items():
                 MASPiece.fromPiece(
                     Piece,
                     MASChessDisplayableBase.square_to_board_coords(position),
@@ -2511,7 +2519,7 @@ init python:
             highlight_magenta = renpy.render(MASChessDisplayableBase.PIECE_HIGHLIGHT_MAGENTA_IMAGE, 1280, 720, st, at)
 
             #Get our mouse pos
-            mx, my = mas_getMousePos()
+            mx, my = renpy.get_mouse_pos()
 
             #Since different buttons show during the game vs post game, we'll sort out what's shown here
             visible_buttons = list()
@@ -2591,7 +2599,7 @@ init python:
                 renderer.blit(highlight_yellow, MASChessDisplayableBase.board_coords_to_screen_coords(hl))
 
             #Draw the pieces on the Board renderer.
-            for piece_location, Piece in self.piece_map.iteritems():
+            for piece_location, Piece in self.piece_map.items():
                 #Unpack the location
                 ix, iy = piece_location
 
@@ -2659,9 +2667,9 @@ init python:
                 #Draw the selected piece.
                 piece = self.get_piece_at(self.selected_piece[0], self.selected_piece[1])
 
-                px, py = mas_getMousePos()
-                px -= MASChessDisplayableBase.PIECE_WIDTH / 2
-                py -= MASChessDisplayableBase.PIECE_HEIGHT / 2
+                px, py = renpy.get_mouse_pos()
+                px -= MASChessDisplayableBase.PIECE_WIDTH // 2
+                py -= MASChessDisplayableBase.PIECE_HEIGHT // 2
                 piece.render(width, height, st, at, px, py, renderer)
 
             #Ask that we be re-rendered ASAP, so we can show the next frame.
@@ -2737,11 +2745,11 @@ init python:
             OUT:
                 Tuple of coordinates (x, y) marking where the piece is
             """
-            mx, my = mas_getMousePos()
+            mx, my = renpy.get_mouse_pos()
             mx -= MASChessDisplayableBase.BASE_PIECE_X
             my -= MASChessDisplayableBase.BASE_PIECE_Y
-            px = mx / MASChessDisplayableBase.PIECE_WIDTH
-            py = my / MASChessDisplayableBase.PIECE_HEIGHT
+            px = mx // MASChessDisplayableBase.PIECE_WIDTH
+            py = my // MASChessDisplayableBase.PIECE_HEIGHT
 
             #White
             if self.is_player_white:
@@ -2812,7 +2820,7 @@ init python:
             OUT:
                 tuple - (x, y) coords representing board coordinates for the square provided
             """
-            return (sq_num % 8, sq_num / 8)
+            return (sq_num % 8, sq_num // 8)
 
         @staticmethod
         def board_coords_to_screen_coords(pos_tuple, inversion_tuple=(False,False)):
@@ -2877,13 +2885,21 @@ init python:
 
         IMG_MAP = {
             color + (symbol.upper() if color == "w" else symbol): Image("mod_assets/games/chess/pieces/{0}{1}.png".format(color, (symbol.upper() if color == "w" else symbol)))
-            for color in FP_COLOR_LOOKUP.itervalues()
+            for color in FP_COLOR_LOOKUP.values()
             for symbol in mas_chess.PIECE_POOL
+        }
+
+        NAMES_MAP = {
+            "b": "Bishop",
+            "k": "King",
+            "n": "Knight",
+            "p": "Pawn",
+            "r": "Rook",
+            "q": "Qeeb"
         }
 
         def __init__(
             self,
-            is_white,
             symbol,
             posX,
             posY,
@@ -2893,20 +2909,18 @@ init python:
             MASPiece constructor
 
             IN:
-                is_white - Whether or not the piece is white
                 symbol - letter symbol representing the piece. If capital, the piece is white
                 posX - x position of the piece
                 posY - y position of the piece
                 piece_map - Map to store this piece in
             """
-            self.is_white = is_white
             self.symbol = symbol
 
             #Store an internal reference to the piece map so we can execute moves from the piece
             self.piece_map = piece_map
 
             #Store the internal reference to this piece's image fp for use in rendering
-            self.__piece_image = MASPiece.IMG_MAP[MASPiece.FP_COLOR_LOOKUP[is_white] + symbol]
+            self.__piece_image = MASPiece.IMG_MAP[MASPiece.FP_COLOR_LOOKUP[self.is_white] + symbol]
 
             #Internal reference to the position
             self.x_pos = posX
@@ -2927,7 +2941,18 @@ init python:
             """
             Handles a representation of this piece
             """
-            return "MASPiece which: {0} and symbol: {1}".format("is white" if self.is_white else "is black", self.symbol)
+            return "MASPiece<{0} {1}>".format(
+                "White" if self.is_white else "Black",
+                self.name
+            )
+
+        @property
+        def name(self) -> str:
+            return self.NAMES_MAP[self.symbol.lower()]
+
+        @property
+        def is_white(self) -> bool:
+            return self.symbol.isupper()
 
         @staticmethod
         def fromPiece(piece, pos_tuple, piece_map):
@@ -2944,7 +2969,6 @@ init python:
                 MASPiece
             """
             return MASPiece(
-                piece.color,
                 piece.symbol(),
                 pos_tuple[0],
                 pos_tuple[1],
@@ -3350,6 +3374,14 @@ init python:
                     self._button_done
                 ]
 
+        def _send_uci_command(self, cmd: str):
+            """
+            Sends a command to stockfish using its input
+            """
+            self.stockfish.stdin.write(
+                cmd.encode("utf-8")
+            )
+
         def __del__(self):
             self.stockfish.stdin.close()
             self.stockfish.wait()
@@ -3361,10 +3393,10 @@ init python:
             OUT:
                 move - representing the best move stockfish found
             """
+            res = None
             with self.lock:
-                res = None
                 while self.queue:
-                    line = self.queue.pop()
+                    line = self.queue.pop().decode("utf-8")
                     match = re.match(r"^bestmove (\w+)", line)
                     if match:
                         res = match.group(1)
@@ -3375,9 +3407,9 @@ init python:
             """
             Starts Monika's analysis of the board
             """
-            self.stockfish.stdin.write("position fen {0}\n".format(self.board.fen()))
-            self.stockfish.stdin.write("go depth {0}\n".format(persistent._mas_chess_difficulty[1]))
-            self.stockfish.stdin.write("go movetime {0}\n".format(self.MONIKA_WAITTIME))
+            self._send_uci_command("position fen {0}\n".format(self.board.fen()))
+            self._send_uci_command("go depth {0}\n".format(persistent._mas_chess_difficulty[1]))
+            self._send_uci_command("go movetime {0}\n".format(self.MONIKA_WAITTIME))
 
         def additional_setup(self):
             """
@@ -3392,13 +3424,20 @@ init python:
                     path - filepath to the stockfish application
                     startupinfo - startup flags
                 """
-                try:
+                def start_stockfish_proc(path: str, startupinfo) -> subprocess.Popen:
+                    """
+                    Tries to launch a stockfish subprocess, can raise exceptions
+                    """
                     return subprocess.Popen(
                         os.path.join(renpy.config.gamedir, path).replace('\\', '/'),
+                        bufsize=0,
                         stdin=subprocess.PIPE,
                         stdout=subprocess.PIPE,
                         startupinfo=startupinfo
                     )
+
+                try:
+                    return start_stockfish_proc(path, startupinfo)
 
                 #Catch the permission error
                 except OSError as os_err:
@@ -3410,7 +3449,7 @@ init python:
 
                         store.mas_ptod.rst_cn()
                         local_ctx = {
-                            "basedir": renpy.config.basedir
+                            "basedir": renpy.config.basedir if not ANDROID_FTSKIPED else ANDROID_DEFBASEDIR
                         }
                         renpy.show("monika", at_list=[t22])
                         renpy.show_screen("mas_py_console_teaching")
@@ -3419,23 +3458,24 @@ init python:
                         renpy.pause(1.0)
                         store.mas_ptod.wx_cmd("import os", local_ctx)
                         renpy.pause(1.0)
-                        store.mas_ptod.wx_cmd(
-                            "subprocess.call(['chmod','+x', os.path.normcase(basedir + '/game/mod_assets/games/chess/stockfish_8_{0}_x64')])".format(
-                                "linux" if renpy.linux else "macosx"
-                            ),
-                            local_ctx
-                        )
+                        if renpy.android:
+                            store.mas_ptod.wx_cmd(
+                                "subprocess.call(['chmod','+x', os.path.normcase(basedir + '/game/mod_assets/games/chess/stockfish-8-arm64-v8a')])",
+                                local_ctx
+                            )
+                        else:
+                            store.mas_ptod.wx_cmd(
+                                "subprocess.call(['chmod','+x', os.path.normcase(basedir + '/game/mod_assets/games/chess/stockfish_8_{0}_x64')])".format(
+                                    "linux" if renpy.linux else "macosx"
+                                ),
+                                local_ctx
+                            )
                         renpy.pause(2.0)
 
                         renpy.hide_screen("mas_py_console_teaching")
                         #Try again
                         try:
-                            stockfish_proc = subprocess.Popen(
-                                os.path.join(renpy.config.gamedir, path).replace('\\', '/'),
-                                stdin=subprocess.PIPE,
-                                stdout=subprocess.PIPE,
-                                startupinfo=startupinfo
-                            )
+                            stockfish_proc = start_stockfish_proc(path, startupinfo)
 
                             renpy.show("monika 3hua", at_list=[t11])
                             renpy.say(m, "Yay! We should be able to play now~")
@@ -3460,8 +3500,12 @@ init python:
                 renpy.jump("mas_chess_cannot_work_embarrassing")
 
             is_64_bit = sys.maxsize > 2**32
-
-            if renpy.windows:
+            if renpy.android:             
+                self.stockfish = open_stockfish(
+                    'mod_assets/games/chess/stockfish-8-arm64-v8a'
+                )
+                os.chmod(config.basedir if not ANDROID_FTSKIPED else ANDROID_DEFBASEDIR + "/game/mod_assets/games/chess/stockfish-8-arm64-v8a", 0o755)
+            elif renpy.windows:
                 startupinfo = subprocess.STARTUPINFO()
                 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 
@@ -3473,13 +3517,13 @@ init python:
             elif is_64_bit:
                 fp = "mod_assets/games/chess/stockfish_8_{0}_x64".format("linux" if renpy.linux else "macosx")
 
-                os.chmod(config.basedir + "/game/".format(fp), 0755)
+                os.chmod(config.basedir + "/game/".format(fp), 0o755)
                 self.stockfish = open_stockfish(fp)
 
             #Set Monika's parameters
-            self.stockfish.stdin.write("setoption name Skill Level value {0}\n".format(persistent._mas_chess_difficulty[0]))
-            self.stockfish.stdin.write("setoption name Contempt value {0}\n".format(self.MONIKA_OPTIMISM))
-            self.stockfish.stdin.write("setoption name Ponder value False\n")
+            self._send_uci_command("setoption name Skill Level value {0}\n".format(persistent._mas_chess_difficulty[0]))
+            self._send_uci_command("setoption name Contempt value {0}\n".format(self.MONIKA_OPTIMISM))
+            self._send_uci_command("setoption name Ponder value False\n")
 
             #And set up facilities for asynchronous communication
             self.queue = collections.deque()
@@ -3620,21 +3664,23 @@ init python:
             # Poll Monika for moves if it's her turn
             if not self.is_game_over:
                 #Queue a Moni move if this is implemented
-                monika_move = self.poll_monika_move()
+                monika_move = None
+                while monika_move is None:
+                    # We have to wait for stockfish to send us a move
+                    monika_move = self.poll_monika_move()
 
-                if monika_move is not None:
-                    #Now verify legality
-                    monika_move_check = chess.Move.from_uci(monika_move)
+                #Now verify legality
+                monika_move_check = chess.Move.from_uci(monika_move)
 
-                    if self.board.is_legal(monika_move_check):
-                        #Monika is thonking
-                        renpy.pause(1.5)
+                if self.board.is_legal(monika_move_check):
+                    #Monika is thonking
+                    renpy.pause(1.5)
 
-                        #Push her move
-                        self.__push_move(monika_move)
+                    #Push her move
+                    self.__push_move(monika_move)
 
-                        #Set the buttons
-                        self.set_button_states()
+                    #Set the buttons
+                    self.set_button_states()
 
         def set_button_states(self):
             """

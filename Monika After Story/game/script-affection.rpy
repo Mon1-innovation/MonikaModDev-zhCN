@@ -174,7 +174,7 @@ init -900 python in mas_affection:
         LOVE: 0.15
     }
 
-    __STRUCT = struct.Struct(__STRUCT_FMT)
+    __STRUCT = struct.Struct(str(__STRUCT_FMT))
 
     # compare functions for affection / group
     def _compareAff(aff_1, aff_2):
@@ -796,7 +796,12 @@ init -900 python in mas_affection:
             return
 
         new_data = list()
-
+        #旧版本好感为0时 直接更换版本
+        if old_data.get("affection", 0.0) == 0.0:
+            log.info(f"Prevent transferring affection from v1({old_data.get('affection', 0.0)}) to v2 because it is 0")
+            persistent._mas_affection_version += 1
+            return
+        log.info(f"Transferring affection from v1({old_data.get('affection', 0.0)}) to v2")
         aff = old_data.get("affection", 0.0)
         if aff >= 1000000:
             aff = 0.0
@@ -1701,6 +1706,7 @@ init 15 python in mas_affection:
         Initializes the talk quiplists
         """
         global talk_menu_quips
+
         def save_quips(_aff, quiplist):
             mas_ql = store.MASQuipList(allow_label=False)
             for _quip in quiplist:
@@ -1838,6 +1844,7 @@ init 15 python in mas_affection:
         Initializes the play quipliust
         """
         global play_menu_quips
+
         def save_quips(_aff, quiplist):
             mas_ql = store.MASQuipList(allow_label=False)
             for _quip in quiplist:
@@ -3078,7 +3085,7 @@ label mas_player_nickname_loop(check_scrollable_text, nickname_pool):
 
     python:
         done = False
-        acceptable_nicknames = _return.keys()
+        acceptable_nicknames = list(_return.keys())
 
         if acceptable_nicknames:
             dlg_line = "Is there anything else you'd like me to call you?"
@@ -3332,7 +3339,7 @@ label mas_finalfarewell_start:
         allow_dialogue = False
         store.songs.enabled = False
         mas_in_finalfarewell_mode = True
-        layout.QUIT = glitchtext(20)
+        layout.QUIT = mas_glitchText(20)
         #Console is not going to save you.
         config.keymap["console"] = []
 
@@ -3486,7 +3493,7 @@ init python:
         ASSUMES:
             basedir
         """
-        filepath = basedir + path
+        filepath = basedir if not renpy.android else ANDROID_MASBASE + path
         if update or not renpy.exists(filepath):
             with open(filepath, "w") as note:
                 note.write(renpy.substitute(text))

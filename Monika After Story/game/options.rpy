@@ -22,6 +22,9 @@ define gui.about = _("")
 
 define build.name = "Monika_After_Story"
 
+## Name of the executables, we must keep it DDLC to obey the guidelines
+define build.executable_name = "DDLC"
+
 ## Preference defaults #########################################################
 
 ## Controls the default text speed. The default, 0, is infinite, while any other
@@ -119,42 +122,42 @@ init python:
     ## Classify files as None to exclude them from the built distributions.
 
     ##This tells Renpy to build an updater file
-    build.include_update = True
+    #build.include_update = True
 
-    ## This is the archive of data for your mod
-    #build.archive(build.name, "all")
+    ## Define the archives to use
+    build.archive("scripts", "all")
 
-    #Add the pictures necessary for the scrollable menu
-    build.classify("game/gui/**",build.name)
+    ##Add the pictures necessary for the scrollable menu
+    #build.classify("game/gui/**",build.name)
+#
+    ### These files get put into your data file
+    #build.classify("game/mod_assets/**",build.name)
+    ##build.classify("game/**.rpy",build.name) #Optional line to include plaintext scripts
+    #build.classify("game/*.rpyc",build.name) #Serialized scripts must be included
+    #build.classify("game/dev/*.*",None) #But not the dev folder
+    #build.classify("README.html",build.name) #Included help file for mod installation
+    #build.classify("game/python-packages/**",build.name)#Additional python pacakges
+    #build.classify("CustomIcon**.**",build.name)
+#
+#
+    #build.package(build.directory_name + "Mod",'zip',build.name,description='DDLC Compatible Mod')
 
-    ## These files get put into your data file
-    build.classify("game/mod_assets/**",build.name)
-    #build.classify("game/**.rpy",build.name) #Optional line to include plaintext scripts
-    build.classify("game/*.rpyc",build.name) #Serialized scripts must be included
-    build.classify("game/dev/*.*",None) #But not the dev folder
-    build.classify("README.html",build.name) #Included help file for mod installation
-    build.classify("game/python-packages/**",build.name)#Additional python pacakges
-    build.classify("CustomIcon**.**",build.name)
-
-
-    build.package(build.directory_name + "Mod",'zip',build.name,description='DDLC Compatible Mod')
-
-    build.classify('**~', None)
-    build.classify('**.bak', None)
-    build.classify('**/.**', None)
-    build.classify('**/#**', None)
-    build.classify('**/thumbs.db', None)
-    build.classify('**.rpy', None)
-    build.classify('**.psd', None)
-    build.classify('**.sublime-project', None)
-    build.classify('**.sublime-workspace', None)
-    build.classify('/music/*.*', None)
-    build.classify('script-regex.txt', None)
-    build.classify('/game/10', None)
-    build.classify('/game/cache/*.*', None)
-    build.classify('**.rpa',None)
-    build.classify("game/mod_assets/api_keys.json", None)
-    build.classify("**.pem", None)
+    #build.classify('**~', None)
+    #build.classify('**.bak', None)
+    #build.classify('**/.**', None)
+    #build.classify('**/#**', None)
+    #build.classify('**/thumbs.db', None)
+    #build.classify('**.rpy', None)
+    #build.classify('**.psd', None)
+    #build.classify('**.sublime-project', None)
+    #build.classify('**.sublime-workspace', None)
+    #build.classify('/music/*.*', None)
+    #build.classify('script-regex.txt', None)
+    #build.classify('/game/10', None)
+    #build.classify('/game/cache/*.*', None)
+    #build.classify('**.rpa',None)
+    #build.classify("game/mod_assets/api_keys.json", None)
+    #build.classify("**.pem", None)
 
     ## Files matching documentation patterns are duplicated in a mac app build,
     ## so they appear in both the app and the zip file.

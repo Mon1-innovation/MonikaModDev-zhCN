@@ -768,7 +768,7 @@ style quick_button_text_dark:
 ## to other menus, and to start the game.
 
 init 4 python:
-    def FinishEnterName():
+    def _finishEnterName():
         global player
 
         if not player:
@@ -900,7 +900,7 @@ screen navigation():
 
         if main_menu:
 
-            textbutton _("Just Monika") action If(persistent.playername, true=Start(), false=Show(screen="name_input", message="Please enter your name", ok_action=Function(FinishEnterName)))
+            textbutton _("Just Monika") action If(persistent.playername, true=Start(), false=Show(screen="name_input", message="Please enter your name", ok_action=Function(_finishEnterName)))
 
         else:
 
@@ -1661,7 +1661,7 @@ screen preferences():
             hbox:
                 #We disable updating on the main menu because it causes graphical issues
                 #due to the spaceroom not being loaded in
-                if not main_menu:
+                if not main_menu and not renpy.android:
                     textbutton _("Update Version"):
                         action Function(renpy.call_in_new_context, 'forced_update_now')
                         style "navigation_button"
@@ -2717,6 +2717,7 @@ screen twopane_scrollable_menu(prev_items, main_items, left_area, left_align, ri
                     yfill False
                     mousewheel True
                     arrowkeys True
+                    draggable True
 
                     vbox:
                         for ev in flt_evs:
@@ -2768,6 +2769,7 @@ screen twopane_scrollable_menu(prev_items, main_items, left_area, left_align, ri
                     yfill False
                     mousewheel True
                     arrowkeys True
+                    draggable True
 
                     vbox:
                         for i_caption, i_label in prev_items:
@@ -2808,6 +2810,7 @@ screen twopane_scrollable_menu(prev_items, main_items, left_area, left_align, ri
                         yfill False
                         mousewheel True
                         arrowkeys True
+                        draggable True
 
                         vbox:
                             for i_caption, i_label in main_items:
@@ -2938,6 +2941,7 @@ screen mas_gen_scrollable_menu(items, display_area, scroll_align, *args):
                 id "viewport"
                 yfill False
                 mousewheel True
+                draggable True
 
                 vbox:
                     for item_prompt, item_value, is_italic, is_bold in items:
@@ -3025,6 +3029,7 @@ screen mas_check_scrollable_menu(
                 id "viewport"
                 yfill False
                 mousewheel True
+                draggable True
 
                 vbox:
                     for button_prompt, button_key, start_selected, true_value, false_value in items:
@@ -3095,6 +3100,17 @@ screen mas_generic_restart:
                 spacing 100
 
                 textbutton _("OK") action Return(True)
+
+style poem_vbox:
+    xalign 0.5
+style poem_viewport:
+    xanchor 0
+    xsize 720
+    xpos 280
+style poem_vbar is vscrollbar:
+    xpos 1000
+    yalign 0.5
+    ysize 700
 
 # Partial generic showpoem screen
 # IN:
