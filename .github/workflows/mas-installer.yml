@@ -16,19 +16,46 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Download MasInstaller.exe
+    - name: Install GitHub CLI
       run: |
-        $releaseUrl = "https://github.com/Mon1-innovation/MASToolScript/releases/latest"
-        $redirectedUrl = (Invoke-WebRequest -Uri $releaseUrl -MaximumRedirection 0 -ErrorAction Ignore).Headers.Location
-        $repoOwner, $repoName = $redirectedUrl -split "/", -2
-
-        # Get latest release details
-        $latestRelease = Invoke-RestMethod -Uri "https://api.github.com/repos/$repoOwner/$repoName/releases/latest"
-        $installerAsset = $latestRelease.assets | Where-Object { $_.name -eq "MasInstaller.exe" }
-
-        # Download the installer
-        Invoke-WebRequest -Uri $installerAsset.browser_download_url -OutFile MasInstaller.exe
+        # Install GitHub CLI
+        choco install gh -y
       shell: powershell
+
+    - name: Download MasInstaller.exe
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # Explicitly set repository details
+        $repoOwner = "Mon1-innovation"
+        $repoName = "MASToolScript"
+
+        try {
+          # Use GitHub CLI to get releases with better error handling
+          $releases = gh release list -R "$repoOwner/$repoName" --json tagName,assets --limit 1
+
+          # Parse the JSON response
+          $releaseInfo = $releases | ConvertFrom-Json
+          $installerAsset = $releaseInfo.assets | Where-Object { $_.name -eq "MasInstaller.exe" }
+
+          if ($installerAsset) {
+            # Download the installer
+            gh release download -R "$repoOwner/$repoName" -p "MasInstaller.exe"
+
+            # Verify file exists
+            if (Test-Path "MasInstaller.exe") {
+              Write-Host "Successfully downloaded MasInstaller.exe"
+            } else {
+              throw "Download failed: MasInstaller.exe not found"
+            }
+          } else {
+            throw "No MasInstaller.exe found in the latest release"
+          }
+        } catch {
+          Write-Error "Failed to download MasInstaller.exe: $_"
+          exit 1
+        }
+      shell: pwsh
 
     - name: Create Installation Directory
       run: |
