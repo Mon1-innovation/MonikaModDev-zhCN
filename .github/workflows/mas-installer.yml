@@ -79,23 +79,26 @@ jobs:
 
     - name: Run MasInstaller.exe
       run: |
-        # Set PowerShell to use UTF-8 encoding
-        $PSDefaultParameterValues['*:Encoding'] = 'utf8'
+        # Explicitly set system locale to UTF-8
+        $oldUI = Get-WinSystemLocale
+        $oldUser = Get-WinUserLanguageList
 
-        # Temporarily set console output encoding to UTF-8
-        [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-        [Console]::InputEncoding = [System.Text.Encoding]::UTF8
-
-        Set-Location .\MAS_Install
-
-        # Prepare for potential encoding issues
-        $env:PYTHONIOENCODING = 'utf-8'
-        $env:PYTHONUTF8 = '1'
-
-        # Try to run the installer with error handling
         try {
-          # Use cmd.exe to potentially bypass some encoding issues
-          $process = Start-Process cmd.exe -ArgumentList "/c MasInstaller.exe" -PassThru -NoNewWindow -Wait
+          # Set system locale to support Unicode
+          Set-WinSystemLocale zh-CN
+          Set-WinUserLanguageList zh-CN -Force
+
+          # Prepare environment variables
+          $env:PYTHONIOENCODING = 'utf-8'
+          $env:PYTHONUTF8 = '1'
+          $env:LANG = 'zh_CN.UTF-8'
+
+          # Temporarily change code page to UTF-8
+          chcp 65001
+
+          # Attempt to run the installer
+          Set-Location .\MAS_Install
+          $process = Start-Process .\MasInstaller.exe -PassThru -NoNewWindow -Wait
 
           # Check exit code
           if ($process.ExitCode -ne 0) {
@@ -105,6 +108,10 @@ jobs:
         } catch {
           Write-Error "Error running installer: $_"
           exit 1
+        } finally {
+          # Restore original system settings
+          Set-WinSystemLocale $oldUI.Name
+          Set-WinUserLanguageList $oldUser -Force
         }
       shell: powershell
 
