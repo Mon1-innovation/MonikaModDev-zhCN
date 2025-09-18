@@ -70,7 +70,11 @@ jobs:
         name: MAS-Release-Assets
         path: .\MAS_Release_Assets\*
         retention-days: 5
-        Move-Item -Path MasInstaller.exe -Destination .\MAS_Install\
+
+    - name: Prepare Installation Directory
+      run: |
+        New-Item -ItemType Directory -Path .\MAS_Install
+        Move-Item -Path .\MAS_Release_Assets\MasInstaller.exe -Destination .\MAS_Install\ -ErrorAction SilentlyContinue
       shell: powershell
 
     - name: Run MasInstaller.exe
