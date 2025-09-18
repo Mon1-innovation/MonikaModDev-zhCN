@@ -22,7 +22,7 @@ jobs:
         choco install gh -y
       shell: powershell
 
-    - name: Download MasInstaller.exe
+    - name: Download Release Assets
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
@@ -31,35 +31,45 @@ jobs:
         $repoName = "MASToolScript"
 
         try {
-          # Use GitHub CLI to get releases with better error handling
-          $releases = gh release list -R "$repoOwner/$repoName" --json tagName,assets --limit 1
+          # Get the latest release tag
+          $latestTag = (gh release list -R "$repoOwner/$repoName" --json tagName --limit 1 | ConvertFrom-Json).tagName
 
-          # Parse the JSON response
-          $releaseInfo = $releases | ConvertFrom-Json
-          $installerAsset = $releaseInfo.assets | Where-Object { $_.name -eq "MasInstaller.exe" }
+          if (-not $latestTag) {
+            throw "No releases found"
+          }
 
-          if ($installerAsset) {
-            # Download the installer
-            gh release download -R "$repoOwner/$repoName" -p "MasInstaller.exe"
+          # Create a directory for assets
+          New-Item -ItemType Directory -Path .\MAS_Release_Assets
 
-            # Verify file exists
-            if (Test-Path "MasInstaller.exe") {
-              Write-Host "Successfully downloaded MasInstaller.exe"
-            } else {
-              throw "Download failed: MasInstaller.exe not found"
+          # Set working directory to the assets folder
+          Set-Location .\MAS_Release_Assets
+
+          # Download all non-source code assets
+          $assets = gh release view $latestTag -R "$repoOwner/$repoName" --json assets --jq '.assets[] | select(.name | test("\\.exe$|\\.dll$|\\.zip$|\\.7z$|\\.rar$")) | .name'
+
+          if ($assets) {
+            foreach ($asset in $assets) {
+              Write-Host "Downloading asset: $asset"
+              gh release download $latestTag -R "$repoOwner/$repoName" -p "$asset"
             }
+
+            # List downloaded assets
+            Get-ChildItem
           } else {
-            throw "No MasInstaller.exe found in the latest release"
+            Write-Host "No downloadable assets found in the release"
           }
         } catch {
-          Write-Error "Failed to download MasInstaller.exe: $_"
+          Write-Error "Failed to download release assets: $_"
           exit 1
         }
       shell: pwsh
 
-    - name: Create Installation Directory
-      run: |
-        New-Item -ItemType Directory -Path .\MAS_Install
+    - name: Upload Release Assets
+      uses: actions/upload-artifact@v4
+      with:
+        name: MAS-Release-Assets
+        path: .\MAS_Release_Assets\*
+        retention-days: 5
         Move-Item -Path MasInstaller.exe -Destination .\MAS_Install\
       shell: powershell
 
