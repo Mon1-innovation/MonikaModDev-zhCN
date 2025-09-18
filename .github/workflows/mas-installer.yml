@@ -80,7 +80,32 @@ jobs:
     - name: Run MasInstaller.exe
       run: |
         Set-Location .\MAS_Install
-        Start-Process -FilePath .\MasInstaller.exe -Wait -ArgumentList @('', '', '', '', '', '', '', '')
+
+        # Start the installer process and prepare to handle inputs
+        $installerProcess = Start-Process -FilePath .\MasInstaller.exe -PassThru -NoNewWindow
+
+        # Function to send Enter key to the process
+        function Send-EnterKey {
+          $wshell = New-Object -ComObject wscript.shell
+          $wshell.AppActivate($installerProcess.Id)
+          Start-Sleep -Milliseconds 500
+          $wshell.SendKeys("{ENTER}")
+        }
+
+        # Automatically send Enter key multiple times to handle prompts
+        for ($i = 0; $i -lt 8; $i++) {
+          Send-EnterKey
+          Start-Sleep -Seconds 1
+        }
+
+        # Wait for the installer to complete
+        $installerProcess.WaitForExit()
+
+        # Check the exit code
+        if ($installerProcess.ExitCode -ne 0) {
+          Write-Error "Installer exited with code $($installerProcess.ExitCode)"
+          exit 1
+        }
       shell: powershell
 
     - name: Upload Installation Artifacts
