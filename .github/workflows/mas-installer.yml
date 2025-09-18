@@ -1,0 +1,50 @@
+name: MAS Installer Workflow
+
+on:
+  workflow_dispatch:  # Allow manual triggering
+  # Uncomment and modify as needed for automatic triggers
+  # push:
+  #   branches: [ master ]
+  # pull_request:
+  #   branches: [ master ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Download MasInstaller.exe
+      run: |
+        $releaseUrl = "https://github.com/Mon1-innovation/MASToolScript/releases/latest"
+        $redirectedUrl = (Invoke-WebRequest -Uri $releaseUrl -MaximumRedirection 0 -ErrorAction Ignore).Headers.Location
+        $repoOwner, $repoName = $redirectedUrl -split "/", -2
+
+        # Get latest release details
+        $latestRelease = Invoke-RestMethod -Uri "https://api.github.com/repos/$repoOwner/$repoName/releases/latest"
+        $installerAsset = $latestRelease.assets | Where-Object { $_.name -eq "MasInstaller.exe" }
+
+        # Download the installer
+        Invoke-WebRequest -Uri $installerAsset.browser_download_url -OutFile MasInstaller.exe
+      shell: powershell
+
+    - name: Create Installation Directory
+      run: |
+        New-Item -ItemType Directory -Path .\MAS_Install
+        Move-Item -Path MasInstaller.exe -Destination .\MAS_Install\
+      shell: powershell
+
+    - name: Run MasInstaller.exe
+      run: |
+        Set-Location .\MAS_Install
+        Start-Process -FilePath .\MasInstaller.exe -Wait -ArgumentList @('', '', '', '', '', '', '', '')
+      shell: powershell
+
+    - name: Upload Installation Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: MAS-Installation
+        path: .\MAS_Install\*
+        retention-days: 5
