@@ -168,6 +168,14 @@ python early:
     
 init python:
     cn_debuging = p_debug
+    if not p_debug:
+        for evlabel in persistent.event_database:
+            ev = mas_getEV(evlabel)
+            if ev:
+                if ev.category:
+                    for c in ev.category:
+                        if "dev" in c:
+                            mas_lockEvent(ev)
     import os
     def _restart_mas():
         renpy.full_restart()
