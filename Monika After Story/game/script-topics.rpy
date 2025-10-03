@@ -9905,12 +9905,12 @@ label monika_timeconcern_graveyard_day:
     $ _history_list.pop()
     menu:
         m "Do you still work regularly at night, [player]?{fast}"
-        "Yes I do.":
+        "Yes I do.{#monika_timeconcern_graveyard_day}":
             m 1ekd "Aw..."
             m 1esc "I guess it really can't be helped..."
             m 1eka "Look after yourself, okay?"
             m 1ekc "I always get so worried when you're not here with me..."
-        "No I don't.":
+        "No I don't.{#monika_timeconcern_graveyard_day}":
             $ persistent._mas_timeconcerngraveyard = False
             $ persistent._mas_timeconcern = 0
             m 1hub "That's wonderful!"
@@ -9953,7 +9953,7 @@ label monika_timeconcern_night_1:
             $ _history_list.pop()
             menu:
                 m "Do you always work late, [player]?{fast}"
-                "Yes, I do.":
+                "Yes, I do.{#monika_timeconcern_night_1}":
                     $ persistent._mas_timeconcerngraveyard = True
                     m 1rksdld "That's not good..."
                     m 1ekd "You're not able to change that, are you?"
@@ -9962,7 +9962,7 @@ label monika_timeconcern_night_1:
                     m 1eka "Just make sure you do try to stay healthy, okay?"
                     m 1ekc "If something were to happen to you, I don't know what I'd do..."
 
-                "No, I don't.":
+                "No, I don't.{#monika_timeconcern_night_1}":
                     $ evhand.greeting_database["greeting_timeconcern"].unlocked = True
                     $ evhand.greeting_database["greeting_timeconcern_day"].unlocked = True
                     m 1hua "That's a relief!"
@@ -9970,7 +9970,7 @@ label monika_timeconcern_night_1:
                     m 1hub "Good luck with your work and thanks for keeping me company when you're so busy!"
                     m 1eka "It means a lot to me, [player], that even when you're preoccupied...you're here with me~"
 
-        "No, I'm not.":
+        "No, I'm not.{#monika_timeconcern_night_1}":
             $ persistent._mas_timeconcern = 3
             m 1esc "I see."
             m 1ekc "Well in that case, I would really prefer it if you went to bed now."
