@@ -1184,10 +1184,10 @@ label mas_scary_story_kuchisake_onna:
         show screen mas_background_timed_jump(5, "mas_scary_story_kuchisake_onna.no")
         menu:
             "am I pretty?"
-            "Yes.":
+            "Yes.{#mas_scary_story_kuchisake_onna_1}":
                 hide screen mas_background_timed_jump
                 jump mas_scary_story_kuchisake_onna.clean
-            "No.":
+            "No.{#mas_scary_story_kuchisake_onna_1}":
                 jump mas_scary_story_kuchisake_onna.no
     else:
         jump mas_scary_story_kuchisake_onna.end
@@ -1737,9 +1737,9 @@ label mas_scary_story_flowered_lantern:
     $ _history_list.pop()
     menu:
         m "...And that's it for part one! Do you want to continue to the next one?{fast}"
-        "Yes.":
+        "Yes.{#mas_scary_story_flowered_lantern_1}":
             jump mas_scary_story_flowered_lantern_2
-        "No.":
+        "No.{#mas_scary_story_flowered_lantern_1}":
             pass
     call mas_scary_story_cleanup
     return

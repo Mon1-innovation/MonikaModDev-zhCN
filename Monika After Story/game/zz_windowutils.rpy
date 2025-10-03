@@ -130,6 +130,8 @@ init python in mas_windowutils:
 
     else:
         store.mas_windowreacts.can_do_windowreacts = False
+        store.mas_windowreacts.can_show_notifs = False
+
 
 
     #Fallback Const Defintion
@@ -200,7 +202,7 @@ init python in mas_windowutils:
             mas_utils.mas_log.error("Failed to get MAS window object: {}".format(e))
             return None
 
-    def __getMASWindowHWND_Windows() -> int|None:
+    def __getMASWindowHWND_Windows():
         """
         Gets the hWnd of the MAS window
 
@@ -700,7 +702,7 @@ init python:
     def mas_display_notif(
         title: str,
         body: list[str],
-        group: str|None = None,
+        group: None,
         skip_checks: bool = False,
         flash_window: bool = False
     ) -> bool:
