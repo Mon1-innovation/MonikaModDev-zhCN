@@ -17,35 +17,35 @@ label dev_chess_moves_test:
     menu:
         m "What do you want to test?{fast}"
 
-        "White promotion.":
+        "White promotion.{#dev_chess_moves_test_1}":
             $ player_color = chess.WHITE
             $ starting_fen = "8/PPPPPPPP/8/8/8/8/8/k6K w - - 0 1"
 
-        "Black promotion.":
+        "Black promotion.{#dev_chess_moves_test_2}":
             $ player_color = chess.BLACK
             $ starting_fen = "k6K/8/8/8/8/8/pppppppp/8 w - - 0 1"
 
-        "White castling.":
+        "White castling.{#dev_chess_moves_test_3}":
             $ player_color = chess.WHITE
             $ starting_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1"
 
-        "Black castling.":
+        "Black castling.{#dev_chess_moves_test_4}":
             $ player_color = chess.BLACK
             $ starting_fen = "r3k2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
-        "White en passant.":
+        "White en passant.{#dev_chess_moves_test_5}":
             $ player_color = chess.WHITE
             $ starting_fen = "8/8/8/3pP3/8/8/8/k6K w - d6 0 1"
 
-        "Black en passant.":
+        "Black en passant.{#dev_chess_moves_test_6}":
             $ player_color = chess.BLACK
             $ starting_fen = "k6K/8/8/8/3Pp3/8/5Pp1/8 b - d3 0 1"
 
-        "White stalemate.":
+        "White stalemate.{#dev_chess_moves_test_7}":
             $ player_color = chess.WHITE
             $ starting_fen = "k7/3Q4/8/3K4/8/8/8/8 w - - 0 1"
 
-        "Black stalemate.":
+        "Black stalemate.{#dev_chess_moves_test_8}":
             $ player_color = chess.BLACK
             $ starting_fen = "8/8/8/8/3k4/8/3q4/K7 b - - 0 1"
 
@@ -54,10 +54,10 @@ label dev_chess_moves_test:
     menu:
         m "Casual rules?{fast}"
 
-        "Yes.":
+        "Yes.{#dev_chess_moves_test_9}":
             $ casual_rules = True
 
-        "No.":
+        "No.{#dev_chess_moves_test_10}":
             $ casual_rules = False
 
 
@@ -72,8 +72,8 @@ label dev_chess_moves_test:
     menu:
         m "Do you want to test anything else?{fast}"
 
-        "Yes.":
+        "Yes.{#dev_chess_moves_test_11}":
             jump dev_chess_moves_test
 
-        "No.":
+        "No.{#dev_chess_moves_test_12}":
             return

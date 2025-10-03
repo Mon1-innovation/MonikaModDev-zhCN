@@ -16,7 +16,7 @@ label dev_moni_disps_test:
     menu:
         m "What do you want to test?{fast}"
 
-        "Test idle disp.":
+        "Test idle disp.{#dev_moni_disps_test_1}":
             $ test_idle_disp = MASMoniIdleDisp(
                 (
                     MASMoniIdleExp("1eua", duration=3),
@@ -39,7 +39,7 @@ label dev_moni_disps_test:
             show expression test_idle_disp as monika at i11 zorder MAS_MONIKA_Z
             $ PauseDisplayableWithEvents().start()
 
-        "Test follow disps.":
+        "Test follow disps.{#dev_moni_disps_test_2}":
             $ test_idle_disp = MASMoniIdleDisp(
                 (
                     MASMoniIdleExp("1eua_follow", duration=10),
@@ -51,7 +51,7 @@ label dev_moni_disps_test:
             show expression test_idle_disp as monika at i11 zorder MAS_MONIKA_Z
             $ PauseDisplayableWithEvents().start()
 
-        "Test wink disp.":
+        "Test wink disp.{#dev_moni_disps_test_3}":
             m 3eub "I'll auto progress this one for you, don't click."
             show monika 1eua
             $ renpy.pause(0.5)
@@ -96,7 +96,7 @@ label dev_moni_disps_test:
             show monika idle at i11 zorder MAS_MONIKA_Z
             $ renpy.pause(6.0)
 
-        "Test tears disp.":
+        "Test tears disp.{#dev_moni_disps_test_4}":
             $ pd = PauseDisplayableWithEvents()
             m 1eua "Click to progress to the next image."
             show monika 1ektsc at i11 zorder MAS_MONIKA_Z
@@ -113,10 +113,10 @@ label dev_moni_disps_test:
     menu:
         m "Do you want to test anything else?{fast}"
 
-        "Yes.":
+        "Yes.{#dev_moni_disps_test_5}":
             jump dev_moni_disps_test
 
-        "No.":
+        "No.{#dev_moni_disps_test_6}":
             pass
 
     return

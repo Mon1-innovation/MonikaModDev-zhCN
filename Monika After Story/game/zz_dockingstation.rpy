@@ -2435,7 +2435,7 @@ label mas_dockstat_generic_iowait:
     # 4 seconds seems decent enough for waiting.
     show screen mas_background_timed_jump(4, "mas_dockstat_generic_iowait")
     menu:
-        "Hold on a second!":
+        "Hold on a second!{#mas_dockstat_generic_iowait_1}":
             hide screen mas_background_timed_jump
             $ persistent._mas_dockstat_cm_wait_count += 1
 
@@ -2465,7 +2465,7 @@ label mas_dockstat_generic_iowait:
 label mas_dockstat_generic_wait_label:
     menu:
         m "What is it?"
-        "Actually, I can't take you right now.":
+        "Actually, I can't take you right now.{#mas_dockstat_generic_wait_label_1}":
             call mas_dockstat_abort_gen
 
             #Show Monika again
@@ -2478,7 +2478,7 @@ label mas_dockstat_generic_wait_label:
             #Fallback to generic cancel
             jump mas_dockstat_generic_cancel
 
-        "Nothing.":
+        "Nothing.{#mas_dockstat_generic_wait_label_2}":
             # if we get here, we should jump back to the top so we can
             # continue waiting
             m 2hub "Oh, good! Let me finish getting ready."
@@ -2551,7 +2551,7 @@ label mas_dockstat_generic_cancelled_still_going_ask:
     $ _history_list.pop()
     menu:
         m "Are you still going to go?{fast}"
-        "Yes.":
+        "Yes.{#mas_dockstat_generic_cancelled_still_going_ask_1}":
             if mas_isMoniNormal(higher=True):
                 m 2eka "All right. I'll be right here waiting for you, as usual..."
                 m 2hub "So hurry back! I love you, [player]!"
@@ -2562,7 +2562,7 @@ label mas_dockstat_generic_cancelled_still_going_ask:
 
             return "quit"
 
-        "No.":
+        "No.{#mas_dockstat_generic_cancelled_still_going_ask_2}":
             if mas_isMoniNormal(higher=True):
                 m 2eka "...Thank you."
                 m "It means a lot that you're going to spend more time with me since I can't come along."
@@ -2582,12 +2582,12 @@ label mas_dockstat_generic_failed_io_still_going_ask:
     $ _history_list.pop()
     menu:
         m "Are you still going to go?{fast}"
-        "Yes.":
+        "Yes.{#mas_dockstat_generic_failed_io_still_going_ask_1}":
             m 2eka "I understand. You have things to do, after all..."
             m 2hub "Be safe out there! I'll be right here waiting for you!"
             return "quit"
 
-        "No.":
+        "No.{#mas_dockstat_generic_failed_io_still_going_ask_2}":
             m 2wub "Really? Are you sure? Even though it's my own fault I can't go with you..."
             m 1eka "...Thank you, [player]. That means more to me than you could possibly understand."
             $ mas_gainAffection()

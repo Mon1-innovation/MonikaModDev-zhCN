@@ -201,10 +201,10 @@ label dev_hold_still_monika:
     menu:
         m "Would you like to test another pose?{fast}"
 
-        "Yes.":
+        "Yes.{#dev_hold_still_monika_1}":
             jump dev_hold_still_monika
 
-        "No.":
+        "No.{#dev_hold_still_monika_2}":
             return
 
 

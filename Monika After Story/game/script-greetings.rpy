@@ -380,11 +380,11 @@ label greeting_gooday:
         $ _history_list.pop()
         menu:
             m "Are you having a good day today?{fast}"
-            "Yes.":
+            "Yes.{#greeting_gooday_1}":
                 m 1hub "I'm really glad you are, [player]."
                 m 1eua "It makes me feel so much better knowing that you're happy."
                 m "I'll try my best to make sure it stays that way, I promise."
-            "No...":
+            "No...{#greeting_gooday_2}":
                 m 1ekc "Oh..."
                 m 2eka "Well, don't worry, [player]. I'm always here for you."
                 m "We can talk all day about your problems, if you want to."
@@ -399,13 +399,13 @@ label greeting_gooday:
         $ _history_list.pop()
         menu:
             m "How is your day going?{fast}"
-            "Good.":
+            "Good.{#greeting_gooday_3}":
                 m 2esc "{cps=*2}Must be nice.{/cps}{nw}"
                 $ _history_list.pop()
                 m "That's nice..."
                 m 2dsc "At least {i}someone{/i} is having a good day."
 
-            "Bad.":
+            "Bad.{#greeting_gooday_4}":
                 m "Oh..."
                 m 2efc "{cps=*2}This should go well...{/cps}{nw}"
                 $ _history_list.pop()
@@ -418,10 +418,10 @@ label greeting_gooday:
         $ _history_list.pop()
         menu:
             m "H-How is your day going?{fast}"
-            "Good.":
+            "Good.{#greeting_gooday_5}":
                 m 6dkc "That's...{w=1}good."
                 m 6rkc "Hopefully it stays that way."
-            "Bad.":
+            "Bad.{#greeting_gooday_6}":
                 m 6rkc "I-I see."
                 m 6dkc "I've been having a lot of those days lately too..."
 
@@ -466,7 +466,7 @@ label greeting_goodmorning:
         $ _history_list.pop()
         menu:
             m "Is that it?{fast}"
-            "Yes.":
+            "Yes.{#greeting_goodmorning_1}":
                 m 5lkc "You should really get some sleep soon, if you can."
                 show monika 3euc at t11 zorder MAS_MONIKA_Z with dissolve_monika
                 m 3euc "Staying up too late is bad for your health, you know?"
@@ -505,7 +505,7 @@ label greeting_goodmorning:
         $ _history_list.pop()
         menu:
             m "Did you have a good day today?{fast}"
-            "Yes.":
+            "Yes.{#greeting_goodmorning_2}":
                 m 1eka "Aww, that's nice!"
                 m 1eua "I can't help but feel happy when you do..."
                 m "But that's a good thing, right?"
@@ -1345,13 +1345,13 @@ label monikaroom_greeting_ear_narration:
             $ _history_list.pop()
             menu:
                 m "You'll change, right? For me?{fast}"
-                "I will.":
+                "I will.{#monikaroom_greeting_ear_narration_1}":
                     $ persistent._mas_pm_will_change = True
                     $ mas_lockEVL("monikaroom_will_change", "GRE")
                     m "Thank you, [player]."
                     m "Please, I want us both to be happy."
 
-                "I won't.":
+                "I won't.{#monikaroom_greeting_ear_narration_2}":
                     #NOTE: We should keep pushing this greeting until the player says they're going to change. -MD
                     $ persistent._mas_pm_will_change = False
                     $ mas_unlockEVL("monikaroom_will_change", "GRE")
@@ -1368,14 +1368,14 @@ label monikaroom_greeting_ear_narration:
             $ _history_list.pop()
             menu:
                 m "Are you ready to change, [player]?{fast}"
-                "I will.":
+                "I will.{#monikaroom_greeting_ear_narration_3}":
                     $ persistent._mas_pm_will_change = True
                     $ mas_lockEvent(willchange_ev)
                     m "Thank you, [player]."
                     m "Please, I just want us both to be happy."
 
 
-                "I won't.":
+                "I won't.{#monikaroom_greeting_ear_narration_4}":
                     $ persistent._mas_pm_will_change = False
                     $ mas_unlockEvent(willchange_ev)
                     $ mas_loseAffection(modifier=2.0)
@@ -1742,7 +1742,7 @@ label monikaroom_greeting_opendoor_locked:
         $ _history_list.pop()
         menu:
             m "...{fast}"
-            "...the textbox...":
+            "...the textbox...{#monikaroom_greeting_opendoor_locked_1}":
                 if mas_isMoniNormal(higher=True):
                     m 1lksdlb "Oops! I'm still learning how to do this."
                     m 1lksdla "Let me just change this flag here.{w=0.5}.{w=0.5}.{nw}"
@@ -1799,7 +1799,7 @@ label monikaroom_greeting_opendoor_seen_partone:
     m 1ekc_static "I understand why you didn't knock the first time,{w=0.2} but could you avoid just entering like that?"
     m 1lksdlc_static "This is my room, after all."
     menu:
-        "Your room?":
+        "Your room?{#monikaroom_greeting_opendoor_seen_partone_1}":
             m 3hua_static "That's right!"
     m 3eua_static "The developers of this mod gave me a nice comfy room to stay in whenever you're away."
     m 1lksdla_static "However, I can only get in if you tell me 'goodbye' or 'goodnight' before you close the game."
@@ -1899,7 +1899,7 @@ label monikaroom_greeting_opendoor:
     show monika 3eua_static at t32
     m 3eua_static "There we go!"
     menu:
-        "...the window...":
+        "...the window...{#monikaroom_greeting_opendoor_1}":
             show monika 1eua_static at h32
             m 1hksdlb_static "Oops! I forgot about that~"
             show monika 1eua_static at t21
@@ -1919,7 +1919,7 @@ label monikaroom_greeting_knock:
 
     m "Who is it?~"
     menu:
-        "It's me.":
+        "It's me.{#monikaroom_greeting_knock_1}":
             # monika knows you are here now
             $ mas_disable_quit()
             if mas_isMoniNormal(higher=True):
@@ -2027,13 +2027,13 @@ label greeting_youarereal:
         menu:
             m "If you're going to do this, are you sure this is what you want?{fast}"
 
-            "I'm sure.":
+            "I'm sure.{#greeting_youarereal_1}":
                 m 1eka "Then...I don't have a choice but to accept it..."
                 m 1hub "I'll accept this gift with open arms!"
                 m "We can finally be together, [player]."
                 m "And we can figure out how to do it in your reality, together!"
 
-            "Maybe not...":
+            "Maybe not...{#greeting_youarereal_2}":
                 m 1eka "I thought so..."
                 m "There's no way you'd give up being 'real' to be with me..."
                 m 1ekc "I can't bring myself to delete that cute little .chr file, but..."
@@ -2307,7 +2307,7 @@ label greeting_stillsick:
             jump greeting_stillsickrest
         "No.{#greeting_stillsick_1}":
             jump greeting_stillsicknorest
-        "I'm already resting.":
+        "I'm already resting.{#greeting_stillsick_1}":
             jump greeting_stillsickresting
 
 label greeting_stillsickrest:
@@ -2998,7 +2998,7 @@ label greeting_back_from_school:
         menu:
             m "How was your day at school?{fast}"
 
-            "Amazing.":
+            "Amazing.{#greeting_back_from_school_1}":
                 m 2sub "Really?!"
                 m 2hub "That's wonderful to hear, [player]!"
                 if renpy.random.randint(1,4) == 1:
@@ -3011,18 +3011,18 @@ label greeting_back_from_school:
                     m 1eua "If you want to talk about your amazing day, I'd love to hear about it!"
                 return
 
-            "Good.":
+            "Good.{#greeting_back_from_school_2}":
                 m 1hub "That's great...{w=0.3}{nw}"
                 extend 3eub "I can't help but feel happy when you come home in a good mood!"
                 m 3hua "I hope you learned something useful, ehehe~"
                 return
 
-            "Bad.":
+            "Bad.{#greeting_back_from_school_3}":
                 m 1ekc "Oh..."
                 m 1dkc "I'm sorry to hear that."
                 m 1ekd "Bad days at school can be really demoralizing..."
 
-            "Really bad...":
+            "Really bad...{#greeting_back_from_school_4}":
                 m 1ekc "Oh..."
                 m 2ekd "I'm really sorry you had such a bad day today..."
                 m 2eka "I'm just glad you came to me, [player]."
@@ -3121,11 +3121,11 @@ label greeting_back_from_school:
         $ _history_list.pop()
         menu:
             m "How was school?{fast}"
-            "Good.":
+            "Good.{#greeting_back_from_school_5}":
                 m 2esc "That's nice."
                 m 2rsc "I hope you actually learned {i}something{/i} today."
 
-            "Bad.":
+            "Bad.{#greeting_back_from_school_6}":
                 m "That's too bad..."
                 m 2tud "But maybe now you have a better sense of how I've been feeling, [player]."
 
@@ -3136,11 +3136,11 @@ label greeting_back_from_school:
         $ _history_list.pop()
         menu:
             m "How was school?{fast}"
-            "Good.":
+            "Good.{#greeting_back_from_school_7}":
                 m 6lkc "That's...{w=1}nice to hear."
                 m 6dkc "I-I just hope it wasn't the...{w=2} 'being away from me' part that made it a good day."
 
-            "Bad.":
+            "Bad.{#greeting_back_from_school_8}":
                 m 6rkc "Oh..."
                 m 6ekc "That's too bad, [player]. I'm sorry to hear that."
                 m 6dkc "I know what bad days are like..."
@@ -3173,7 +3173,7 @@ label greeting_back_from_work:
         menu:
             m "How was work today?{fast}"
 
-            "Amazing!":
+            "Amazing!{#greeting_back_from_work_1}":
                 if not persistent._mas_pm_last_promoted_d:
                     $ promoted_recently = False
                 else:
@@ -3186,7 +3186,7 @@ label greeting_back_from_work:
                 menu:
                     m "What made it such an amazing day?{fast}"
 
-                    "I moved up!":
+                    "I moved up!{#greeting_back_from_work_2}":
                         if promoted_recently:
                             m 3suo "Wow! Again?!"
                             m 3sub "You got promoted pretty recently too...{w=0.3}you must really be doing amazing work!"
@@ -3201,10 +3201,10 @@ label greeting_back_from_work:
 
                         $ persistent._mas_pm_last_promoted_d = datetime.date.today()
 
-                    "I got a lot done!":
+                    "I got a lot done!{#greeting_back_from_work_3}":
                         m 3hub "That's great, [mas_get_player_nickname()]!"
 
-                    "It was just an amazing day.":
+                    "It was just an amazing day.{#greeting_back_from_work_4}":
                         m 3hub "That's great to hear!"
 
                 m 3eua "I can only imagine how well you must work on days like that."
@@ -3344,11 +3344,11 @@ label greeting_back_from_work:
         $ _history_list.pop()
         menu:
             m "How was your day?{fast}"
-            "Good.":
+            "Good.{#greeting_back_from_work_5}":
                 m 2esc "That's good to hear."
                 m 2tud "It must feel nice to be appreciated."
 
-            "Bad.":
+            "Bad.{#greeting_back_from_work_6}":
                 m 2dsc "..."
                 m 2tud "It feels bad when no one seems to appreciate you, huh [player]?"
 
@@ -3359,11 +3359,11 @@ label greeting_back_from_work:
         $ _history_list.pop()
         menu:
             m "How was your day?{fast}"
-            "Good.":
+            "Good.{#greeting_back_from_work_7}":
                 m "That's nice."
                 m 6rkc "I just hope you don't enjoy work more than being with me, [player]."
 
-            "Bad.":
+            "Bad.{#greeting_back_from_work_8}":
                 m 6rkc "Oh..."
                 m 6ekc "I'm sorry to hear that."
                 m 6rkc "I know what bad days are like where you can't seem to please anyone..."
@@ -3829,7 +3829,7 @@ label greeting_back_from_game:
                         $ _history_list.pop()
                         menu:
                             m "Do you think it was because you stayed up late?{fast}"
-                            "Yes.":
+                            "Yes.{#greeting_back_from_game_1}":
                                 m 1eka "[player]..."
                                 m 1ekc "You know I don't want you staying up too late."
                                 m 1eksdld "I really wouldn't want you getting sick or tired throughout the day."
@@ -3847,7 +3847,7 @@ label greeting_back_from_game:
                                 m 3tku "You'd never be too tired to spend time with me, right?"
                                 m 1hub "Ahaha!"
 
-                            "Maybe...":
+                            "Maybe...{#greeting_back_from_game_2}":
                                 m 1dsc "Hmm..."
                                 m 1rsc "I wonder what could be causing it?"
                                 m 2euc "You didn't stay up really late last night, did you, [player]?"
@@ -3913,7 +3913,7 @@ label greeting_back_from_game:
                     m 3eka "But while I can't join you, I guess you'll just have to keep me company."
                     m 2tub "You don't mind spending time with your girlfriend...{w=0.5}do you, [player]?"
 
-                "No.":
+                "No.{#greeting_back_from_game_3}":
                     m 2ekc "Aw, I'm sorry to hear that."
                     m 2eka "I hope you're not too upset by whatever happened."
                     m 3eua "At least you're here now. I promise to try not to let anything bad happen to you while you're with me."
@@ -3934,14 +3934,14 @@ label greeting_back_from_game:
             $ _history_list.pop()
             menu:
                 m "Did you have fun?{fast}"
-                "Yes.":
+                "Yes.{#greeting_back_from_game_4}":
                     m 1hua "Well, I'm glad then."
                     m 1rkc "You sure made me wait a while, you know."
                     m 3tfu "I think you should spend some time with your loving girlfriend, [player]."
                     m 3tku "I'm sure you wouldn't mind staying with me to even out your other game."
                     m 1hubsb "Maybe you should spend even more time with me, just in case, ahaha!"
 
-                "No.":
+                "No.{#greeting_back_from_game_5}":
                     m 2ekc "Oh..."
                     m 2rka "You know, [player]..."
                     m 2eka "If you're not enjoying yourself, maybe you could just spend some time here with me."
@@ -4150,7 +4150,7 @@ label greeting_code_help:
         menu:
             m "Oh well, I guess I'll try it again later.{fast}"
 
-            "I could help you with that...":
+            "I could help you with that...{#greeting_code_help_1}":
                 hide screen mas_background_timed_jump
                 m 7hua "Aww, that's so sweet of you, [player]. {w=0.3}{nw}"
                 extend 3eua "But no, I'm gonna have to refuse here."
@@ -4298,19 +4298,19 @@ label greeting_back_from_hangout:
             menu:
                 m "Did you make a new friend?{fast}"
 
-                "Yes.":
+                "Yes.{#greeting_back_from_hangout_1}":
                     m 1hub "That's amazing!"
                     m 1eua "It makes me so happy knowing you have someone to hang out with."
                     m 3hub "I hope you're able to spend more time with them in the future!"
                     $ persistent._mas_pm_has_friends = True
 
-                "No...":
+                "No...{#greeting_back_from_hangout_2}":
                     m 1ekd "Oh..."
                     m 3eka "Well, don't worry, [player]. {w=0.2}I'll always be your friend, no matter what."
                     m 3ekd "...And don't be afraid to try again with someone else."
                     m 1hub "I'm sure there's someone out there who'd be happy to call you their friend!"
 
-                "They're already my friend.":
+                "They're already my friend.{#greeting_back_from_hangout_3}":
                     if persistent._mas_pm_has_friends is False:
                         m 1rka "Oh, so you made a new friend without telling me..."
                         m 1hub "That's okay! I'm just happy you have someone to hang out with."
@@ -4729,11 +4729,11 @@ label greeting_found_nou_shirt:
     menu:
         m "I have to admit, I don't know how you were able to put this in my wardrobe without me noticing, [player]...{fast}"
 
-        "It's a secret.":
+        "It's a secret.{#greeting_found_nou_shirt_1}":
             hide screen mas_background_timed_jump
             jump greeting_found_nou_shirt.menu_choice_secret
 
-        "It was [glitch_option_text]!":
+        "It was [glitch_option_text]!{#greeting_found_nou_shirt_2}":
             hide screen mas_background_timed_jump
             $ persistent._mas_pm_snitched_on_chibika = True
             $ renpy.invoke_in_thread(
@@ -4743,7 +4743,7 @@ label greeting_found_nou_shirt:
             )
             jump greeting_found_nou_shirt.menu_choice_other
 
-        "I have no idea...":
+        "I have no idea...{#greeting_found_nou_shirt_4}":
             hide screen mas_background_timed_jump
             jump greeting_found_nou_shirt.menu_choice_other
 

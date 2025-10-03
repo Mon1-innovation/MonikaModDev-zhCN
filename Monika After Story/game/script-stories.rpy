@@ -1805,9 +1805,9 @@ label mas_scary_story_flowered_lantern_2:
     $ _history_list.pop()
     menu:
         m "...And that's it for part two! Do you want to continue to the next one?{fast}"
-        "Yes.":
+        "Yes.{#mas_scary_story_flowered_lantern_2_1}":
             jump mas_scary_story_flowered_lantern_3
-        "No.":
+        "No.{#mas_scary_story_flowered_lantern_2_2}":
             pass
     call mas_scary_story_cleanup
     return

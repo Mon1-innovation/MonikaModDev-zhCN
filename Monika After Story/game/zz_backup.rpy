@@ -743,9 +743,9 @@ label mas_backups_you_have_bad_persistent:
         "Do you have your own backups?{nw}"
         menu:
             "Do you have your own backups?{fast}"
-            "Yes.":
+            "Yes.{#mas_backups_you_have_bad_persistent_2}":
                 jump mas_backups_have_some
-            "No.":
+            "No.{#mas_backups_you_have_bad_persistent_3}":
                 jump mas_backups_have_none
 
     # otherwise we culd not copy
@@ -894,9 +894,9 @@ label mas_backups_incompat_start:
     # cannot pop history, no history for some reason
     menu:
         "Hello there!{fast}"
-        "What happened?":
+        "What happened?{#mas_backups_incompat_start_2}":
             pass
-        "Take me to the updater.":
+        "Take me to the updater.{#mas_backups_incompat_start_3}":
             jump mas_backups_incompat_updater_start_intro
 
     show chibika sad at mas_chflip_s(-1)
@@ -913,9 +913,9 @@ label mas_backups_incompat_what_do:
     # cannot pop history, no history for some reason
     menu:
         "What would you like to do?{fast}"
-        "Update MAS.":
+        "Update MAS.{#mas_backups_incompat_what_do_2}":
             jump mas_backups_incompat_updater_start_intro
-        "Restore a compatible persistent.":
+        "Restore a compatible persistent.{#mas_backups_incompat_what_do_3}":
             jump mas_backups_incompat_user_will_restore
 
 
@@ -954,9 +954,9 @@ label mas_backups_incompat_updater_cannot_because_rpy:
     "I'll have to delete those files for this to work. Is that okay?{nw}"
     menu:
         "I'll have to delete those files for this to work. Is that okay?{fast}"
-        "Yes, delete them.":
+        "Yes, delete them.{#mas_backups_incompat_updater_cannot_because_rpy_2}":
             jump mas_backups_incompat_rpy_yes_del
-        "No, don't delete them.":
+        "No, don't delete them.{#mas_backups_incompat_updater_cannot_because_rpy_3}":
             jump mas_backups_incompat_rpy_no_del
 
 
@@ -968,9 +968,9 @@ label mas_backups_incompat_updater_cannot_because_rpy_again:
     "Would you like me to try deleting them again?{nw}"
     menu:
         "Would you like me to try deleting them again?{fast}"
-        "Yes.":
+        "Yes.{#mas_backups_incompat_updater_cannot_because_rpy_again_2}":
             jump mas_backups_incompat_rpy_yes_del
-        "No.":
+        "No.{#mas_backups_incompat_updater_cannot_because_rpy_again_3}":
             jump mas_backups_incompat_rpy_no_del
 
 

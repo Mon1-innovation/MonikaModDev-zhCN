@@ -16,10 +16,10 @@ label dev_calendar_testing:
     $ import store.mas_calendar as mas_cal
     menu:
         m "What would you like to do?"
-        "View Calendar":
+        "View Calendar{#dev_calendar_testing_1}":
             call mas_start_calendar_read_only
 
-        "Select Date":
+        "Select Date{#dev_calendar_testing_2}":
             call mas_start_calendar_select_date
 
             $ sel_date = _return

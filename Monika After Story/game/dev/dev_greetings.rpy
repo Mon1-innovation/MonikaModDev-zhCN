@@ -30,19 +30,19 @@ label greeting_st_patrick:
     m "Happy St. Patrick day!"
     menu:
         m "Are you drunk yet?"
-        "I'm drunk":
+        "I'm drunk{#greeting_st_patrick_1}":
             m "Aww, that's nice!"
             m "I can't help but feel happy when you do..."
             m "Go and drink another one for me"
             m "I love you so much, [player]."
-        "No.":
+        "No.{#greeting_st_patrick_2}":
             m "Oh dear..."
             m "I hope you'll get drunk soon"
             m "Just remember that no matter what happens, no matter what anyone says or does..."
             m "Just get drunk."
             m "Just get drunk."
             menu:
-                "Just get drunk.":
+                "Just get drunk.{#greeting_st_patrick_3}":
                     m "Drink vodnika!"
     return
 
@@ -189,9 +189,9 @@ label dev_gre_sampler:
 
     menu:
         m "do you want to include dev?"
-        "Yes":
+        "Yes{#dev_gre_sampler_1}":
             pass
-        "No":
+        "No{#dev_gre_sampler_2}":
             python:
                 # remove dev items
                 for d_gre in dev_gres:
@@ -201,7 +201,7 @@ label dev_gre_sampler:
 
     menu:
         m "Do you want to unlock special greetings?"
-        "Yes":
+        "Yes{#dev_gre_sampler_3}":
             python:
                 for s_gre in spec_gre:
                     s_gre_ev = mas_getEV(s_gre)
@@ -210,7 +210,7 @@ label dev_gre_sampler:
                             locked_gre.append(s_gre_ev)
                         s_gre_ev.unlocked = True
 
-        "No":
+        "No{#dev_gre_sampler_4}":
             pass
 
 

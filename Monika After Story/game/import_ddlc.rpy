@@ -44,7 +44,7 @@ label import_ddlc_persistent:
         menu:
             "Save data from Doki Doki Literature Club has been merged already. Aborting."
 
-            "Okay.":
+            "Okay.{#import_ddlc_persistent_2}":
                 pass
 
         pause 0.3
@@ -81,10 +81,10 @@ label import_ddlc_persistent:
         menu:
             "Would you like to import Doki Doki Literature Club save data into [config.name]?\n(DDLC will not be affected)"
 
-            "Yes, import DDLC save data.":
+            "Yes, import DDLC save data.{#import_ddlc_persistent_4}":
                 pause 0.3
 
-            "No, do not import.":
+            "No, do not import.{#import_ddlc_persistent_5}":
                 pause 0.3
                 return
 
@@ -94,7 +94,7 @@ label import_ddlc_persistent:
         menu:
             "Save data will not be imported at this time."
 
-            "Okay.":
+            "Okay.{#import_ddlc_persistent_7}":
                 pause 0.3
                 return
 
@@ -122,7 +122,7 @@ label import_ddlc_persistent:
         menu:
             "Couldn't read/decode save data from Doki Doki Literature Club. Aborting."
 
-            "Okay.":
+            "Okay.{#import_ddlc_persistent_9}":
                 pass
 
         pause 0.3
@@ -134,10 +134,10 @@ label import_ddlc_persistent:
         menu:
             "Previous Monika After Story save data has also been found.\nWould you like to merge with DDLC save data?"
 
-            "Merge save data.":
+            "Merge save data.{#import_ddlc_persistent_11}":
                 pass
 
-            "Cancel.":
+            "Cancel.{#import_ddlc_persistent_12}":
                 "DDLC data can be imported later in the Settings menu."
                 return
 
@@ -297,8 +297,8 @@ label import_ddlc_persistent:
 label merge_unmatched_names:
     menu:
         "Player names do not match. Which would you like to keep?"
-        "[ddlc_persistent.playername]":
+        "[ddlc_persistent.playername]{#merge_unmatched_names_2}":
             $ persistent.playername = ddlc_persistent.playername
-        "[persistent.playername]":
+        "[persistent.playername]{#merge_unmatched_names_3}":
             $ persistent.playername
     return

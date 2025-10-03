@@ -41,10 +41,10 @@ label dev_check_scrollable_menu_test:
     menu:
         m "Would you like the menu to return the items with true values, or any items?{fast}"
 
-        "Only with true values":
+        "Only with true values{#dev_check_scrollable_menu_test_1}":
             $ return_all = False
 
-        "Any":
+        "Any{#dev_check_scrollable_menu_test_2}":
             $ return_all = True
 
     m 1eua "Shall we use True or False as the true value?{nw}"
@@ -52,10 +52,10 @@ label dev_check_scrollable_menu_test:
     menu:
         m "Shall we use True or False as the true value?{fast}"
 
-        "Use True":
+        "Use True{#dev_check_scrollable_menu_test_3}":
             $ true_value = True
 
-        "Use False":
+        "Use False{#dev_check_scrollable_menu_test_4}":
             $ true_value = False
 
     python:

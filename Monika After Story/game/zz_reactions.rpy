@@ -2826,23 +2826,23 @@ label mas_reaction_gift_noudeck:
             m "Have you ever played 'NOU', [player]?{fast}"
 
             # If you're an advanced nou'r, we unlock house rules for you from the start
-            "Yes.":
+            "Yes.{#mas_reaction_gift_noudeck_1}":
                 m 1rksdlb "Ahaha..."
                 m 1eksdla "Of course you have, you gave me the deck after all."
                 call mas_reaction_gift_noudeck_have_played
 
-            "No.":
+            "No.{#mas_reaction_gift_noudeck_2}":
                 m 3tuu "How about 'UNO' then, ehehe?{nw}"
                 $ _history_list.pop()
                 menu:
                     m "How about 'UNO' then, ehehe?{fast}"
 
-                    "Yes.":
+                    "Yes.{#mas_reaction_gift_noudeck_3}":
                         m 3hub "Great! {w=0.3}{nw}"
                         extend 3tub "'NOU' is {i}very{/i} similar, ahaha..."
                         call mas_reaction_gift_noudeck_have_played
 
-                    "No.":
+                    "No.{#mas_reaction_gift_noudeck_4}":
                         call mas_reaction_gift_noudeck_havent_played
 
         m 3hub "I can't wait to play it with you!"

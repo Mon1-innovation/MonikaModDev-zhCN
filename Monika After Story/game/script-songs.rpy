@@ -364,7 +364,7 @@ label mas_song_derandom:
     menu:
         m "Tired of hearing me sing that song, [player]?{fast}"
 
-        "A little.":
+        "A little.{#mas_song_derandom_1}":
             m 1eka "That's alright."
             m 1eua "I'll only sing it when you want me to then. Just let me know if you want to hear it."
             python:
@@ -372,7 +372,7 @@ label mas_song_derandom:
                 persistent._mas_player_derandomed_songs.append(prev_topic)
                 mas_unlockEVL("mas_sing_song_rerandom", "EVE")
 
-        "It's okay.":
+        "It's okay.{#mas_song_derandom_2}":
             m 1eua "Alright, [player]."
     return
 
@@ -1133,12 +1133,12 @@ label mas_song_my_silver_lining:
         menu:
             m "Do you have time to listen to it now?{fast}"
 
-            "Sure.":
+            "Sure.{#mas_song_my_silver_lining_1}":
                 m 1hub "Alright!"
                 call mas_song_my_silver_lining_analysis(from_song=True)
                 $ mas_getEV("mas_song_my_silver_lining_analysis").shown_count += 1
 
-            "Not right now.":
+            "Not right now.{#mas_song_my_silver_lining_2}":
                 m 1eka "Alright, [player]..."
                 m 3eka "I'll save my thoughts on the subject for another time. {w=0.2}Just let me know when you want to hear them, okay?"
 
@@ -1275,12 +1275,12 @@ label mas_song_shelter:
         menu:
             m "Would you like to hear more about it right now?{fast}"
 
-            "Sure!":
+            "Sure!{#mas_song_shelter_1}":
                 m 3hub "Okay, great!"
                 call mas_song_shelter_analysis(from_song=True)
                 $ mas_assignModifyEVLPropValue("mas_song_shelter_analysis", "shown_count", "+=", 1)
 
-            "Not right now.":
+            "Not right now.{#mas_song_shelter_2}":
                 m 1eka "Okay, [player]..."
                 m 3eka "Just let me know when you'd like to hear my thoughts about it later."
 
@@ -1607,12 +1607,12 @@ label mas_song_wonderwall:
         menu:
             m "...Would you like to talk about it now?{fast}"
 
-            "Sure.":
+            "Sure.{#mas_song_wonderwall_1}":
                 m 1hua "Okay then!"
                 call mas_song_wonderwall_analysis(from_song=True)
                 $ mas_assignModifyEVLPropValue("mas_song_wonderwall_analysis", "shown_count", "+=", 1)
 
-            "Not now.":
+            "Not now.{#mas_song_wonderwall_2}":
                 m 1eka "Oh, okay then..."
                 m 3eka "Just let me know if you want to talk more about this song later."
 
@@ -1913,10 +1913,10 @@ label mas_song_save_the_last_dance_for_me:
         menu:
             m "There's actually a story behind this song, do you have time to hear it now?{fast}"
 
-            "Yes.":
+            "Yes.{#mas_song_save_the_last_dance_for_me_1}":
                 call mas_song_save_the_last_dance_for_me_analysis(from_song=True)
 
-            "No.":
+            "No.{#mas_song_save_the_last_dance_for_me_2}":
                 m 3eua "Oh, okay, just let me know if you want to talk about this song later, okay?"
     else:
         m 6rublb "Thank you for continuing to listen to my aching heart..."
