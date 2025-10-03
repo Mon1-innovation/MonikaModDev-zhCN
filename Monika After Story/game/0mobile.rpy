@@ -79,6 +79,7 @@ python early:
     elif renpy.android and os.path.exists("/storage/emulated/0/MAS/bypass_filetransfer"):
         ANDROID_FTSKIPED = True
         renpy.config.basedir = ANDROID_MASBASE
+        renpy.config.gamedir = os.path.join(renpy.config.basedir, "game")
     
     if not os.path.exists("/storage/emulated/0/MAS/use_android_savedir") and renpy.check_permission("android.permission.WRITE_EXTERNAL_STORAGE"):
         renpy.config.savedir = os.path.join(ANDROID_MASBASE, "saves")
