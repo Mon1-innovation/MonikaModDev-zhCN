@@ -210,7 +210,7 @@ def process_rpy_file(file_path):
                         # 生成tag并插入
                         tag = generate_tag(current_label)
                         
-                        line_out = raw_line.replace()
+                        line_out = raw_line.replace(choice_text, add_tag_str(choice_text, tag))
 
                         processed_choices.append({
                             'original_text': choice_text,
