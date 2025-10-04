@@ -2838,7 +2838,7 @@ label monika_affection_nickname:
     $ _history_list.pop()
     menu:
         m "What do you say?{fast}"
-        "Yes.":
+        "Yes.{#monika_affection_nickname_1}":
             label monika_affection_nickname_yes:
                 pass
 
@@ -2967,7 +2967,7 @@ label monika_affection_nickname:
                         $ mas_lockEVL("monika_affection_nickname", "EVE")
                         $ done = True
 
-        "No.":
+        "No.{#monika_affection_nickname_yes_1}":
             m 1ekc "Oh..."
             m 1lksdlc "Alright then, if you say so."
             m 3eka "Just tell me if you ever change your mind, [player]."
@@ -3013,12 +3013,12 @@ label mas_affection_playernickname:
     menu:
         m "Is that alright with you?{fast}"
 
-        "Sure, [m_name].":
+        "Sure, [m_name].{#mas_affection_playernickname_1}":
             m 1hua "Great!"
             m 3eud "I should ask though, what names are you comfortable with?"
             call mas_player_nickname_loop("Deselect the names you're not comfortable with me calling you.", base_nicknames)
 
-        "No.":
+        "No.{#mas_affection_playernickname_2}":
             m 1eka "Alright, [player]."
             m 3eua "Just let me know if you ever change your mind, okay?"
 
@@ -3096,7 +3096,7 @@ label mas_player_nickname_loop(check_scrollable_text, nickname_pool):
         menu:
             m "[dlg_line]{fast}"
 
-            "Yes.":
+            "Yes.{#monika_change_player_nicknames_1}":
                 label .name_enter_skip_loop:
                     pass
 
@@ -3148,7 +3148,7 @@ label mas_player_nickname_loop(check_scrollable_text, nickname_pool):
                     #If this is all good, then we'll add this to a list of things to add
                     $ acceptable_nicknames.append(lowername)
 
-            "No.":
+            "No.{#monika_change_player_nicknames_2}":
                 $ done = True
 
     if acceptable_nicknames:
@@ -3349,9 +3349,9 @@ label mas_finalfarewell:
     call mas_showpoem(mas_poems.getPoem(persistent._mas_finalfarewell_poem_id))
 
     menu:
-        "I'm sorry.":
+        "I'm sorry.{#mas_finalfarewell_1}":
             pass
-        "...":
+        "...{#mas_finalfarewell_2}":
             pass
 
     jump mas_finalfarewell

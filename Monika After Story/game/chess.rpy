@@ -1189,10 +1189,10 @@ label mas_chess_start_chess:
         menu:
             m "Would you like to save this game?{fast}"
 
-            "Yes.":
+            "Yes.{#mas_chess_start_chess_1}":
                 call mas_chess_savegame
 
-            "No.":
+            "No.{#mas_chess_start_chess_2}":
                 pass
 
     # FALL THROUGH
@@ -1203,18 +1203,18 @@ label mas_chess_play_again_ask:
     menu:
         m "Would you like to play again?{fast}"
 
-        "Yes.":
+        "Yes.{#mas_chess_play_again_ask_1}":
             $ mas_assignModifyEVLPropValue("mas_chess", "shown_count", "+=", 1)
             if drew_lots:
                 call mas_chess_draw_lots
 
             jump mas_chess_start_chess
 
-        "Yes, but with different rules.":
+        "Yes, but with different rules.{#mas_chess_play_again_ask_2}":
             $ mas_assignModifyEVLPropValue("mas_chess", "shown_count", "+=", 1)
             jump mas_chess_remenu
 
-        "No.":
+        "No.{#mas_chess_play_again_ask_3}":
             m 1eua "Alright, let's play again soon."
 
     return
@@ -1289,10 +1289,10 @@ label mas_chess_savegame(silent=False, allow_return=True):
             $ _history_list.pop()
             menu:
                 m "Should I overwrite it?{fast}"
-                "Yes.":
+                "Yes.{#mas_chess_play_again_ask_4}":
                     pass
 
-                "No.":
+                "No.{#mas_chess_play_again_ask_5}":
                     #NOTE: Since jumping back to the main label causes arg resets, we jump to a local label inside to prevent that
                     #TODO: Jump with args
                     jump .save_start
@@ -1331,7 +1331,7 @@ label mas_chess_savegame(silent=False, allow_return=True):
                 menu:
                     m "Right, [player]?{fast}"
 
-                    "Of course not.":
+                    "Of course not.{#mas_chess_play_again_ask_6}":
                         m 1hua "Yay~"
 
         if game_result == mas_chess.IS_ONGOING:
@@ -1507,16 +1507,16 @@ label mas_chess_dlg_quickfile_lost:
     menu:
         m "Did you mess with the saves, [player]?{fast}"
 
-        "I deleted the save.":
+        "I deleted the save.{#mas_chess_dlg_quickfile_lost_1}":
             jump mas_chess_dlg_quickfile_lost_deleted
 
-        "It was an accident!":
+        "It was an accident!{#mas_chess_dlg_quickfile_lost_2}":
             jump mas_chess_dlg_quickfile_lost_accident
 
-        "Maybe...":
+        "Maybe...{#mas_chess_dlg_quickfile_lost_3}":
             jump mas_chess_dlg_quickfile_lost_maybe
 
-        "Of course not!":
+        "Of course not!{#mas_chess_dlg_quickfile_lost_4}":
             jump mas_chess_dlg_quickfile_lost_ofcoursenot
 
 
@@ -1529,11 +1529,11 @@ label mas_chess_dlg_quickfile_lost_deleted:
     menu:
         m "Did you not want to continue that game?{fast}"
 
-        "Yeah.":
+        "Yeah.{#mas_chess_dlg_quickfile_lost_deleted_1}":
             m 1eka "I understand, [player]."
             m 1hua "Let's start a new game~"
 
-        "No.":
+        "No.{#mas_chess_dlg_quickfile_lost_deleted_2}":
             m 1etc "Oh?"
             m 1rsc "I guess you just deleted it by mistake then."
             m 1eua "Let's just start a new game."
@@ -1649,7 +1649,7 @@ label mas_chess_quickfile_lost_maybe_filechecker_loop:
     show screen mas_background_timed_jump(4, "mas_chess_quickfile_lost_maybe_filechecker_loop")
     $ seconds += 4
     menu:
-        "I deleted the save...":
+        "I deleted the save...{#mas_chess_quickfile_lost_maybe_filechecker_loop_1}":
             hide screen mas_background_timed_jump
             jump mas_chess_dlg_quickfile_lost_maybe_filechecker_no_file
 
@@ -1705,10 +1705,10 @@ label mas_chess_dlg_quickfile_edited:
     menu:
         m "Did you edit the save file?{fast}"
 
-        "Yes.":
+        "Yes.{#mas_chess_dlg_quickfile_edited_1}":
             jump mas_chess_dlg_quickfile_edited_yes
 
-        "No.":
+        "No.{#mas_chess_dlg_quickfile_edited_2}":
             jump mas_chess_dlg_quickfile_edited_no
 
 
@@ -1725,7 +1725,7 @@ label mas_chess_dlg_quickfile_edited_yes:
         # we want a timed menu here. Let's give the player 5 seconds to say sorry
         show screen mas_background_timed_jump(5, "mas_chess_dlg_quickfile_edited_yes.game_ruined")
         menu:
-            "I'm sorry.":
+            "I'm sorry.{#mas_chess_dlg_quickfile_edited_yes_1}":
                 hide screen mas_background_timed_jump
                 # light affection boost for being honest
                 $ mas_gainAffection(modifier=0.5)
@@ -1733,7 +1733,7 @@ label mas_chess_dlg_quickfile_edited_yes:
                 m 1eua "Luckily, I still remember a little bit of the last game, so we can continue it from there."
                 return store.mas_chess.CHESS_GAME_BACKUP
 
-            "...":
+            "...{#mas_chess_dlg_quickfile_edited_yes_2}":
                 label .game_ruined:
                     pass
 
@@ -1797,7 +1797,7 @@ label mas_chess_dlg_quickfile_edited_no:
         #NOTE: This is the ultimate choice, it dictates whether we delete everything or not
         show screen mas_background_timed_jump(3, "mas_chess_dlg_quickfile_edited_no.menu_silent")
         menu:
-            "I'm sorry.":
+            "I'm sorry.{#mas_chess_dlg_quickfile_edited_no_1}":
                 hide screen mas_background_timed_jump
                 # light affection boost for apologizing
                 $ mas_gainAffection(modifier=0.5)
@@ -1813,7 +1813,7 @@ label mas_chess_dlg_quickfile_edited_no:
                 m 2dktdc "..."
                 return store.mas_chess.CHESS_GAME_BACKUP
 
-            "...":
+            "...{#mas_chess_dlg_quickfile_edited_no_2}":
                 label .menu_silent:
                     hide screen mas_background_timed_jump
                     jump mas_chess_dlg_pre_go_ham

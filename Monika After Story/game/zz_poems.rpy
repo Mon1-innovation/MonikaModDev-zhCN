@@ -357,9 +357,9 @@ label monika_showpoem:
     menu:
         m "Would you like to read another poem?{fast}"
 
-        "Yes.":
+        "Yes.{#monika_showpoem_1}":
             jump monika_showpoem
 
-        "No.":
+        "No.{#monika_showpoem_2}":
             m 1eua "Alright, [player]."
     return

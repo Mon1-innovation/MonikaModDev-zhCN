@@ -379,7 +379,7 @@ label monika_idle_shower:
             menu:
                 m "Can I come with you?{fast}"
 
-                "Yes.":
+                "Yes.{#monika_idle_shower_1}":
                     hide screen mas_background_timed_jump
                     m 2wubsd "Oh, uh...{w=0.5}you sure answered that fast."
                     m 2hkbfsdlb "You...{w=0.5}sure seem eager to let me tag along, huh?"
@@ -389,7 +389,7 @@ label monika_idle_shower:
                     show monika 5kubfu at t11 zorder MAS_MONIKA_Z with dissolve_monika
                     m 5kubfu "Maybe another time~"
 
-                "No.":
+                "No.{#monika_idle_shower_2}":
                     hide screen mas_background_timed_jump
                     m 2eka "Aw, you rejected me so fast."
                     m 3tubsb "Are you shy, [player]?"
@@ -428,11 +428,11 @@ label monika_idle_shower_callback:
             menu:
                 m "Did you take a bath instead?{fast}"
 
-                "Yes.":
+                "Yes.{#monika_idle_shower_callback_1}":
                     m 7hub "Oh! {w=0.3}I see!"
                     m 3eua "I hope it was nice and relaxing!"
 
-                "No.":
+                "No.{#monika_idle_shower_callback_2}":
                     m 7rua "Oh...{w=0.3}maybe you just like really long showers..."
                     m 3duu "Sometimes it can be nice just to feel the water rushing over you...{w=0.3}it can be really soothing."
                     m 1hksdlb "...Or maybe I'm overthinking this and you just didn't come back right away, ahaha!"
@@ -672,11 +672,11 @@ label monika_idle_workout_callback:
             menu:
                 m "Are you sure you can't keep going?{fast}"
 
-                "I'm sure.":
+                "I'm sure.{#monika_idle_workout_callback_1}":
                     m 1eka "That's okay."
                     m 1hua "I'm sure you did your best, [player]~"
 
-                "I'll try to keep going.":
+                "I'll try to keep going.{#monika_idle_workout_callback_2}":
                     # continue workout and return Monika to idle state
                     m 1hub "That's the spirit!"
 

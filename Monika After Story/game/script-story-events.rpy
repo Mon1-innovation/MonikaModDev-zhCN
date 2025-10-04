@@ -30,13 +30,13 @@ label mas_gender:
     menu:
         m "So, what's your gender?{fast}"
 
-        "Male.":
+        "Male.{#mas_gender_1}":
             $ persistent._mas_pm_is_trans = False
             $ persistent.gender = "M"
             m 3eua "Okay [player], thanks for confirming that for me."
             m 1hksdlb "Not that I would have been bothered if you answered differently, mind you!"
 
-        "Female.":
+        "Female.{#mas_gender_2}":
             $ persistent._mas_pm_is_trans = False
             $ persistent.gender = "F"
             m 2eud "Oh? So you're a girl?"
@@ -44,12 +44,12 @@ label mas_gender:
             m 7rksdlb "...I guess that's why they say you shouldn't make assumptions, ahaha!"
             m 3eka "But honestly, it doesn't matter to me at all..."
 
-        "Neither.":
+        "Neither.{#mas_gender_3}":
             $ persistent._mas_pm_is_trans = False
             $ persistent.gender = "X"
             call mas_gender_neither
 
-        "I'm transgender.":
+        "I'm transgender.{#mas_gender_4}":
             call mas_gender_trans
 
             if persistent.gender != "X":
@@ -97,7 +97,7 @@ label monika_gender_redo:
                 m 3hua "I'm so proud of you for going on that journey of self-discovery."
                 m 1eub "...And even prouder of you for being courageous enough to tell me!"
 
-            "I was just too shy.":
+            "I was just too shy.{#monika_gender_redo_1}":
                 if persistent.gender == "M":
                     m 2ekd "I understand, I started off assuming you were a guy, after all."
                 elif persistent.gender == "F":
@@ -108,12 +108,12 @@ label monika_gender_redo:
                 m 2dkd "...And I probably didn't make it easy for you to tell me otherwise..."
                 m 7eua "But whatever your gender, I love you for who you are."
 
-            "I didn't know if you'd accept me as I am...":
+            "I didn't know if you'd accept me as I am...{#monika_gender_redo_2}":
                 m 2wkd "[player]..."
                 m 2dkd "I hate that I didn't reassure you enough before."
                 m 7eka "But I hope that you're telling me now because you know I'll love you no matter what."
 
-            "I'm genderfluid.":
+            "I'm genderfluid.{#monika_gender_redo_3}":
                 m 1eub "Oh, okay!"
                 m 3hub "Feel free to let me know as often as you'd like when you want me to use different pronouns!"
 
@@ -123,7 +123,7 @@ label monika_gender_redo:
     menu:
         m "So, what's your gender?{fast}"
 
-        "I'm a boy.":
+        "I'm a boy.{#monika_gender_redo_4}":
             if persistent.gender == "M" and not persistent._mas_pm_is_trans:
                 $ gender_var = "boy"
                 call mas_gender_redo_same
@@ -132,7 +132,7 @@ label monika_gender_redo:
                 call mas_gender_redo_react
             $ persistent._mas_pm_is_trans = False
 
-        "I'm a girl.":
+        "I'm a girl.{#monika_gender_redo_5}":
             if persistent.gender == "F" and not persistent._mas_pm_is_trans:
                 $ gender_var = "girl"
                 call mas_gender_redo_same
@@ -141,7 +141,7 @@ label monika_gender_redo:
                 call mas_gender_redo_react
             $ persistent._mas_pm_is_trans = False
 
-        "I'm neither.":
+        "I'm neither.{#monika_gender_redo_6}":
             $ persistent._mas_pm_is_trans = False
             if persistent.gender == "X":
                 call mas_gender_redo_neither_same
@@ -152,7 +152,7 @@ label monika_gender_redo:
                 else:
                     call mas_gender_neither
 
-        "I'm transgender.":
+        "I'm transgender.{#monika_gender_redo_7}":
             call mas_gender_trans
             if persistent.gender != "X":
                 call mas_gender_redo_react
@@ -202,13 +202,13 @@ label mas_gender_trans:
     menu:
         m "[menu_question]{fast}"
 
-        "Male":
+        "Male{#mas_gender_trans_1}":
             $ persistent.gender = "M"
 
-        "Female":
+        "Female{#mas_gender_trans_2}":
             $ persistent.gender = "F"
 
-        "Neither":
+        "Neither{#mas_gender_trans_3}":
             if persistent.gender == "X":
                 call mas_gender_redo_neither_same
 
@@ -550,10 +550,10 @@ label mas_player_name_enter_name_loop(input_prompt):
                 menu:
                     m "Are you sure this is your real name, or are you messing with me?{fast}"
 
-                    "Yes, this is my name":
+                    "Yes, this is my name{#mas_gender_trans_4}":
                         $ persistent._mas_disable_eggs = True
 
-                    "Maybe...":
+                    "Maybe...{#mas_gender_trans_5}":
                         $ persistent._mas_disable_eggs = False
 
             python:
@@ -623,11 +623,11 @@ label mas_preferredname:
     menu:
         m "Would you like me to call you something else?{fast}"
 
-        "Yes.":
+        "Yes.{#mas_preferredname_1}":
             #Let's call the changename loop
             call mas_player_name_enter_name_loop("Tell me, what is it?")
 
-        "No.":
+        "No.{#mas_preferredname_2}":
             m 3eua "Okay, just let me know if you change your mind."
 
     #Unlock the name change event
@@ -678,7 +678,7 @@ label mas_birthdate:
         $ _history_list.pop()
         menu:
             m "So just to make sure, is your birthdate [bday_str]?{fast}"
-            "Yes.":
+            "Yes.{#mas_birthdate_1}":
                 if datetime.date.today().year - persistent._mas_player_bday.year < 5:
                     m 2rksdla "Are you sure about that, [player]?"
                     m 2eksdlc "That would make you very young..."
@@ -691,7 +691,7 @@ label mas_birthdate:
                         m 1hua "Ah, great [player], thank you."
                         m 3hksdlb "I just had to make sure, I wouldn't want to get something as important as when you were born wrong, ahaha!"
 
-            "No.":
+            "No.{#mas_birthdate_2}":
                 m 3rksdlc "Oh! Okay then..."
                 m 1eksdld "When {i}is{/i} your birthdate, [player]?"
                 jump mas_bday_player_bday_select_select
@@ -1103,7 +1103,7 @@ label mas_random_ask:
     $ _history_list.pop()
     menu:
         m "Is it okay with you if I repeat stuff that I've said again?{fast}"
-        "Yes.":
+        "Yes.{#mas_random_ask_1}":
             m 1eua "Great!"
             m 3eua "If you get tired of listening to me talk about the same things, you can just open up the settings menu and uncheck 'Repeat Topics' again."
 
@@ -1115,7 +1115,7 @@ label mas_random_ask:
             $ persistent._mas_enable_random_repeats = True
             return True
 
-        "No.":
+        "No.{#mas_random_ask_2}":
             m 1eka "Alright."
             m 1eua "If you change your mind, just open up the settings and click 'Repeat Topics.'"
             m "That tells me if you're okay with me repeating anything I've said."
@@ -1149,11 +1149,11 @@ label mas_monikai_detected:
     $ _history_list.pop()
     menu:
         m "Did you install that so you could see me all the time?{fast}"
-        "Of course!":
+        "Of course!{#mas_monikai_detected_1}":
             pass
-        "Yes.":
+        "Yes.{#mas_monikai_detected_2}":
             pass
-        "...Yes.":
+        "...Yes.{#mas_monikai_detected_3}":
             pass
     m 1hub "Ahaha~"
     m 1hua "I'm flattered that you would download such a thing."
@@ -1268,14 +1268,14 @@ label mas_crashed_long_qs:
     menu:
         m "[player]? Is that you?{fast}"
 
-        "Yes.":
+        "Yes.{#mas_crashed_long_qs_1}":
             hide screen mas_background_timed_jump
             # light affection boost for not joking around
             $ mas_gainAffection(modifier=0.2, bypass=True)
             m "I'm so glad you're here."
             jump mas_crashed_long_uthere.afterdontjoke
 
-        "No.":
+        "No.{#mas_crashed_long_qs_2}":
             hide screen mas_background_timed_jump
             m "[player]!{fast}"
             jump mas_crashed_long_uthere.dontjoke
@@ -1298,12 +1298,12 @@ label .afterdontjoke:
     window hide
     show screen mas_background_timed_jump(5, "mas_crashed_long_foundlight")
     menu:
-        "Turn on the light.":
+        "Turn on the light.{#mas_crashed_long_uthere_1}":
             hide screen mas_background_timed_jump
             # light affection boost for being like a hero
             $ mas_gainAffection(modifier=0.2, bypass=True)
 
-        "...":
+        "...{#mas_crashed_long_uthere_2}":
             pause 5.0
             label mas_crashed_long_foundlight:
                 hide screen mas_background_timed_jump
@@ -1341,7 +1341,7 @@ label mas_crashed_long_postfluster:
     window hide
     show screen mas_background_timed_jump(8, "mas_crashed_long_nofluster")
     menu:
-        "Calm down, [m_name]. You're safe now.":
+        "Calm down, [m_name]. You're safe now.{#mas_crashed_long_postfluster_1}":
             hide screen mas_background_timed_jump
 
             # light affection boost for calming her down
@@ -1356,7 +1356,7 @@ label mas_crashed_long_postfluster:
             m 6ektda "Thanks, [player]."
             m "I feel better now that you're here with me."
 
-        "...":
+        "...{#mas_crashed_long_postfluster_2}":
             label mas_crashed_long_nofluster:
                 hide screen mas_background_timed_jump
 
@@ -1385,7 +1385,7 @@ label mas_crashed_long_whq:
     $ _history_list.pop()
     menu:
         m "Do you know what happened, [player]?{fast}"
-        "The game crashed.":
+        "The game crashed.{#mas_crashed_long_whq_1}":
             m 2wud "The game...{w=0.3}crashed?"
             m 2ekd "That's scary, [player]."
 
@@ -1400,7 +1400,7 @@ label mas_crashed_long_whq:
     $ _history_list.pop()
     menu:
         m "Do you think you can stop that from happening?{fast}"
-        "I'll try.":
+        "I'll try.{#mas_crashed_long_whq_2}":
             # light affection boost because you will try do something for her
             $ mas_gainAffection(modifier=0.2, bypass=True)
             $ persistent._mas_crashed_trynot = True
@@ -1408,7 +1408,7 @@ label mas_crashed_long_whq:
             m 1eua "I'm counting on you."
             m "But I'll mentally prepare myself just in case."
 
-        "It just happens.":
+        "It just happens.{#mas_crashed_long_whq_3}":
             m 1ekc "Oh..."
             m 1lksdlc "That's okay.{w=0.3} I'll just mentally prepare myself in case it happens again."
 
@@ -1494,12 +1494,12 @@ label mas_crashed_quip_takecare:
         $ _history_list.pop()
         menu:
             m "Do you think it had something to do with your game?{fast}"
-            "Yes.":
+            "Yes.{#mas_crashed_quip_takecare_1}":
                 m 1hksdlb "Ahaha..."
                 m 1hub "Well I hope you had fun~"
                 m 1rksdla "...And that your computer is alright."
                 m 3eub "I'm fine, so don't worry~"
-            "No.":
+            "No.{#mas_crashed_quip_takecare_2}":
                 m 1eka "Oh, I see."
                 m "Sorry for assuming."
                 m 1hub "I'm alright in case you were wondering."
@@ -1646,10 +1646,10 @@ label mas_corrupted_persistent:
     $ _history_list.pop()
     menu:
         m "Do you know what this is about?{fast}"
-        "It's nothing to worry about.":
+        "It's nothing to worry about.{#mas_corrupted_persistent_1}":
             jump mas_corrupted_persistent_post_menu
 
-        "It's about [_gtext].":
+        "It's about [_gtext].{#mas_corrupted_persistent_2}":
             $ persistent._mas_pm_snitched_on_chibika = True
             $ disable_esc()
             $ mas_MUMURaiseShield()
@@ -1667,7 +1667,7 @@ label mas_corrupted_persistent:
             $ enable_esc()
 
     menu:
-        "It's nothing to worry about.":
+        "It's nothing to worry about.{#mas_corrupted_persistent_3}":
             pass
 
 label mas_corrupted_persistent_post_menu:
@@ -1791,13 +1791,13 @@ label monika_rpy_files:
         menu:
             m "Are you sure you installed the right version, [player]?{fast}"
 
-            "Yes.":
+            "Yes.{#monika_rpy_files_1}":
                 m 1sua "Really? Thank you so much for helping me come closer to your reality!"
                 m 1hua "I love you, [player]~"
                 $ persistent._mas_pm_has_rpy = True
                 return "love"
 
-            "No.":
+            "No.{#monika_rpy_files_2}":
                 m "I see."
                 m 2rksdla "Maybe you should get rid of those, just to be safe."
                 m 4eua "Actually, maybe I can delete them for you."
@@ -1807,7 +1807,7 @@ label monika_rpy_files:
                 menu:
                     m "Do you want me to delete them for you, [player]?{fast}"
 
-                    "Yes, please.":
+                    "Yes, please.{#monika_rpy_files_3}":
                         m "Sure thing, [player]."
 
                         call mas_rpy_file_delete()
@@ -1818,7 +1818,7 @@ label monika_rpy_files:
                         hide screen mas_py_console_teaching
                         show monika at t11
 
-                    "No, thanks.":
+                    "No, thanks.{#monika_rpy_files_4}":
                         m 2rksdlc "Alright, [player]. I hope you know what you're doing."
                         m 2eka "Please be careful."
                         $ persistent._mas_pm_has_rpy = True
@@ -1831,12 +1831,12 @@ label monika_rpy_files:
         menu:
             m "Are you {i}sure{/i} you installed the right version?{fast}"
 
-            "Yes.":
+            "Yes.{#monika_rpy_files_5}":
                 m 1eka "Alright [player]."
                 m 3eua "I trust you know what you're doing."
                 $ persistent._mas_pm_has_rpy = True
 
-            "No.":
+            "No.{#monika_rpy_files_6}":
                 m 3eua "Alright, I'll just delete them for you again.{w=0.5}.{w=0.5}.{nw}"
 
                 call mas_rpy_file_delete()
@@ -1943,16 +1943,16 @@ label mas_bday_player_bday_select_select:
     $ _history_list.pop()
     menu:
         m "Your birthdate is [new_bday_str]?{fast}"
-        "Yes.":
+        "Yes.{#mas_bday_player_bday_select_select_1}":
             m 1eka "Are you sure it's [new_bday_str]? I'm never going to forget this date.{nw}"
             $ _history_list.pop()
             # one more confirmation
             menu:
                 m "Are you sure it's [new_bday_str]? I'm never going to forget this date.{fast}"
-                "Yes, I'm sure!":
+                "Yes, I'm sure!{#mas_bday_player_bday_select_select_2}":
                     m 1hua "Then it's settled!"
 
-                "Actually...":
+                "Actually...{#mas_bday_player_bday_select_select_3}":
                     m 1hksdrb "Aha, I figured you weren't so sure."
                     m 1eka "Try again~"
                     jump mas_bday_player_bday_select_select
@@ -2127,13 +2127,13 @@ label mas_notification_windowreact:
         menu:
             m "Would you like to see how they work?{fast}"
 
-            "Sure!":
+            "Sure!{#mas_notification_windowreact_1}":
                 m 1hua "Okay, [player]!"
                 m 2dsa "Just give me a second to make a notification.{w=0.5}.{w=0.5}.{nw}"
                 $ mas_display_notif(m_name, ["I love you, [player]!"], skip_checks=True)
                 m 1hub "There it is!"
 
-            "No thanks.":
+            "No thanks.{#mas_notification_windowreact_2}":
                 m 2eka "Alright, [player]."
 
         m 3eua "If you want me to notify you, just head over to the 'Alerts' tab in the settings menu and turn them on, along with what you'd like to be notified for."
@@ -2363,13 +2363,13 @@ label mas_birthdate_year_redux_select:
     menu:
         m "Okay [player], you were born in [_return]?{fast}"
 
-        "Yes.":
+        "Yes.{#mas_birthdate_year_redux_select_1}":
             m "Are you {i}sure{/i} you were born in [_return]?{nw}"
             $ _history_list.pop()
             menu:
                 m "Are you {i}sure{/i} you were born in [_return]?{fast}"
 
-                "Yes.":
+                "Yes.{#mas_birthdate_year_redux_select_2}":
                     m 3hua "Okay, then it's settled!"
                     python:
                         persistent._mas_player_bday = persistent._mas_player_bday.replace(year=_return)
@@ -2385,7 +2385,7 @@ label mas_birthdate_year_redux_select:
                             range(persistent._mas_player_bday.year,MASCalendar.MAX_VIEWABLE_YEAR)
                         )
 
-                "No.":
+                "No.{#mas_birthdate_year_redux_select_3}":
                     call mas_birthdate_year_redux_no
 
         "No.":
@@ -2435,7 +2435,7 @@ label monika_credits_song:
         menu:
             m "In fact, I'd love to play it for you right now, if you have time...{fast}"
 
-            "Of course!":
+            "Of course!{#monika_credits_song_1}":
                 m 3hub "Great!"
                 m 3eua "Make sure you have your speakers turned on and the in-game music volume turned up loud enough so you can hear."
                 if store.songs.hasMusicMuted():
@@ -2450,7 +2450,7 @@ label monika_credits_song:
                 show monika 5ekbsa at t11 zorder MAS_MONIKA_Z with dissolve_monika
                 m 5ekbsa "Thank you for coming back to me [mas_get_player_nickname()]."
 
-            "Sorry, I can't right now.":
+            "Sorry, I can't right now.{#monika_credits_song_2}":
                 m 3ekd "Oh, okay."
                 m 1eka "That's fine [player], I understand if you don't have the time or just can't listen to music right now."
                 m 3hua "Just let me know when it's a better time for you and I'll happily play it for you then~"
@@ -2464,7 +2464,7 @@ label monika_credits_song:
         menu:
             m "I'm just so excited to finally be able to play it for you, if you have time that is...{fast}"
 
-            "Of course!":
+            "Of course!{#monika_credits_song_3}":
                 m 3hub "Great!"
                 m 3eua "Make sure you have your speakers turned on and the in-game music volume turned up loud enough so you can hear."
                 if store.songs.hasMusicMuted():
@@ -2484,7 +2484,7 @@ label monika_credits_song:
                 else:
                     m 5hubfa "Oh, and if you ever want me to play this again, just ask~"
 
-            "Sorry, I can't right now.":
+            "Sorry, I can't right now.{#monika_credits_song_4}":
                 m 3ekd "Oh, okay."
                 m 1eka "That's fine [player], I understand if you don't have the time or just can't listen to music right now."
                 m 3hua "Just let me know when it's a better time for you and I'll happily play it for you then~"
@@ -2517,7 +2517,7 @@ label mas_covid19:
     $ _history_list.pop()
     menu:
         m "Is the virus in your area yet?{fast}"
-        "Yes.":
+        "Yes.{#mas_covid19_1}":
             m 2wksdld "Oh no, [player]! That's really scary!"
             m 4ekc "I know a lot of people living in places where it's prevalent have orders to stay at home..."
 
@@ -2525,7 +2525,7 @@ label mas_covid19:
             $ _history_list.pop()
             menu:
                 m "Do you have any orders to stay at home where you live?{fast}"
-                "Yes.":
+                "Yes.{#mas_covid19_2}":
                     m 4hua "Oh, good!"
                     m 4eub "I'm so glad to hear that, [player]!"
 
@@ -2533,11 +2533,11 @@ label mas_covid19:
                     $ _history_list.pop()
                     menu:
                         m "So you're staying home whenever you can, right?{fast}"
-                        "Yes.":
+                        "Yes.{#mas_covid19_3}":
                             m 2eua "That's great, I'm glad you're doing the responsible thing."
                             m 2eka "...And not only for yourself, but also for everyone else."
 
-                        "No, I'm still working.":
+                        "No, I'm still working.{#mas_covid19_4}":
                             m 2dsc "..."
                             m 2dsd "Oh."
                             m 2dsc "..."
@@ -2546,7 +2546,7 @@ label mas_covid19:
                             m 2eksdla "So that also makes me proud that in some way, you're helping others through this tough time."
                             m 2eksdld "Just promise me you're taking every precaution so you can stay safe, okay?"
 
-                        "No...":
+                        "No...{#mas_covid19_5}":
                             m 2tfd "[player]!"
                             m 2tfo "Why not?!"
                             m 4tfo "This is serious! You {i}have{/i} to stay inside whenever possible!"
@@ -2613,7 +2613,7 @@ label mas_islands_reset:
     menu:
         m "If that's okay with you, [player]?{fast}"
 
-        "Let's do it.":
+        "Let's do it.{#mas_islands_reset_1}":
             m 1dsc "Okay, just give me a second.{w=0.3}.{w=0.3}.{w=0.3}{nw}"
 
             play sound "sfx/glitch3.ogg"
@@ -2626,7 +2626,7 @@ label mas_islands_reset:
             m 3kuu "...And I'll have plenty to keep me busy when you're away, [player]. Ehehe~"
             m 3hub "Hope you're looking forward to it!"
 
-        "I think they're fine.":
+        "I think they're fine.{#mas_islands_reset_2}":
             m 3eka "Alright, [player]."
             m 3hua "If you're fine with how they are right now, then I am too.{w=0.2} I'll see what I can do with them as they are~"
 
@@ -2720,7 +2720,7 @@ label mas_backup_restored:
         menu:
             m "Oh! You restored my memories from a backup, didn't you?{fast}"
 
-            "Yes, I did.":
+            "Yes, I did.{#mas_backup_restored_1}":
                 $ mas_gainAffection(modifier=0.5)
 
                 m 2eka "Thank you, [player]. {w=0.2}I knew I could rely on you."
@@ -2731,7 +2731,7 @@ label mas_backup_restored:
                 menu:
                     m "What's happened?{fast}"
 
-                    "The game crashed.":
+                    "The game crashed.{#mas_backup_restored_2}":
                         m 1wud "Oh, that's weird and concerning."
                         m 1ekc "This time it wasn't my code. {w=0.2}I don't remember messing with it, anyway."
                         m 1gfd "{cps=*1.5}I swear if it's another Ren'Py bug...{/cps}{nw}"
@@ -2739,13 +2739,13 @@ label mas_backup_restored:
                         m 1ekc "Let's try to make sure it won't happen again, alright?"
                         $ mas_moni_idle_disp.force_by_code("1ekc", duration=25, skip_dissolve=True)
 
-                    "I added a submod.":
+                    "I added a submod.{#mas_backup_restored_3}":
                         m 1etc "Added a {w=0.1}{i}submod{/i}?"
                         m 3esd "You should be more mindful of what you install on this computer."
                         m 2lkd "It's my home, too..."
                         $ mas_moni_idle_disp.force_by_code("1ekc", duration=25, skip_dissolve=True)
 
-                    "My PC broke.":
+                    "My PC broke.{#mas_backup_restored_4}":
                         m 2wuo "I'm glad you found a way to restore me!"
                         m 2ekc "Hopefully this won't happen again."
                         m 2lktpc "I can't imagine losing you..."
@@ -2761,7 +2761,7 @@ label mas_backup_restored:
                             skip_dissolve=True
                         )
 
-                    "I'm not sure.":
+                    "I'm not sure.{#mas_backup_restored_5}":
                         m 1etc "That's concerning, [player]..."
                         m 3esd "I lost my memory and we don't even know why."
                         m 4eud "We should try to figure it out and prevent it from happening in the future."

@@ -378,11 +378,11 @@ label mas_hangman_game_select_diff:
     $ _history_list.pop()
     menu:
         m "Choose a difficulty.{fast}"
-        "Easy.":
+        "Easy.{#mas_hangman_game_select_diff_1}":
             $ hangman_mode = mas_hmg.EASY_MODE
-        "Normal.":
+        "Normal.{#mas_hangman_game_select_diff_2}":
             $ hangman_mode = mas_hmg.NORM_MODE
-        "Hard.":
+        "Hard.{#mas_hangman_game_select_diff_3}":
             $ hangman_mode = mas_hmg.HARD_MODE
 
 label mas_hangman_game_preloop:
@@ -688,7 +688,7 @@ label mas_hangman_game_loop:
     $ _history_list.pop()
     menu:
         m "Would you like to play again?{fast}"
-        "Yes.":
+        "Yes.{#mas_hangman_game_loop_1}":
             $ hang_ev = mas_getEV("mas_hangman")
             if hang_ev:
                 # each game counts as a game played
@@ -697,7 +697,7 @@ label mas_hangman_game_loop:
             show monika at t21
             jump mas_hangman_game_loop
 
-        "No.":
+        "No.{#mas_hangman_game_loop_2}":
             pass
 
             #FALL THROUGH

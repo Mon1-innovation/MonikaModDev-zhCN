@@ -841,7 +841,7 @@ label mas_updater_rpy_issue:
     menu:
         m "Would you like me to delete them?{fast}"
 
-        "Yes, please.":
+        "Yes, please.{#mas_updater_rpy_issue_1}":
             m 1hua "Sure!"
 
             #Delete files
@@ -861,7 +861,7 @@ label mas_updater_rpy_issue:
             #Run the updater
             jump update_now
 
-        "No, thanks.":
+        "No, thanks.{#mas_updater_rpy_issue_2}":
             m 3eka "Alright [player]. If you delete them and then try to update again, I'll run the updater for you."
 
     return

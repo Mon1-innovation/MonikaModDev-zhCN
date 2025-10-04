@@ -2037,7 +2037,7 @@ label mas_monika_islands_progress:
     menu:
         m "What do you say?{fast}"
 
-        "Sure, [m_name].":
+        "Sure, [m_name].{#mas_monika_islands_progress_1}":
             $ persistent._mas_pm_cares_island_progress = True
             $ mas_gainAffection(5, bypass=True)
             m 2hub "Yay!"
@@ -2052,7 +2052,7 @@ label mas_monika_islands_progress:
             $ mas_setEventPause(10)
             $ mas_moni_idle_disp.force_by_code("1hua", duration=10, skip_dissolve=True)
 
-        "I'm not interested.":
+        "I'm not interested.{#mas_monika_islands_progress_2}":
             $ persistent._mas_pm_cares_island_progress = False
             $ mas_loseAffectionFraction(min_amount=50, modifier=1.0)
             m 2ekc "Oh..."
@@ -2062,7 +2062,7 @@ label mas_monika_islands_progress:
             $ mas_setEventPause(60*10)
             $ mas_moni_idle_disp.force_by_code("2ekc", duration=60*10, skip_dissolve=True)
 
-        "Maybe later.":
+        "Maybe later.{#mas_monika_islands_progress_3}":
             m 2ekc "Oh...{w=0.5}{nw}"
             extend 2eka "alright."
             m 7eka "Just don't keep me waiting too long~"
