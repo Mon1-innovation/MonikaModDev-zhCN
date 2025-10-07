@@ -55,7 +55,7 @@ python early:
     req_perm()
     import os
     gamesyncTask = None
-    if renpy.android and not os.path.exists("/storage/emulated/0/MAS/bypass_filetransfer"):
+    if renpy.android and os.path.exists("/storage/emulated/0/MAS/use_filetransfer"):
         android_toast("正在加载游戏文件...")
         if os.path.exists("/storage/emulated/0/MAS/pure_sync"):
             gameSyncer.pure_sync = True
@@ -76,7 +76,7 @@ python early:
                 )
             bar.dismiss()
         AsyncTask(_progress_process())
-    elif renpy.android and os.path.exists("/storage/emulated/0/MAS/bypass_filetransfer"):
+    elif renpy.android and not os.path.exists("/storage/emulated/0/MAS/use_filetransfer"):
         ANDROID_FTSKIPED = True
         renpy.config.basedir = ANDROID_MASBASE
         renpy.config.gamedir = os.path.join(renpy.config.basedir, "game")
@@ -507,7 +507,7 @@ label create_hint_file:
             if os.path.exists(hint_file):
                 os.remove(hint_file)
         hint_files = [
-            {"name": "bypass_filetransfer", "description": "该文件可以禁用文件同步, basedir将改为外置MAS目录, 这可能有助于精灵包等外部文件加载, 但也可能导致预料之外的问题"},
+            {"name": "use_filetransfer", "description": "该文件使用文件同步来替代直接读取外部文件夹, 会导致加载变慢, 但可以有效保证MAS和Renpy本体相关代码正常运行."},
             {"name": "pure_sync", "description": "该文件可以完全重新同步文件"},
             {"name": "debug.p", "description": "该文件可以开启开发者模式"},
             {"name": "use_android_savedir", "description": "该文件可以将存档文件夹修改为Android数据文件夹下的默认位置"},
