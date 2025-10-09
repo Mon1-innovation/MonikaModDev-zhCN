@@ -167,16 +167,21 @@ python early:
             window.AsyncTaskerCheck.wait()
             renpy.quit()
     
+init 999 python:
+    @store.mas_submod_utils.functionplugin("ch30_preloop", priority=-10000)
+    def hide_dev():
+        if not p_debug:
+            if persistent.event_database:
+                for evlabel in persistent.event_database:
+                    ev = mas_getEV(evlabel)
+                    if ev:
+                        if ev.category:
+                            for c in ev.category:
+                                if "dev" in c:
+                                    mas_lockEvent(ev)
+
 init python:
     cn_debuging = p_debug
-    if not p_debug:
-        for evlabel in persistent.event_database:
-            ev = mas_getEV(evlabel)
-            if ev:
-                if ev.category:
-                    for c in ev.category:
-                        if "dev" in c:
-                            mas_lockEvent(ev)
     import os
     def _restart_mas():
         renpy.full_restart()
