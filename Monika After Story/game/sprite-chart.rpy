@@ -1042,7 +1042,7 @@ init -5 python in mas_sprites:
 
     # reverse map for eaiser lookup
     ARMS_LEAN = {}
-    for lean, values in LEAN_ARMS.iteritems():
+    for lean, values in LEAN_ARMS.items():
         for value in values:
             ARMS_LEAN[value] = lean
 
@@ -1092,27 +1092,6 @@ init -5 python in mas_sprites:
         if val is None:
             return allow_none
         return _verify_uprightpose(val) or _verify_leaningpose(val)
-
-    @store.mas_utils.deprecated(should_raise=True)
-    def acs_lean_mode(sprite_list, lean):
-        """
-        NOTE: DEPRECATED
-
-        Adds the appropriate accessory prefix dpenedong on lean
-
-        IN:
-            sprite_list - list to add sprites to
-            lean - type of lean
-        """
-        if lean:
-            sprite_list.extend((
-                PREFIX_ACS_LEAN,
-                lean,
-                ART_DLM
-            ))
-
-        else:
-            sprite_list.append(PREFIX_ACS)
 
 
     def face_lean_mode(lean):
@@ -1185,7 +1164,7 @@ init -5 python in mas_sprites:
             if no ACS of the given type
         """
         return [
-            acs for acs in ACS_MAP.itervalues()
+            acs for acs in ACS_MAP.values()
             if acs.acs_type == acs_type
         ]
 
@@ -1380,7 +1359,7 @@ init -5 python in mas_sprites:
         if predicate:
             return [
                 spr_object
-                for spr_object in sprite_map.itervalues()
+                for spr_object in sprite_map.values()
                 if predicate(spr_object)
             ]
 
@@ -2829,10 +2808,18 @@ init -3 python:
                 startup - True if we are loading on start, False if not
                     (Default: False)
             """
+            clothes = store.mas_sprites.CLOTH_MAP.get(_clothes_name, None)
+            if clothes is None:
+                store.mas_utils.mas_log.warning(f"Failed to find clothes '{_clothes_name}', restoring default")
+                clothes = store.mas_clothes_def
+            hair = store.mas_sprites.HAIR_MAP.get(_hair_name, None)
+            if hair is None:
+                store.mas_utils.mas_log.warning(f"Failed to find hair '{_hair_name}', restoring default")
+                hair = store.mas_hair_def
             # clothes and hair
             self.change_outfit(
-                store.mas_sprites.CLOTH_MAP.get(_clothes_name, store.mas_clothes_def),
-                store.mas_sprites.HAIR_MAP.get(_hair_name, store.mas_hair_def),
+                clothes,
+                hair,
                 startup=startup
             )
 
@@ -3506,7 +3493,7 @@ init -3 python:
             IN:
                 exprop - exprop to check for
             """
-            for acs_name in self.acs_list_map.keys():
+            for acs_name in tuple(self.acs_list_map.keys()):
                 _acs = store.mas_sprites.ACS_MAP.get(acs_name, None)
                 if _acs and _acs.hasprop(exprop):
                     self.remove_acs_in(_acs, self.acs_list_map[acs_name])
@@ -3520,7 +3507,7 @@ init -3 python:
             """
             for mux_type in mux_types:
                 acs_with_mux = self._acs_type_map.get(mux_type, {})
-                for acs_name in acs_with_mux.keys():
+                for acs_name in tuple(acs_with_mux.keys()):
                     self.remove_acs(store.mas_sprites.get_acs(acs_name))
 
         def remove_acs_in(self, accessory, acs_layer):
@@ -4295,7 +4282,7 @@ init -3 python:
                         vhl_data,
                         msg_log,
                         ind_lvl,
-                        layer_map.keys()
+                        list(layer_map.keys())
                 ):
                     # success
                     hl_data = vhl_data.get("hl_data", None)
@@ -4366,7 +4353,7 @@ init -3 python:
             IN:
                 mapping - mapping to clean
             """
-            for map_key in mapping.keys():
+            for map_key in tuple(mapping.keys()):
                 if map_key not in self.__MPA_KEYS:
                     mapping.pop(map_key)
 
@@ -4569,7 +4556,7 @@ init -3 python:
                 arm_data - cleaned arm data
             """
             # first validate the arm data
-            for arm_key in arm_data.keys():
+            for arm_key in tuple(arm_data.keys()):
 
                 # then check
                 if arm_key in store.mas_sprites.NUM_ARMS:
@@ -4651,7 +4638,7 @@ init -3 python:
 
             # loop over valid arm data
             isbad = False
-            for arm_id, arm_sid in store.mas_sprites.NUM_ARMS.iteritems():
+            for arm_id, arm_sid in store.mas_sprites.NUM_ARMS.items():
                 if arm_sid in json_obj:
                     arm_obj = json_obj.pop(arm_sid)
 
@@ -5195,7 +5182,7 @@ init -3 python:
 
             # verify other params
             isbad = False
-            for prop_name in json_obj.keys():
+            for prop_name in tuple(json_obj.keys()):
                 prop_val = json_obj.pop(prop_name)
                 if prop_name in cls.CONS_PARAM_NAMES:
                     if not cls._verify_mpm_item(
@@ -5274,13 +5261,13 @@ init -3 python:
             """
             try:
                 values = []
-                for value in self.__all_map.itervalues():
+                for value in self.__all_map.values():
                     if value is not None and value not in values:
                         values.append(value)
 
                 return values
             except:
-                return self.values()
+                return list(self.values())
 
         def values(self):
             """
@@ -5290,7 +5277,7 @@ init -3 python:
             """
             return [
                 value
-                for value in self.__all_map.itervalues()
+                for value in self.__all_map.values()
                 if value is not None
             ]
 
@@ -5605,7 +5592,7 @@ init -3 python:
             if self.hl_map is None:
                 return []
 
-            return self.hl_map.keys()
+            return list(self.hl_map.keys())
 
         def is_dynamic(self):
             """
@@ -5811,6 +5798,8 @@ init -3 python:
                 leaves, False if not
             hl_map - MASHighlightMap object where keys are defined by the given
                 posemap. Value determined by extending classes.
+            use_folders - True if the sprites are organized using the new-style
+                (folder-based) structure
 
         SEE MASSpriteBase for inherited properties
         """
@@ -5844,7 +5833,8 @@ init -3 python:
                 ex_props=None,
                 dlg_data=None,
                 keep_on_desk=False,
-                hl_data=None
+                hl_data=None,
+                use_folders=True
             ):
             """
             MASAccessory constructor
@@ -5904,6 +5894,9 @@ init -3 python:
                         if None, then no mapped highlights
                     if None, no highlights at all
                     (Default: None)
+                use_folders - determines if sprites are organized using new-style
+                    (folder-based) structure
+                    (Default: True)
             """
             super(MASAccessoryBase, self).__init__(
                 name,
@@ -5923,6 +5916,7 @@ init -3 python:
             self.acs_type = acs_type
             self.mux_type = mux_type
             self.keep_on_desk = keep_on_desk
+            self.use_folders = use_folders
 
             if dlg_data is not None and len(dlg_data) == 2:
                 self.dlg_desc, self.dlg_plur = dlg_data
@@ -6004,6 +5998,27 @@ init -3 python:
             """
             raise NotImplementedError
 
+        def _build_img_str_prefix(self, prefix):
+            """
+            Builds img string prefix to use for loadstrs
+
+            IN:
+                prefix - prefix to build with
+
+            RETURNS: img string prefix to use
+            """
+            if self.use_folders:
+                return prefix + [
+                    self.img_sit,
+                    "/",
+                ]
+
+            return prefix + [
+                store.mas_sprites.PREFIX_ACS,
+                self.img_sit,
+                store.mas_sprites.ART_DLM,
+            ]
+
 
     class MASAccessory(MASAccessoryBase):
         """
@@ -6030,7 +6045,8 @@ init -3 python:
                 ex_props=None,
                 dlg_data=None,
                 keep_on_desk=False,
-                hl_data=None
+                hl_data=None,
+                use_folders=True,
         ):
             """
             Constructor.
@@ -6089,6 +6105,9 @@ init -3 python:
                         if None, then no mapped highlights
                     if None, then no highlights at all
                     (Default: None)
+                use_folders - determines if sprites are organized using new-style
+                    (folder-based) structure
+                    (Default: True)
             """
             super(MASAccessory, self).__init__(
                 self.ASO_REG,
@@ -6106,7 +6125,8 @@ init -3 python:
                 ex_props,
                 dlg_data,
                 keep_on_desk,
-                hl_data
+                hl_data,
+                use_folders
             )
 
         def __repr__(self):
@@ -6150,12 +6170,7 @@ init -3 python:
             # loop over MASPoseMap for pose ids
             for poseid in self.pose_map.unique_values():
                 # generate new img str
-                new_img = prefix + [
-                    store.mas_sprites.PREFIX_ACS,
-                    self.img_sit,
-                    store.mas_sprites.ART_DLM,
-                    poseid,
-                ]
+                new_img = self._build_img_str_prefix(prefix) + [poseid]
 
                 # add the image
                 loadstrs.append(new_img + [store.mas_sprites.FILE_EXT])
@@ -6257,7 +6272,8 @@ init -3 python:
                 arm_split=None,
                 dlg_data=None,
                 keep_on_desk=False,
-                hl_data=None
+                hl_data=None,
+                use_folders=True
             ):
             """
             MASSplitAccessory constructor
@@ -6321,6 +6337,9 @@ init -3 python:
                         None means no highlight for this pose
                     if None, then no highlights at all
                     (Default: None)
+                use_folders - determines if sprites are organized using new-style
+                    (folder-based) structure
+                    (Default: True)
             """
             super(MASSplitAccessory, self).__init__(
                 self.ASO_SPLIT,
@@ -6338,7 +6357,8 @@ init -3 python:
                 ex_props,
                 dlg_data,
                 keep_on_desk,
-                MASSplitAccessory._prepare_hl_data(hl_data)
+                MASSplitAccessory._prepare_hl_data(hl_data),
+                use_folders
             )
 
             self.arm_split = arm_split
@@ -6417,12 +6437,7 @@ init -3 python:
             for poseid in self.pose_map.unique_values():
 
                 # generate new img str
-                new_img = prefix + [
-                    store.mas_sprites.PREFIX_ACS,
-                    self.img_sit,
-                    store.mas_sprites.ART_DLM,
-                    poseid,
-                ]
+                new_img = self._build_img_str_prefix(prefix) + [poseid]
 
                 # check layers
                 for armcode in self.get_arm_split_code(poseid):
@@ -6800,11 +6815,16 @@ init -3 python:
                         NOTE: can be multiple of this format
                     "<lean>|mid" - mid hair for a leaning type
                         NOTE: can be multiple of this format
+                    (replace keys with numeric keys if using numeric layer ids)
                 values:
                     MASFilterMap objects
             mpm_mid - MASPoseMap for mid hair layer.
                 Determines if the mid layer should be used for a pose.
                 This is the enable/disable type
+            use_folders - True if the sprites are organized using the new-style
+                (folder-based) structure
+            use_numeric_layer_ids - True if the sprites should use numeric ids for
+                layers (back=0, mid=5, front=10)
 
         SEE MASSpriteFallbackBase for inherited properties
 
@@ -6812,7 +6832,14 @@ init -3 python:
             Use an empty string to
         """
 
+        LAYER_BACK = "0"
+        LAYER_MID = "5"
+        LAYER_FRONT = "10"
+
         __MHM_KEYS = store.mas_sprites._genLK(("front", "back", "mid"))
+        __MHM_KEYS_NUM = store.mas_sprites._genLK(
+            (LAYER_FRONT, LAYER_BACK, LAYER_MID)
+        )
 
         def __init__(self,
                 name,
@@ -6826,7 +6853,9 @@ init -3 python:
                 split=None,
                 ex_props=None,
                 hl_data=None,
-                mpm_mid=None
+                mpm_mid=None,
+                use_folders=True,
+                use_numeric_layer_ids=True
             ):
             """
             MASHair constructor
@@ -6871,6 +6900,12 @@ init -3 python:
                     Determines if a mid layer should be used for a pose.
                     Should be enable/disable type or else we crash
                     (Default: None)
+                use_folders - determines if sprites are organized using new-style
+                    (folder-based) structure
+                    (Default: True)
+                use_numeric_layer_ids - determines if sprites should use numeric
+                    layer ids for layers (back=0, mid=5, front=10)
+                    (Default: True)
             """
             super(MASHair, self).__init__(
                 name,
@@ -6898,6 +6933,8 @@ init -3 python:
 
             self.split = split
             self.mpm_mid = mpm_mid
+            self.use_folders = use_folders
+            self.use_numeric_layer_ids = use_numeric_layer_ids
 
         def __repr__(self):
             return "<Hair: {0}>".format(self.name)
@@ -6931,12 +6968,13 @@ init -3 python:
             ]
 
         @classmethod
-        def _prepare_hl_data(cls, hl_data):
+        def _prepare_hl_data(cls, hl_data, use_nli=False):
             """
             Generates hl-ready data for MASSpriteBase
 
             IN:
                 hl_data - hl data. See Constructor for info
+                use_nli - set to True to use numeric layer ids
 
             RETURNS: hl_data to pass into MASSpriteBase
             """
@@ -6946,6 +6984,9 @@ init -3 python:
             hl_def, hl_mapping = hl_data
             if hl_def is None and hl_mapping is None:
                 return None
+
+            if use_nli:
+                return (cls.__MHM_KEYS_NUM, hl_def, hl_mapping)
 
             return (cls.__MHM_KEYS, hl_def, hl_mapping)
 
@@ -6959,6 +7000,13 @@ init -3 python:
             #   we don't have any weirdness going on
             all_split = self.split is None
 
+            # use folder prefix if new style
+            if self.use_folders:
+                prefix = prefix + [
+                    self.img_sit,
+                    "/"
+                ]
+
             # loop over all poses
             for leanpose in store.mas_sprites.ALL_POSES:
 
@@ -6971,64 +7019,130 @@ init -3 python:
                         actual_pose
                         and (all_split or self.split.get(actual_pose, False))
                 ):
-                    # determine lean
-                    islean = "|" in leanpose
-
-                    # generate img string
-                    new_img = list(prefix)
-
-                    # determine starting prefix
-                    if islean:
-                        lean = leanpose.partition("|")[0]
-                        hl_key = lean + "|{0}"
-                        new_img.extend((
-                            store.mas_sprites.PREFIX_HAIR_LEAN,
-                            lean,
-                            store.mas_sprites.ART_DLM
-                        ))
-                    else:
-                        hl_key = "{0}"
-                        new_img.append(store.mas_sprites.PREFIX_HAIR)
-
-                    # add the tag
-                    new_img.append(self.img_sit)
-
-                    # genreate back and front images
-                    back_img = new_img + [store.mas_sprites.BHAIR_SUFFIX]
-                    front_img = new_img + [store.mas_sprites.FHAIR_SUFFIX]
-
-                    # mid images as well
-                    if (
-                            self.mpm_mid is not None
-                            and self.mpm_mid.get(leanpose, False)
-                    ):
-                        mid_img = new_img + [store.mas_sprites.MHAIR_SUFFIX]
-
-                    else:
-                        mid_img = None
-
-                    # add them to list
-                    loadstrs.append(back_img + [store.mas_sprites.FILE_EXT])
-                    loadstrs.append(front_img + [store.mas_sprites.FILE_EXT])
-                    if mid_img is not None:
-                        loadstrs.append(mid_img + [store.mas_sprites.FILE_EXT])
-
-                    # highlights
-                    loadstrs.extend(self.__build_loadstrs_hl(
-                        back_img,
-                        hl_key.format(store.mas_sprites.BHAIR)
-                    ))
-                    loadstrs.extend(self.__build_loadstrs_hl(
-                        front_img,
-                        hl_key.format(store.mas_sprites.FHAIR)
-                    ))
-                    if mid_img is not None:
-                        loadstrs.extend(self.__build_loadstrs_hl(
-                            mid_img,
-                            hl_key.format(store.mas_sprites.MHAIR)
-                        ))
+                    loadstrs.extend(self.build_loadstr(prefix, leanpose))
 
             return loadstrs
+
+        def build_loadstr(self, prefix, leanpose):
+            """
+            Builds loadstr for a single leanpose
+
+            IN:
+                prefix - img prefix
+                leanpose - current leanpose to process
+
+            RETURNS: list of loadstrs for the given leanpose
+            """
+            loadstrs = []
+
+            # determine lean
+            islean = "|" in leanpose
+
+            # generate img string
+            new_img = list(prefix)
+
+            # determine starting prefix
+            if islean:
+                lean = leanpose.partition("|")[0]
+                hl_key = lean + "|{0}"
+
+                if not self.use_folders:
+                    new_img.append(store.mas_sprites.PREFIX_HAIR_LEAN)
+
+                new_img.extend((
+                    lean,
+                    store.mas_sprites.ART_DLM
+                ))
+            else:
+                hl_key = "{0}"
+
+                if not self.use_folders:
+                    new_img.append(store.mas_sprites.PREFIX_HAIR)
+
+            if self.use_folders:
+                # pull hair suffixes, no dash
+                back_sfx, mid_sfx, front_sfx = self._get_hair_keys()
+
+            else:
+                # add the tag
+                new_img.append(self.img_sit)
+
+                # pull hair suffixes
+                back_sfx, mid_sfx, front_sfx = self._get_sfxs()
+
+            # genreate back and front images
+            back_img = new_img + [back_sfx]
+            front_img = new_img + [front_sfx]
+
+            # mid images as well
+            if (
+                    self.mpm_mid is not None
+                    and self.mpm_mid.get(leanpose, False)
+            ):
+                mid_img = new_img + [mid_sfx]
+
+            else:
+                mid_img = None
+
+            # add them to list
+            loadstrs.append(back_img + [store.mas_sprites.FILE_EXT])
+            loadstrs.append(front_img + [store.mas_sprites.FILE_EXT])
+            if mid_img is not None:
+                loadstrs.append(mid_img + [store.mas_sprites.FILE_EXT])
+
+            # get hl keys to use
+            back_hl, mid_hl, front_hl = self._get_hair_keys()
+
+            # highlights
+            loadstrs.extend(self.__build_loadstrs_hl(
+                back_img,
+                hl_key.format(back_hl)
+            ))
+            loadstrs.extend(self.__build_loadstrs_hl(
+                front_img,
+                hl_key.format(front_hl)
+            ))
+            if mid_img is not None:
+                loadstrs.extend(self.__build_loadstrs_hl(
+                    mid_img,
+                    hl_key.format(mid_hl)
+                ))
+
+            return loadstrs
+
+        def _get_sfxs(self):
+            """
+            Gets tuple of suffixes to use in back-to-front order
+
+            RETURNS: tuple of suffixes to use
+            """
+            if self.use_numeric_layer_ids:
+                return (
+                    ART_DLM + self.LAYER_BACK,
+                    ART_DLM + self.LAYER_MID,
+                    ART_DLM + self.LAYER_FRONT,
+                )
+
+            return (
+                store.mas_sprites.BHAIR_SUFFIX,
+                store.mas_sprites.MHAIR_SUFFIX,
+                store.mas_sprites.FHAIR_SUFFIX,
+            )
+
+        def _get_hair_keys(self):
+            """
+            Get tuple of hair keys, in back to front order
+
+            RETURNS: tuple of hair keys to use
+            """
+            if self.use_numeric_layer_ids:
+                return (self.LAYER_BACK, self.LAYER_MID, self.LAYER_FRONT)
+
+            return (
+                store.mas_sprites.BHAIR,
+                store.mas_sprites.MHAIR,
+                store.mas_sprites.FHAIR,
+            )
 
         def format_exprops(self):
             """
@@ -7047,7 +7161,7 @@ init -3 python:
             Gets highlight code
 
             IN:
-                hair_key - the hair key to get hlc for (front/back)
+                hair_key - the hair key to get hlc for
                 lean - type of lean to get hlc for
                 flt - filter to get highlight for
                 defval - the default value to return
@@ -7076,16 +7190,23 @@ init -3 python:
 
             RETURNS: keys used for all MASHighlightMaps for MASHair objects
             """
-            return self.__MHM_KEYS
+            return (
+                self.__MHM_KEYS_NUM
+                if self.use_numeric_layer_ids 
+                else self.__MHM_KEYS
+            )
 
         @classmethod
-        def hl_keys_c(cls):
+        def hl_keys_c(cls, use_nli=False):
             """
             Class method of hl_keys
 
+            IN:
+                use_nli - set to True to use numeric layer ids
+
             RETURNS: tuple of hl keys
             """
-            return cls.__MHM_KEYS
+            return cls.__MHM_KEYS_NUM if use_nli else cls.__MHM_KEYS
 
 
     class MASClothes(MASSpriteFallbackBase):
@@ -8395,7 +8516,7 @@ python early:
                 exps = (exps,)
 
             for exp in exps:
-                for aff_lvl, exp_list in self.exp_map.iteritems():
+                for aff_lvl, exp_list in self.exp_map.items():
                     if exp.check_aff(aff_lvl):
                         exp_list.append(exp)
 
@@ -8447,7 +8568,7 @@ python early:
             """
             need_redraw = self.current_exp is exp
 
-            for exp_list in self.exp_map.itervalues():
+            for exp_list in self.exp_map.values():
                 if exp in exp_list:
                     exp_list.remove(exp)
                     need_redraw = True
@@ -8482,7 +8603,7 @@ python early:
                     need_redraw = True
                     break
 
-            for exp_list in self.exp_map.itervalues():
+            for exp_list in self.exp_map.values():
                 for exp_id in range(len(exp_list)-1, -1, -1):
                     if exp_list[exp_id].tag == tag:
                         exp_list.pop(exp_id)
@@ -9420,7 +9541,7 @@ python early:
             """
             Adds 4 new params
             """
-            super(_MASMoniFollowTransformDissolve, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
 
             # KEY CHANGES
             self.new_widget_st = None
@@ -9452,15 +9573,30 @@ python early:
 
             bottom = renpy.display.transition.render(self.old_widget, width, height, old_widget_st, old_widget_at)
             top = renpy.display.transition.render(self.new_widget, width, height, new_widget_st, new_widget_at)
+            # END KEY CHANGES
 
             width = min(top.width, bottom.width)
             height = min(top.height, bottom.height)
 
-            rv = renpy.display.render.Render(width, height, opaque=not self.alpha)
+            rv = renpy.display.render.Render(width, height)
 
             rv.operation = renpy.display.render.DISSOLVE
-            rv.operation_alpha = self.alpha
+            rv.operation_alpha = self.alpha or renpy.config.dissolve_force_alpha
             rv.operation_complete = complete
+
+            if renpy.display.render.models:
+
+                target = rv.get_size()
+
+                if top.get_size() != target:
+                    top = top.subsurface((0, 0, width, height))
+                if bottom.get_size() != target:
+                    bottom = bottom.subsurface((0, 0, width, height))
+
+                rv.mesh = True
+                rv.add_shader("renpy.dissolve")
+                rv.add_uniform("u_renpy_dissolve", complete)
+                rv.add_property("mipmap", renpy.config.mipmap_dissolves if (self.style.mipmap is None) else self.style.mipmap)
 
             rv.blit(bottom, (0, 0), focus=False, main=False)
             rv.blit(top, (0, 0), focus=True, main=True)
@@ -9519,8 +9655,9 @@ python early:
                 # self.up_eyes_code: self.up_eyes_img,
                 # self.down_eyes_code: self.down_eyes_img
             }
-            for first_img_code in img_map.iterkeys():
-                for second_img_code in img_map.iterkeys():
+
+            for first_img_code in list(img_map.keys()):
+                for second_img_code in list(img_map.keys()):
                     if first_img_code != second_img_code:
                         self.transform_map[(first_img_code, second_img_code)] = _MASMoniFollowTransformDissolve(
                             time=MASMoniFollowTransform.DIS_DUR,
