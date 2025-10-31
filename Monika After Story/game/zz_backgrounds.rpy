@@ -2860,18 +2860,21 @@ init -20 python in mas_background:
         """
         if bg_obj is None:
             return
-
-        # NOTE: version should already be written out if this is runtime
-        _bg_log.info(
-            "\n\nBackground Object: {0}\nFilter System:\n\n{1}\n\nRaw Filter Manager Data:\n{2}".format(
-                bg_obj.background_id,
-                str(bg_obj._flt_man),
-                repr(bg_obj._flt_man)
+        try:
+            # NOTE: version should already be written out if this is runtime
+            _bg_log.info(
+                "\n\nBackground Object: {0}\nFilter System:\n\n{1}\n\nRaw Filter Manager Data:\n{2}".format(
+                    bg_obj.background_id,
+                    str(bg_obj._flt_man),
+                    repr(bg_obj._flt_man)
+                )
             )
-        )
 
-        if exc_info:
-            _bg_log.info("", exc_info=True)
+            if exc_info:
+                _bg_log.info("", exc_info=True)
+        except Exception as e:
+            store.mas_utils.mas_log.error(f"Failed to run log_bg({bg_obj}, {exc_info}): {e}")
+            
 
 
 #START: BG change functions
