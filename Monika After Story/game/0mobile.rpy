@@ -5,6 +5,8 @@ python early:
     ANDROID_DEFBASEDIR = str(renpy.config.basedir)
     ANDROID_FTSKIPED = False
     ANDROID_SAVEDIR_CHANGED = False
+    ANDROID_MAGICK_BINPATH = os.path.join(ANDROID_DEFBASEDIR, "magick")
+
     #config.savedir = os.path.join(ANDROID_MASBASE, "saves")
 
     def android_toast(message):
@@ -243,6 +245,7 @@ init python:
         extract_file("mod_assets/games/piano/songs/yourreality.json")
         extract_file("mod_assets/games/chess/stockfish-8-arm64-v8a")
         extract_file("python-packages/certifi/cacert.pem")
+        extract_file("magick")
         extract_file("audio.rpa")
         extract_file(".nomedia")
         if not ANDROID_FTSKIPED:
