@@ -7,6 +7,12 @@ python early:
     ANDROID_SAVEDIR_CHANGED = False
     ANDROID_MAGICK_BINPATH = os.path.join("/data/user/0/and.sirp.masmobile/files/game", "magick")
 
+    if renpy.android and os.path.exists(ANDROID_MAGICK_BINPATH):
+        os.chmod(ANDROID_MAGICK_BINPATH, 0o755)
+        os.environ['TMPDIR'] = os.path.join("/data/user/0/and.sirp.masmobile/files/game", "tmp")
+        os.environ['MAGICK_HOME'] = os.path.join("/data/user/0/and.sirp.masmobile/files/game")
+        os.environ['LD_LIBRARY_PATH'] = os.path.join("/data/user/0/and.sirp.masmobile/files/game")
+
     #config.savedir = os.path.join(ANDROID_MASBASE, "saves")
 
     def android_toast(message):
@@ -246,6 +252,8 @@ init python:
         extract_file("mod_assets/games/chess/stockfish-8-arm64-v8a")
         extract_file("python-packages/certifi/cacert.pem")
         extract_file("magick")
+        extract_file("libc++_shared.so")
+        extract_file("libomp.so")
         extract_file("audio.rpa")
         extract_file(".nomedia")
         if not ANDROID_FTSKIPED:
