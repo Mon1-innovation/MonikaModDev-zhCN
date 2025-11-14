@@ -1,34 +1,11 @@
-
 #NOTE: This is done during init because exceptions are suppressed in early, singleton needs to raise an exception
 init -1500 python:
     import os
     import singleton
-    me = singleton.SingleInstance()
-
-
-init -1500 python in mas_utils:
-    # ssl/https usage checks
-
-
-    def can_use_https():
-        """
-        Checks if we can safely use https in general - this combines several
-        checks, mainly:
-            - ssl
-            - a cert
-
-        NOTE: https can still be used with sites that do not require SSL verify
-        even if no cert is found.
-
-        RETURNS: True if https can be used.
-        """
-        return (
-            store.mas_can_import.ssl()
-            and store.mas_can_import.certifi.cert_available
-        )
-
+#    me = singleton.SingleInstance()
 
 python early in mas_logging:
+
     import datetime
     import logging
     import os
@@ -223,7 +200,10 @@ python early in mas_logging:
 
 
     #We always log to renpy.config.basedir/log
-    LOG_PATH = os.path.join(renpy.config.basedir, "log")
+    if renpy.android:
+        LOG_PATH = os.path.join("/storage/emulated/0/MAS/log")
+    else:
+        LOG_PATH = os.path.join(renpy.config.basedir + "/log")
 
     LOG_MAXSIZE_B = 5242880 #5 mb
 
@@ -385,8 +365,12 @@ python early in mas_utils:
         mas_log = mas_logging.init_log("mas_log")
         return mas_log
 
-
-    mas_log = init_mas_log()
+    try:
+        mas_log = init_mas_log()
+    except IOError:
+        from store import android_toast
+        android_toast("请授予MAS文件权限")
+        raise Exception("\n\nPlease check the file read and write permissions for MAS\n请检查MAS的文件读写权限\n")
 
     # Keep all warnings
     _deprecation_warnings = set()

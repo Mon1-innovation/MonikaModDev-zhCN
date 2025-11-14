@@ -2015,7 +2015,7 @@ init 810 python:
         # DETECTION_LIST
 
         # AT_LIST
-        AT_LIST = [i22]
+        AT_LIST = []#[i22]
         TEXT_AT_LIST = [mas_piano_lyric_label]
 
         # expressions

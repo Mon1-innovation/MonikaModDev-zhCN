@@ -65,6 +65,19 @@ label import_ddlc_persistent:
             else:
                 rv = "~/RenPy/"
                 check_path = os.path.expanduser(rv)
+        elif renpy.android:
+            check_path = [
+                "/storage/emulated/0/Android/data/keyi.ddlc.chs/files/saves/",
+                "/storage/",
+                "/storage/emulated/0/Android/data/com.refii.ddlc/DDLC-1454445547/"
+            ]
+            for cp in check_path:
+                ddlc_save_path = glob(cp + 'persistent')
+                if ddlc_save_path:
+                    check_path = cp
+                    break
+            if isinstance(check_path, list):
+                check_path = ""
 
         else:
             rv = "~/.renpy/"

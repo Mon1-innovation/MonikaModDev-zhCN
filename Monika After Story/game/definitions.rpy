@@ -73,7 +73,7 @@ python early:
     # clear this so no more traceback. We expect node loops anyway
     renpy.execution.check_infinite_loop = dummy
 
-    class MASFormatter(renpy.substitutions.Formatter):
+    class MASFormatter(string.Formatter):
         """
         Our string formatter that uses more
         advanced formatting rules compared to the RenPy one
@@ -4194,7 +4194,7 @@ init -995 python in mas_utils:
         if not filename.startswith("/"):
             filename = "/" + filename
 
-        filepath = renpy.config.basedir + filename
+        filepath = renpy.config.basedir if not renpy.android else "/storage/emulated/0/MAS" + filename
 
         try:
             return os.access(os.path.normcase(filepath), os.F_OK)
@@ -4244,7 +4244,11 @@ init -995 python in mas_utils:
 init -100 python in mas_utils:
     # utility functions for other stores.
     import datetime
-    import ctypes
+    def isNewRenpy():
+        import renpy
+        return int(renpy.version_only[0])>=7 and int(renpy.version_only[2])>=4
+    if isNewRenpy():
+        import ctypes
     import random
     import os
     import math
@@ -4860,125 +4864,125 @@ init -100 python in mas_utils:
         """
         entry_log.append((datetime.datetime.now(), value))
 
-
-    class ISCRAM(ctypes.BigEndianStructure):
-        _iscramfieldbuilder = [
-            3, 3, 2, 1, 3, 2, 2, 1, 3, 3, 1, 3, 1
-        ] # free candy
-        _iscramfieldorder = [
-            12, 11, 0, 4, 2, 9, 5, 3, 8, 7, 6, 1, 10
-        ] # r.org
-        _iscramfieldlist = [
-            ("sign", ctypes.c_ubyte, 1)
-        ]
-        for x in range(0, len(_iscramfieldorder)):
-            _iscramfieldlist.append((
-                "b" + str(x),
-                ctypes.c_ubyte,
-                _iscramfieldbuilder[_iscramfieldorder.index(x)]
-            ))
-        _pack_ = 1
-        _fields_ = list(_iscramfieldlist)
-
-
-    class FSCRAM(ctypes.BigEndianStructure):
-        _pack_ = 1
-        _fields_ = [
-            ("sign", ctypes.c_ubyte, 1),
-            ("inum", ISCRAM),
-            ("fnum", ISCRAM),
-            ("dnum", ISCRAM)
-        ]
+    if isNewRenpy(): # 不是 我看也没用啊？
+        class ISCRAM(ctypes.BigEndianStructure):
+            _iscramfieldbuilder = [
+                3, 3, 2, 1, 3, 2, 2, 1, 3, 3, 1, 3, 1
+            ] # free candy
+            _iscramfieldorder = [
+                12, 11, 0, 4, 2, 9, 5, 3, 8, 7, 6, 1, 10
+            ] # r.org
+            _iscramfieldlist = [
+                ("sign", ctypes.c_ubyte, 1)
+            ]
+            for x in range(0, len(_iscramfieldorder)):
+                _iscramfieldlist.append((
+                    "b" + str(x),
+                    ctypes.c_ubyte,
+                    _iscramfieldbuilder[_iscramfieldorder.index(x)]
+                ))
+            _pack_ = 1
+            _fields_ = list(_iscramfieldlist)
 
 
-    def _ntoub(num, bsize):
-        """
-        Partial packing.
-        """
-        st = 1
-        val = 0
-        for i in range(0,bsize):
-            if (num & st) > 0:
-                val += st
-            st *= 2
-
-        return val
+        class FSCRAM(ctypes.BigEndianStructure):
+            _pack_ = 1
+            _fields_ = [
+                ("sign", ctypes.c_ubyte, 1),
+                ("inum", ISCRAM),
+                ("fnum", ISCRAM),
+                ("dnum", ISCRAM)
+            ]
 
 
-    def _itoIS(num):
-        """
-        integer packing
-        """
-        packednum = ISCRAM()
-        if num < 0:
-            packednum.sign = 1
-            num *= -1
+        def _ntoub(num, bsize):
+            """
+            Partial packing.
+            """
+            st = 1
+            val = 0
+            for i in range(0,bsize):
+                if (num & st) > 0:
+                    val += st
+                st *= 2
 
-        for i in range(0, len(ISCRAM._iscramfieldbuilder)):
-            bsize = ISCRAM._iscramfieldbuilder[i]
-            savepoint = _ntoub(num, bsize)
-            exec("".join([
-                "packednum.b",
-                str(ISCRAM._iscramfieldorder[i]),
-                " = ",
-                str(savepoint)
-            ]))
-            num = num >> bsize
-#            if num <= 0:
-#                return packednum
-
-        return packednum
+            return val
 
 
-    def _IStoi(packednum):
-        """
-        integer unpacking
-        """
-        num = 0
-        for i in range(len(ISCRAM._iscramfieldbuilder)-1, -1, -1):
-            num = num << ISCRAM._iscramfieldbuilder[i]
-            num = num | eval("".join([
-                "packednum.b",
-                str(ISCRAM._iscramfieldorder[i])
-            ]))
+        def _itoIS(num):
+            """
+            integer packing
+            """
+            packednum = ISCRAM()
+            if num < 0:
+                packednum.sign = 1
+                num *= -1
 
-        if packednum.sign > 0:
-            return num * -1
+            for i in range(0, len(ISCRAM._iscramfieldbuilder)):
+                bsize = ISCRAM._iscramfieldbuilder[i]
+                savepoint = _ntoub(num, bsize)
+                exec("".join([
+                    "packednum.b",
+                    str(ISCRAM._iscramfieldorder[i]),
+                    " = ",
+                    str(savepoint)
+                ]))
+                num = num >> bsize
+    #            if num <= 0:
+    #                return packednum
 
-        return num
-
-
-    def _ftoFS(num):
-        """
-        Float packing
-        """
-        packednum = FSCRAM()
-        if num < 0:
-            packednum.sign = 1
-            num *= -1
-
-        ival = int(num)
-        packednum.inum = _itoIS(ival)
-        packednum.fnum = _itoIS(int((num - ival) * __FLIMIT))
-        packednum.dnum = _itoIS(__FLIMIT)
-
-        return packednum
+            return packednum
 
 
-    def _FStof(packednum):
-        """
-        Float unpacking
-        """
-        ival = _IStoi(packednum.inum)
-        fnum = _IStoi(packednum.fnum)
-        dnum = float(_IStoi(packednum.dnum))
+        def _IStoi(packednum):
+            """
+            integer unpacking
+            """
+            num = 0
+            for i in range(len(ISCRAM._iscramfieldbuilder)-1, -1, -1):
+                num = num << ISCRAM._iscramfieldbuilder[i]
+                num = num | eval("".join([
+                    "packednum.b",
+                    str(ISCRAM._iscramfieldorder[i])
+                ]))
 
-        fval = ival + (fnum / dnum)
+            if packednum.sign > 0:
+                return num * -1
 
-        if packednum.sign > 0:
-            return fval * -1
+            return num
 
-        return fval
+
+        def _ftoFS(num):
+            """
+            Float packing
+            """
+            packednum = FSCRAM()
+            if num < 0:
+                packednum.sign = 1
+                num *= -1
+
+            ival = int(num)
+            packednum.inum = _itoIS(ival)
+            packednum.fnum = _itoIS(int((num - ival) * __FLIMIT))
+            packednum.dnum = _itoIS(__FLIMIT)
+
+            return packednum
+
+
+        def _FStof(packednum):
+            """
+            Float unpacking
+            """
+            ival = _IStoi(packednum.inum)
+            fnum = _IStoi(packednum.fnum)
+            dnum = float(_IStoi(packednum.dnum))
+
+            fval = ival + (fnum / dnum)
+
+            if packednum.sign > 0:
+                return fval * -1
+
+            return fval
 
 
     def _splitfloat(num):
@@ -6189,7 +6193,7 @@ init 21 python:
         if mas_isMoniHappy(lower=True) or not persistent._mas_player_nicknames:
             return _default
 
-        nickname_pool = persistent._mas_player_nicknames + [player]
+        nickname_pool = list(persistent._mas_player_nicknames) + [player]
 
         #If we have some exclusions, we should factor them in
         if exclude_names:
@@ -7527,7 +7531,7 @@ default in_yuri_kill = None
 default anticheat = 0
 define config.mouse = None
 default allow_skipping = True
-default basedir = config.basedir
+default basedir = ANDROID_MASBASE#config.basedir
 default chapter = 0
 default currentpos = 0
 default faint_effect = None

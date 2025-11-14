@@ -373,7 +373,7 @@ init 999 python:
 
             # add data lines here
             #Consumables stuff
-            for consumable_id in persistent._mas_consumable_map.keys():
+            for consumable_id in list(persistent._mas_consumable_map.keys()):
                 consumable = mas_getConsumable(consumable_id)
 
                 #Need to account for consumables which were removed

@@ -280,9 +280,9 @@ label mas_mood_sick:
     $ _history_list.pop()
     menu:
         m "Will you do that for me?{fast}"
-        "Yes.":
+        "Yes.{#mas_mood_sick_1}":
             jump greeting_stillsickrest
-        "No.":
+        "No.{#mas_mood_sick_1}":
             jump greeting_stillsicknorest
         "I'm already resting.":
             jump greeting_stillsickresting

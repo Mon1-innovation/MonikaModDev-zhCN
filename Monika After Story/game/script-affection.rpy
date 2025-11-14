@@ -174,7 +174,7 @@ init -900 python in mas_affection:
         LOVE: 0.15
     }
 
-    __STRUCT = struct.Struct(__STRUCT_FMT)
+    __STRUCT = struct.Struct(str(__STRUCT_FMT))
 
     # compare functions for affection / group
     def _compareAff(aff_1, aff_2):
@@ -796,7 +796,12 @@ init -900 python in mas_affection:
             return
 
         new_data = list()
-
+        #旧版本好感为0时 直接更换版本
+        if old_data.get("affection", 0.0) == 0.0:
+            log.info(f"Prevent transferring affection from v1({old_data.get('affection', 0.0)}) to v2 because it is 0")
+            persistent._mas_affection_version += 1
+            return
+        log.info(f"Transferring affection from v1({old_data.get('affection', 0.0)}) to v2")
         aff = old_data.get("affection", 0.0)
         if aff >= 1000000:
             aff = 0.0
@@ -3488,7 +3493,7 @@ init python:
         ASSUMES:
             basedir
         """
-        filepath = basedir + path
+        filepath = basedir if not renpy.android else ANDROID_MASBASE + path
         if update or not renpy.exists(filepath):
             with open(filepath, "w") as note:
                 note.write(renpy.substitute(text))
