@@ -2,12 +2,13 @@
 ##
 ## Before load, check to be sure that the archive files were found.
 ## If not, display an error message and quit.
-init -100 python:
+# init -100 python:
+#     pass
     #Check for each archive needed
-    for archive in ['audio','images','scripts','fonts']:
-        if not archive in config.archives:
-            #If one is missing, throw an error and chlose
-            renpy.error("DDLC archive files not found in /game folder. Check installation and try again.")
+#     #for archive in ['audio','images','scripts','fonts']:
+#     #    if not archive in config.archives:
+#     #        #If one is missing, throw an error and chlose
+#     #        renpy.error("DDLC archive files not found in /game folder. Check installation and try again.")
 
 ## First, a disclaimer declaring this is a mod is shown, then there is a
 ## check for the original DDLC assets in the install folder. If those are
@@ -160,7 +161,6 @@ image warning:
 image tos = "bg/warning.png"
 image tos2 = "bg/warning2.png"
 
-
 label splashscreen:
     python:
         _mas_AffStartup()
@@ -194,7 +194,7 @@ label splashscreen:
         menu:
             "By playing [config.name] you agree that you have completed Doki Doki Literature Club and accept any spoilers contained within."
             "I agree.":
-                pass
+                $ firstrun_spread()
         scene tos2
         with Dissolve(1.5)
         pause 1.0
@@ -210,12 +210,13 @@ label splashscreen:
 
 #    $ basedir = config.basedir.replace('\\', '/')
 #   NOTE: this keeps screwing with my syntax coloring
-    python:
-        basedir = config.basedir.replace("\\", "/")
-
-        # dump verseion to a firstrun-style file
-        with open(basedir + "/game/masrun", "w") as versfile:
-            versfile.write(config.name + "|" + config.version + "\n")
+#    python:
+#        basedir = config.basedir.replace("\\", "/")
+#
+#        # dump verseion to a firstrun-style file
+#        with open(basedir + "/game/masrun", "w") as versfile:
+#            versfile.write(config.name + "|" + config.version + "\n")
+        
 
 
     #Check for game updates before loading the game or the splash screen

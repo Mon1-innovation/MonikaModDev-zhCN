@@ -68,12 +68,15 @@ init -1505 python in mas_can_import:
             """
             Also checks if a cert is available.
             """
-            import certifi
+            import certifi, os
             certifi.set_parent_dir(renpy.config.gamedir)
+            os.environ['SSL_CERT_FILE'] = certifi.where()
+
             self.__th_set_cert_avail(certifi.has_cert())
 
             # start the cert update - this will be checked later.
             self.start_cert_update()
+            
 
             return True
 
@@ -238,6 +241,13 @@ init -1505 python in mas_can_import:
 
             this is a hack.
             """
+            try:
+                import ssl
+                from http import client as httplib
+                httplib.ssl = ssl
+                return True
+            except ImportError:
+                return False
             import sys
 
             ssl_pkg = "python-packages/ssl"

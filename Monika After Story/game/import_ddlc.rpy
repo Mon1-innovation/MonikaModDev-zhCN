@@ -14,7 +14,7 @@ init python:
 
         fo = open(dumppath, "w")
 
-        for key in sorted(dumped_persistent.iterkeys()):
+        for key in sorted(dumped_persistent.keys()):
             fo.write(str(key) + ' - ' + str(type(dumped_persistent[key])) + ' >>> '+ str(dumped_persistent[key]) + '\n\n')
 
         fo.close()
@@ -65,6 +65,19 @@ label import_ddlc_persistent:
             else:
                 rv = "~/RenPy/"
                 check_path = os.path.expanduser(rv)
+        elif renpy.android:
+            check_path = [
+                "/storage/emulated/0/Android/data/keyi.ddlc.chs/files/saves/",
+                "/storage/",
+                "/storage/emulated/0/Android/data/com.refii.ddlc/DDLC-1454445547/"
+            ]
+            for cp in check_path:
+                ddlc_save_path = glob(cp + 'persistent')
+                if ddlc_save_path:
+                    check_path = cp
+                    break
+            if isinstance(check_path, list):
+                check_path = ""
 
         else:
             rv = "~/.renpy/"
@@ -103,8 +116,7 @@ label import_ddlc_persistent:
         #Open the persistent save file at ddlc_save_path
         ddlc_persistent = None
         try:
-            with open(ddlc_save_path, "rb") as ddlc_pfile:
-                ddlc_persistent = mas_dockstat.cPickle.loads(ddlc_pfile.read().decode("zlib"))
+            ddlc_persistent = store.mas_per_check._load_per_data(ddlc_save_path)
 
         except Exception as e:
             store.mas_utils.mas_log.error("Failed to read/decode DDLC persistent: {0}".format(e))
