@@ -5,7 +5,7 @@ python early:
     ANDROID_DEFBASEDIR = str(renpy.config.basedir)
     ANDROID_FTSKIPED = False
     ANDROID_SAVEDIR_CHANGED = False
-    ANDROID_MAGICK_BINPATH = os.path.join(ANDROID_DEFBASEDIR, "magick")
+    ANDROID_MAGICK_BINPATH = os.path.join("/data/user/0/and.sirp.masmobile/files/game", "magick")
 
     #config.savedir = os.path.join(ANDROID_MASBASE, "saves")
 
