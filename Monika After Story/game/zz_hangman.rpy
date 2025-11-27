@@ -367,11 +367,11 @@ label game_hangman:
 
         # instruction text and other sensitive stuff
         instruct_txt = (
-            "Guess a letter: (Type {0}'!' to give up)"
+            renpy.substitute(_("Guess a letter: (Type {0}'!' to give up)"))
         )
 
-        instruct_txt = instruct_txt.format("'?' to repeat the hint, ")
-        store.mas_hangman.game_name = "Hangman"
+        instruct_txt = instruct_txt.format(renpy.substitute(_("'?' to repeat the hint, ")))
+        store.mas_hangman.game_name = renpy.substitute(_("Hangman"))
 
 label mas_hangman_game_select_diff:
     m "Choose a difficulty.{nw}"
@@ -668,9 +668,9 @@ label mas_hangman_game_loop:
             show hm_s_win_6 as window_sayori at hangman_sayori_h
 
         if player_word:
-            $ the_word = "your name"
+            $ the_word = _("your name")
         else:
-            $ the_word = "the word"
+            $ the_word = _("the word")
 
         m 1hua "Wow, you guessed [the_word] correctly!"
         m "Good job, [player]!"
