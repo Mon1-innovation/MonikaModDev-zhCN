@@ -193,7 +193,7 @@ label splashscreen:
         "Game files for Doki Doki Literature Club are required to play this mod and can be downloaded for free at: http://ddlc.moe"
         menu:
             "By playing [config.name] you agree that you have completed Doki Doki Literature Club and accept any spoilers contained within."
-            "I agree.":
+            "I agree.{#splashscreen_1}":
                 pass
         scene tos2
         with Dissolve(1.5)

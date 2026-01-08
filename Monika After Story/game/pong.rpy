@@ -562,7 +562,7 @@ label demo_minigame_pong:
     menu:
         m "Would you like to play again?{fast}"
 
-        "Yes.":
+        "Yes.{#demo_minigame_pong_1}":
             $ pong_ev = mas_getEV("mas_pong")
             if pong_ev:
                 # each game counts as a game played
@@ -570,7 +570,7 @@ label demo_minigame_pong:
 
             jump demo_minigame_pong
 
-        "No.{#demo_minigame_pong}":
+        "No.{#demo_minigame_pong_2}":
             if winner == "monika":
                 if renpy.seen_label(store.mas_pong.DLG_WINNER_END):
                     $ end_dialogue = store.mas_pong.DLG_WINNER_FAST
@@ -654,7 +654,7 @@ label mas_pong_dlg_winner:
             menu:
                 m "[menu_response]{fast}"
 
-                "...Maybe.":
+                "...Maybe.{#mas_pong_dlg_winner_1}":
                     m 1hua "Ehehe!~"
                     m 1eka "Thank you, [player]~"
                     show monika 5eka at t11 zorder MAS_MONIKA_Z with dissolve_monika
@@ -674,10 +674,10 @@ label mas_pong_dlg_winner:
                         menu:
                             m "Are you {i}sure?{/i}{fast}"
 
-                            "Yes":
+                            "Yes{#mas_pong_dlg_winner_2}":
                                 call mas_pong_dlg_sorry_assuming
 
-                            "No":
+                            "No{#mas_pong_dlg_winner_3}":
                                 m 1rfu "[player]!"
                                 m 2hksdlb "Stop teasing me!"
                                 $ player_lets_monika_win_on_purpose = True
@@ -871,7 +871,7 @@ label mas_pong_dlg_sorry_assuming:
     menu:
         m "Would you like to take a break, [player]?{fast}"
 
-        "Okay.":
+        "Okay.{#mas_pong_dlg_sorry_assuming_1}":
             m 1eka "Alright, [player].{w=0.3} {nw}"
             extend 1hua "I had fun, thanks for playing Pong with me!"
             m 1eua "Let me know when you're ready to play again."
@@ -883,7 +883,7 @@ label mas_pong_dlg_sorry_assuming:
             show monika idle with dissolve_monika
             jump ch30_loop
 
-        "No.":
+        "No.{#mas_pong_dlg_sorry_assuming_2}":
             m 1eka "Alright, [player]. If you're sure."
             m 1hub "Keep going, you'll beat me soon!"
     return

@@ -3218,7 +3218,7 @@ screen mas_apikeys():
                                 spacing 10
 
                                 if feature_data[2]:
-                                    textbutton _("Clear"):
+                                    textbutton _("Clear{#mas_apikeys}"):
                                         style "mas_button_simple"
                                         yalign 0.5
                                         action Function(store.mas_api_keys.screen_clear, feature_data[1])

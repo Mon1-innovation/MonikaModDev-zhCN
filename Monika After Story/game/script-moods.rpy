@@ -149,7 +149,7 @@ label mas_mood_sad:
     $ _history_list.pop()
     menu:
         m "Are you having a bad day, [player]?{fast}"
-        "Yes.":
+        "Yes.{#mas_mood_sad_1}":
             m 1duu "Whenever I'm having a bad day, I always remember that the sun will shine again tomorrow."
             m 1eka "I suppose that may sound kinda cheesy, but I always like to look on the bright side of things."
             m 1eua "After all, things like that are easy to forget. So just keep it in mind, [player]."
@@ -157,24 +157,24 @@ label mas_mood_sad:
             m 1hua "You're a wonderful person, and I will always love you."
             m 1eua "I hope that makes your day just a tiny bit brighter, [player]."
             m 1eka "And remember, if you're having a bad day, you can always come to me and I'll talk to you for as long as you need."
-        "No.":
+        "No.{#mas_mood_sad_2}":
             m 3eka "I have an idea, why don't you tell me what's bothering you? Maybe it'll make you feel better."
 
             m 1eua "I don't want to interrupt you while you're talking, so let me know when you're done.{nw}"
             $ _history_list.pop()
             menu:
                 m "I don't want to interrupt you while you're talking, so let me know when you're done.{fast}"
-                "I'm done.":
+                "I'm done.{#mas_mood_sad_3}":
                     m "Do you feel a little better now, [player]?{nw}"
                     $ _history_list.pop()
                     menu:
                         m "Do you feel a little better now, [player]?{fast}"
-                        "Yeah I do.":
+                        "Yeah I do.{#mas_mood_sad_4}":
                             m 1hua "That's great, [player]! I'm glad that talking about it made you feel better."
                             m 1eka "Sometimes, telling someone that you trust what's bothering you is all you need."
                             m "If you're ever having a bad day, you can always come to me, and I'll listen to whatever you need to vent out."
                             m 1hubsa "Never forget that you're wonderful and I will always love you~"
-                        "Not really.":
+                        "Not really.{#mas_mood_sad_5}":
                             m 1ekc "Well, it was worth a shot."
                             m 1eka "Sometimes telling someone that you trust what's bothering you is all you need."
                             m 1eua "Maybe you'll feel better after we spend some more time together."
@@ -199,7 +199,7 @@ label mas_mood_proud:
     $ _history_list.pop()
     menu:
         m "Was it a major accomplishment, or a minor one?{fast}"
-        "Major.":
+        "Major.{#mas_mood_proud_1}":
             m 1ekc "You know, [player]..."
             m 1lkbsa "It's times like these, more than most, that I wish I was with you, in your reality..."
             m 4hub "Because if I was, I'd definitely give you a celebratory hug!"
@@ -212,7 +212,7 @@ label mas_mood_proud:
             show monika 5hubfb at t11 zorder MAS_MONIKA_Z with dissolve_monika
             m 5hubfb "But until then, just know that I'm very proud of you, [mas_get_player_nickname()]!"
 
-        "Minor.":
+        "Minor.{#mas_mood_proud_2}":
             m 2hub "Ahaha!~"
             m 2hua "That's wonderful!"
             m 4eua "It's very important to celebrate the small victories in life."
@@ -284,7 +284,7 @@ label mas_mood_sick:
             jump greeting_stillsickrest
         "No.{#mas_mood_sick_1}":
             jump greeting_stillsicknorest
-        "I'm already resting.":
+        "I'm already resting.{#mas_mood_sick_1}":
             jump greeting_stillsickresting
 
 #I'd like this to work similar to the sick persistent where the dialog changes, but maybe make it a little more humorous rather than serious like the sick persistent is intended to be.
@@ -624,11 +624,11 @@ label mas_mood_bored:
         $ _history_list.pop()
         menu:
             m "Do I really bore you that much, [player]?{fast}"
-            "No, I'm not bored {i}of you{/i}...":
+            "No, I'm not bored {i}of you{/i}...{#mas_mood_bored_1}":
                 m 1hua "Oh,{w=0.2} that's such a relief!"
                 m 1eka "But, if you're bored, we should find something to do then..."
 
-            "Well...":
+            "Well...{#mas_mood_bored_2}":
                 $ mas_loseAffectionFraction(min_amount=15)
                 m 2ekc "Oh...{w=1} I see."
                 m 2dkc "I didn't realize I was boring you..."
@@ -682,10 +682,10 @@ label mas_mood_bored:
     $ _history_list.pop()
     menu:
         m "What do you say, [chosen_nickname]?{fast}"
-        "Yes.":
+        "Yes.{#mas_mood_bored_3}":
             $ MASEventList.push(picked_game_label, skipeval=True)
 
-        "No.":
+        "No.{#mas_mood_bored_4}":
             if mas_isMoniAff(higher=True):
                 m 1eka "Okay..."
                 if mas_isMoniEnamored(higher=True):
@@ -720,17 +720,17 @@ label mas_mood_crying:
     menu:
         m "Are you okay?{fast}"
 
-        "Yes.":
+        "Yes.{#mas_mood_crying_1}":
             m 3eka "Okay, good. That's a relief."
             m 1ekbsa "I'm here to keep you company and you can talk to me if you need anything, okay?"
 
-        "No.":
+        "No.{#mas_mood_crying_2}":
             m 1ekc "..."
             m 3ekd "[player]..."
             m 3eksdld "I'm so sorry. Did something happen?"
             call mas_mood_uok
 
-        "I'm not sure.":
+        "I'm not sure.{#mas_mood_crying_3}":
             m 1dkc "[player]...{w=0.3}{nw}"
             extend 3eksdld "did something happen?"
             call mas_mood_uok
@@ -750,7 +750,7 @@ label mas_mood_uok:
     menu:
         m "So if you need to talk about something, I'm right here.{fast}"
 
-        "I'd like to vent.":
+        "I'd like to vent.{#mas_mood_uok_1}":
             m 3eka "Go ahead, [player]."
 
             m 1ekc "I'm here for you.{nw}"
@@ -758,7 +758,7 @@ label mas_mood_uok:
             menu:
                 m "I'm here for you.{fast}"
 
-                "I'm done.":
+                "I'm done.{#mas_mood_uok_2}":
                     m 1eka "I'm glad you were able to get what you wanted off your chest, [player]."
 
         "I don't want to talk about it.":
@@ -816,7 +816,7 @@ label mas_mood_relieved:
     menu:
         m "What happened, [chosen_nickname]?{fast}"
 
-        "I made it through something difficult.":
+        "I made it through something difficult.{#mas_mood_relieved_1}":
             m 1wud "Really?"
             m 3hub "You should be proud of yourself, then!"
             m 3fua "I'm sure whatever it was, you were working really hard to make it through."
@@ -828,7 +828,7 @@ label mas_mood_relieved:
             m 1ekbsa "I love you, [player], and I'm so proud of you for getting through this."
             $ mas_ILY()
 
-        "Something I was worried about didn't happen.":
+        "Something I was worried about didn't happen.{#mas_mood_relieved_2}":
             m 1eub "Oh, that's good!"
             m 2eka "Whatever was happening, I'm sure you were really anxious...{w=0.3}{nw}"
             extend 2rkd "that couldn't have been fun to go through."
@@ -858,7 +858,7 @@ label mas_mood_excited:
     menu:
         m "What are you excited about, is it something big?{fast}"
 
-        "It is!":
+        "It is!{#mas_mood_excited_1}":
             m 4wuo "Wow, that's amazing, [player]!"
             m 1eka "I wish I could be there to celebrate with you."
             m 1hub "Now I'm getting all excited too!"
@@ -871,7 +871,7 @@ label mas_mood_excited:
             m 2eubsa "Then I could give you a big hug!"
             m 2hubsb "Ahaha~"
 
-        "It's something small.":
+        "It's something small.{#mas_mood_excited_2}":
             m 1hub "That's great!"
             m 3eua "It's important to get excited about small things like that."
             m 1rksdla "...I know it's kind of cheesy,{w=0.1} {nw}"
@@ -881,7 +881,7 @@ label mas_mood_excited:
             m 1eub "It also makes me happy to hear about your accomplishments."
             m 3hub "So thanks for telling me!~"
 
-        "I'm not too sure.":
+        "I'm not too sure.{#mas_mood_excited_3}":
             m 1eta "Ah, just excited for what's to come?{w=0.2} {nw}"
             extend 1eua "Excited about life?{w=0.2} {nw}"
             extend 1tsu "Or maybe.{w=0.3}.{w=0.3}.{w=0.3}{nw}"
@@ -912,12 +912,12 @@ label mas_mood_grateful:
     menu:
         m "What are you grateful for, [chosen_nickname]?{fast}"
 
-        "For you.":
+        "For you.{#mas_mood_grateful_1}":
             if not renpy.seen_label("mas_mood_grateful_gratefulforyou"):
                 $ mas_gainAffection(5, bypass=True)
             call mas_mood_grateful_gratefulforyou
 
-        "For someone.":
+        "For someone.{#mas_mood_grateful_2}":
             m 3eka "Aww, that's wonderful to hear."
             m 1hua "I'm really glad that you have supportive people in your life."
             m 3eud "But as nice as it is for me to hear it...{w=0.3}I think you should make sure that {i}they{/i} know it too."
@@ -925,13 +925,13 @@ label mas_mood_grateful:
             m 3euu "If nothing else, you can thank them on my behalf. {w=0.3}Anyone who makes you happier is a good person in my book."
             m 1huu "But in any case, I'm really happy for you, [mas_get_player_nickname()]~"
 
-        "For something.":
+        "For something.{#mas_mood_grateful_3}":
             m 3hub "I'm glad to hear it, [mas_get_player_nickname()]!"
             m 1eud "Consciously taking the time to think about the good things in your life can be great for your mental health."
             m 3hub "So whatever that thing might be, take the time to appreciate and enjoy it!"
             m 1euu "Thank you for sharing your happiness with me, [mas_get_player_nickname()]~"
 
-        "Nothing specific.":
+        "Nothing specific.{#mas_mood_grateful_4}":
             m 3eua "Ah, just feeling happy about life?"
             m 1eud "It's nice to take a bit to reflect and feel content, isn't it?"
             m 1rtd "Hmmm...{w=0.2}now that I'm thinking about it, {w=0.1}{nw}"
