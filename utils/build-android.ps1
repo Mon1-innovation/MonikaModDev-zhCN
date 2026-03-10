@@ -96,6 +96,13 @@ function Copy-DirectoryRecursive {
     }
 }
 
+# 设置默认输出目录（如果未指定）
+if (-not $OutputDir) {
+    $projectRoot = Split-Path $ProjectBase -Parent
+    $OutputDir = Join-Path $projectRoot "dists"
+    Write-Info "未指定输出目录，使用默认值: $OutputDir"
+}
+
 # 验证路径
 Write-Info "验证配置..."
 
@@ -264,6 +271,14 @@ if ($confirm -ne "y") {
 # 执行构建
 Write-Info "开始构建 Android 版本..."
 
+# 清理 SDK 生成的旧 APK 文件
+Write-Info "清理 SDK 中的旧 APK 文件..."
+$sdkApkDir = Join-Path $RenPySDK "rapt\bin"
+if (Test-Path $sdkApkDir) {
+    Get-ChildItem -Path $sdkApkDir -Filter "*.apk" -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
+    Write-Success "SDK 中的旧 APK 文件已清理"
+}
+
 # 清理 Ren'Py SDK 的临时目录（避免 .pyc 文件冲突）
 Write-Info "清理 SDK 临时文件..."
 $sdkTmpDir = Join-Path $RenPySDK "tmp"
@@ -312,10 +327,32 @@ try {
     if ($buildExitCode -eq 0) {
         Write-Success "Android 构建完成！"
 
+        # 从 SDK 输出目录复制 APK 到目标目录
+        $sdkApkDir = Join-Path $RenPySDK "rapt\bin"
+        $generatedApks = Get-ChildItem -Path $sdkApkDir -Filter "*.apk" -ErrorAction SilentlyContinue
+
+        if ($generatedApks) {
+            Write-Info "发现生成的 APK 文件，准备复制..."
+
+            # 确保输出目录存在
+            if (-not (Test-Path $OutputDir)) {
+                New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
+            }
+
+            # 复制所有 APK 到输出目录
+            $generatedApks | ForEach-Object {
+                $destPath = Join-Path $OutputDir $_.Name
+                Copy-Item -Path $_.FullName -Destination $destPath -Force
+                Write-Success "APK 已复制: $destPath"
+            }
+        } else {
+            Write-Warning-Custom "未在 SDK 目录中发现生成的 APK 文件"
+        }
+
         if ($OutputDir -and (Test-Path $OutputDir)) {
-            Write-Info "输出文件位置: $OutputDir"
-            Get-ChildItem $OutputDir -Recurse -Include *.apk, *.aab | ForEach-Object {
-                Write-Success "生成文件: $($_.FullName)"
+            Write-Info "输出目录内容:"
+            Get-ChildItem $OutputDir -Filter "*.apk" -ErrorAction SilentlyContinue | ForEach-Object {
+                Write-Success "文件: $($_.FullName) ($('{0:N0}' -f ($_.Length/1MB)) MB)"
             }
         }
     } else {

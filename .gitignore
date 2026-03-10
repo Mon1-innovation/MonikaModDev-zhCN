@@ -986,6 +986,11 @@ Monika After Story/game/mod_assets/font/DroidSans.ttf
 # 临时构建目录
 .build_temp/
 !.build_temp/.gitkeep
+
+# Android构建输出
+dists/**
+!dists/
+!dists/.gitkeep
 Monika After Story/game/mod_assets/font/fzht.ttf
 Monika After Story/game/mod_assets/font/npy.ttf
 Monika After Story/game/mod_assets/font/SentyMARUKO.ttf
