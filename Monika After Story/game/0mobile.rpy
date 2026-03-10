@@ -459,6 +459,35 @@ label create_hint_file:
             $ delete_hint_file(target_file)
     "完成了"
     return
+
+label create_nomedia_files:
+    python:
+        import os
+        def create_nomedia_recursive(root_path):
+            """在指定路径及其所有子文件夹中创建.nomedia文件"""
+            try:
+                nomedia_count = 0
+                for dirpath, dirnames, filenames in os.walk(root_path):
+                    nomedia_file = os.path.join(dirpath, '.nomedia')
+                    if not os.path.exists(nomedia_file):
+                        with open(nomedia_file, 'w') as f:
+                            pass
+                        nomedia_count += 1
+                return nomedia_count
+            except Exception as e:
+                return -1
+
+        base_path = ANDROID_MASBASE
+        result = create_nomedia_recursive(base_path)
+
+        if result > 0:
+            m "成功在 [result] 个文件夹中创建了.nomedia文件！"
+        elif result == 0:
+            m ".nomedia文件已经存在于所有文件夹中了。"
+        else:
+            m "创建.nomedia文件时发生错误。"
+    return
+
 init 5 python:  
     addEvent(
         Event(
@@ -499,7 +528,17 @@ init 5 python:
             pool=True,
             unlocked=True
         )
-    )  
+    )
+    addEvent(
+        Event(
+            persistent.event_database,
+            eventlabel="create_nomedia_files",
+            category=["维护功能"],
+            prompt="创建.nomedia文件",
+            pool=True,
+            unlocked=True
+        )
+    )
 init -2000 python:
     import store
     def load_persistent(filename):
