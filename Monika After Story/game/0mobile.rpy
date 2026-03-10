@@ -480,12 +480,12 @@ label create_nomedia_files:
         base_path = ANDROID_MASBASE
         result = create_nomedia_recursive(base_path)
 
-        if result > 0:
-            m "成功在 [result] 个文件夹中创建了.nomedia文件！"
-        elif result == 0:
-            m ".nomedia文件已经存在于所有文件夹中了。"
-        else:
-            m "创建.nomedia文件时发生错误。"
+    if result > 0:
+        m "成功在 [result] 个文件夹中创建了.nomedia文件！"
+    elif result == 0:
+        m ".nomedia文件已经存在于所有文件夹中了。"
+    else:
+        m "创建.nomedia文件时发生错误。"
     return
 
 init 5 python:  

@@ -977,6 +977,15 @@ zzzz*
 cacert.pem
 venv/
 Monika After Story/game/mod_assets/font/DroidSans.ttf
+
+# DDLC Base files (本体文件，由.gitkeep保持文件夹)
+.DDLC_BASE/**
+!.DDLC_BASE/
+!.DDLC_BASE/.gitkeep
+
+# 临时构建目录
+.build_temp/
+!.build_temp/.gitkeep
 Monika After Story/game/mod_assets/font/fzht.ttf
 Monika After Story/game/mod_assets/font/npy.ttf
 Monika After Story/game/mod_assets/font/SentyMARUKO.ttf
