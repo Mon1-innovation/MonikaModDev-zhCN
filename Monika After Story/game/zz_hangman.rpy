@@ -384,22 +384,22 @@ label game_hangman:
 
         # instruction text and other sensitive stuff
         instruct_txt = (
-            "Guess a letter: (Type {0}'!' to give up)"
+            renpy.substitute(_("Guess a letter: (Type {0}'!' to give up)"))
         )
 
-        instruct_txt = instruct_txt.format("'?' to repeat the hint, ")
-        store.mas_hangman.game_name = "Hangman"
+        instruct_txt = instruct_txt.format(renpy.substitute(_("'?' to repeat the hint, ")))
+        store.mas_hangman.game_name = renpy.substitute(_("Hangman"))
 
 label mas_hangman_game_select_diff:
     m "Choose a difficulty.{nw}"
     $ _history_list.pop()
     menu:
         m "Choose a difficulty.{fast}"
-        "Easy.":
+        "Easy.{#mas_hangman_game_select_diff_1}":
             $ hangman_mode = mas_hmg.EASY_MODE
-        "Normal.":
+        "Normal.{#mas_hangman_game_select_diff_2}":
             $ hangman_mode = mas_hmg.NORM_MODE
-        "Hard.":
+        "Hard.{#mas_hangman_game_select_diff_3}":
             $ hangman_mode = mas_hmg.HARD_MODE
 
 label mas_hangman_game_preloop:
@@ -685,9 +685,9 @@ label mas_hangman_game_loop:
             show hm_s_win_6 as window_sayori at hangman_sayori_h
 
         if player_word:
-            $ the_word = "your name"
+            $ the_word = _("your name")
         else:
-            $ the_word = "the word"
+            $ the_word = _("the word")
 
         m 1hua "Wow, you guessed [the_word] correctly!"
         m "Good job, [player]!"
@@ -705,7 +705,7 @@ label mas_hangman_game_loop:
     $ _history_list.pop()
     menu:
         m "Would you like to play again?{fast}"
-        "Yes.":
+        "Yes.{#mas_hangman_game_loop_1}":
             $ hang_ev = mas_getEV("mas_hangman")
             if hang_ev:
                 # each game counts as a game played
@@ -714,7 +714,7 @@ label mas_hangman_game_loop:
             show monika at t21
             jump mas_hangman_game_loop
 
-        "No.":
+        "No.{#mas_hangman_game_loop_2}":
             pass
 
             #FALL THROUGH

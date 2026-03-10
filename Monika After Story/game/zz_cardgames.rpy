@@ -4181,12 +4181,12 @@ label .no_change:
     menu:
         m "Maybe we could play now?{fast}"
 
-        "Sure.":
+        "Sure.{#monika_change_nou_house_rules_1}":
             show monika 1hua zorder MAS_MONIKA_Z
             $ mas_nou.visit_game_ev()
             return True
 
-        "Maybe later.":
+        "Maybe later.{#monika_change_nou_house_rules_2}":
             m 2eub "Alright, let's play together soon~"
 
     return False
@@ -4223,12 +4223,12 @@ label .change_points_to_win_loop:
             menu:
                 m "We can play without points if you wish.{fast}"
 
-                "I'd like that.":
+                "I'd like that.{#monika_change_nou_house_rules_3}":
                     m 1eub "Oh, alright!"
                     $ mas_nou.set_house_rule("points_to_win", 0)
                     $ ready = True
 
-                "Nah.":
+                "Nah.{#monika_change_nou_house_rules_4}":
                     m 3eua "Then choose again."
 
         elif points_cap > 3000:
@@ -4238,12 +4238,12 @@ label .change_points_to_win_loop:
             menu:
                 m "Let's leave it at 3000?{fast}"
 
-                "Alright.":
+                "Alright.{#monika_change_nou_house_rules_5}":
                     m 1eua "Settled."
                     $ mas_nou.set_house_rule("points_to_win", 3000)
                     $ ready = True
 
-                "Nah.":
+                "Nah.{#monika_change_nou_house_rules_6}":
                     m 3eua "Then choose again."
 
         else:
@@ -4280,11 +4280,11 @@ label .change_starting_cards_loop:
             menu:
                 m "How about we start with at least 4 cards?{fast}"
 
-                "Alright.":
+                "Alright.{#monika_change_nou_house_rules_7}":
                     $ mas_nou.set_house_rule("starting_cards", 4)
                     $ ready = True
 
-                "Nah.":
+                "Nah.{#monika_change_nou_house_rules_8}":
                     m 3eua "Then try again."
 
         elif starting_cards > 20:
@@ -4294,11 +4294,11 @@ label .change_starting_cards_loop:
             menu:
                 m "We can leave it at 20 cards if you'd like?{fast}"
 
-                "Alright.":
+                "Alright.{#monika_change_nou_house_rules_9}":
                     $ mas_nou.set_house_rule("starting_cards", 20)
                     $ ready = True
 
-                "Nah.":
+                "Nah.{#monika_change_nou_house_rules_10}":
                     m 3eua "Then try again."
 
         else:
@@ -4501,7 +4501,7 @@ label mas_nou_game_end:
             menu:
                 m "Would you like to play some more?{fast}"
 
-                "Sure.":
+                "Sure.{#mas_nou_game_end_1}":
                     m 1hub "Yay!"
                     show monika 1hua zorder MAS_MONIKA_Z
                     python:
@@ -4510,10 +4510,10 @@ label mas_nou_game_end:
 
                     jump mas_nou_game_loop
 
-                "I'd like to change some house rules.":
+                "I'd like to change some house rules.{#mas_nou_game_end_2}":
                     jump mas_nou_game_end_change_rules_and_continue
 
-                "Not right now.":
+                "Not right now.{#mas_nou_game_end_3}":
                     m 1hua "Okay, just let me know when you want to play again~"
 
             jump mas_nou_game_end_end
@@ -4541,7 +4541,7 @@ label mas_nou_game_end:
             menu:
                 m "Would you like to play some more?{fast}"
 
-                "Sure.":
+                "Sure.{#mas_nou_game_end_4}":
                     m 1hub "Yay!"
                     show monika 1hua zorder MAS_MONIKA_Z
                     python:
@@ -4550,10 +4550,10 @@ label mas_nou_game_end:
 
                     jump mas_nou_game_loop
 
-                "I'd like to change some house rules.":
+                "I'd like to change some house rules.{#mas_nou_game_end_5}":
                     jump mas_nou_game_end_change_rules_and_continue
 
-                "Not right now.":
+                "Not right now.{#mas_nou_game_end_6}":
                     m 1hua "Okay, just let me know when you want to play again~"
 
             jump mas_nou_game_end_end
@@ -4578,7 +4578,7 @@ label mas_nou_game_end:
     menu:
         m "Would you like to play another [_round!t]?{fast}"
 
-        "Sure.":
+        "Sure.{#mas_nou_game_end_7}":
             show monika 1hua zorder MAS_MONIKA_Z
             python:
                 store.mas_nou.game.reset_game()
@@ -4586,10 +4586,10 @@ label mas_nou_game_end:
 
             jump mas_nou_game_loop
 
-        "I'd like to change some house rules." if not mas_nou.get_house_rule("points_to_win"):
+        "I'd like to change some house rules.{#mas_nou_game_end_8}" if not mas_nou.get_house_rule("points_to_win"):
             jump mas_nou_game_end_change_rules_and_continue
 
-        "Not right now.":
+        "Not right now.{#mas_nou_game_end_9}":
             m 1hua "Alright, let's play again soon~"
 
 
@@ -4608,7 +4608,7 @@ label mas_nou_game_end_change_rules_and_continue:
     menu:
         m "Ready to continue?{fast}"
 
-        "Yep.":
+        "Yep.{#mas_nou_game_end_change_rules_and_continue_1}":
             show monika 1hua zorder MAS_MONIKA_Z
             python:
                 store.mas_nou.game.reset_game()
@@ -4616,7 +4616,7 @@ label mas_nou_game_end_change_rules_and_continue:
 
             jump mas_nou_game_loop
 
-        "Let's play later.":
+        "Let's play later.{#mas_nou_game_end_change_rules_and_continue_2}":
             if (mas_nou.player_wins_this_sesh + mas_nou.monika_wins_this_sesh) < 4:
                 m 1ekc "Aww, alright."
 

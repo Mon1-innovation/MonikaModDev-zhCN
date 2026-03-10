@@ -871,10 +871,10 @@ label mas_fun_fact_round_earth:
     menu:
         m "[player], do you think the Earth is round or flat?{fast}"
 
-        "Round.":
+        "Round.{#mas_fun_fact_round_earth_1}":
             m 3hua "Right! Pretty much everyone agrees on that nowadays."
 
-        "Flat.":
+        "Flat.{#mas_fun_fact_round_earth_2}":
             m 3hksdlb "Oh come on, [player]! Are you making fun of me?"
 
     m 1eua "Actually, the Earth being round is something that has been known for a pretty long time."
