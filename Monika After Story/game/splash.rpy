@@ -206,6 +206,8 @@ label splashscreen:
         if not persistent._mas_imported_saves:
             call import_ddlc_persistent from _call_import_ddlc_persistent
 
+        if renpy.android:
+            call p_old_savefiles_location_check
         $ persistent.first_run = False
 
 #    $ basedir = config.basedir.replace('\\', '/')

@@ -2593,3 +2593,68 @@ init 890 python:
             
             
     PianoDisplayable = MobilePianoDisplayable
+
+label p_old_savefiles_location_check:
+    python:
+        import os
+        import shutil
+
+        # 检查旧存档路径
+        # 如果在/sdcard/Android/data/and.sirp.masmobile/files/saves发现了persistent文件，就询问是否导入存档文件。
+        # 如果同意，就把这个文件夹下所有内容剪贴至renpy.config.savedir
+
+        old_savedir = "/sdcard/Android/data/and.sirp.masmobile/files/saves"
+        persistent_file = os.path.join(old_savedir, "persistent")
+        should_import = False
+
+        # 检查旧存档路径是否存在且包含persistent文件
+        if os.path.exists(old_savedir) and os.path.exists(persistent_file):
+            should_import = True
+
+    if should_import:
+        "在先前的版本中, 我们调整了存档位置以防止因为误卸载导致存档丢失。"
+        "存档位置已被修改, 你是否想要导入先前的存档?{nw}"
+        menu:
+            "存档位置已被修改, 你是否想要导入先前的存档?{fast}"
+            "是，导入存档":
+                python:
+                    try:
+                        # 获取当前的存档目录
+                        current_savedir = renpy.config.savedir
+
+                        # 确保目标目录存在
+                        if not os.path.exists(current_savedir):
+                            os.makedirs(current_savedir, exist_ok=True)
+
+                        # 移动旧存档目录下的所有文件到新位置
+                        for item in os.listdir(old_savedir):
+                            src_path = os.path.join(old_savedir, item)
+                            dst_path = os.path.join(current_savedir, item)
+
+                            # 如果目标文件已存在，先删除
+                            if os.path.exists(dst_path):
+                                if os.path.isfile(dst_path):
+                                    os.remove(dst_path)
+                                elif os.path.isdir(dst_path):
+                                    shutil.rmtree(dst_path)
+
+                            # 移动文件或目录
+                            shutil.move(src_path, dst_path)
+
+                        # 尝试删除空的旧目录
+                        try:
+                            os.rmdir(old_savedir)
+                        except:
+                            pass
+
+                        import logging
+                        logging.info(f"Successfully coped saves from {old_savedir} to {current_savedir}")
+                        renpy.quit()
+                    except Exception as e:
+                        import logging
+                        logging.error(f"Failed to import saves: {e}")
+
+            "否，跳过":
+                pass
+
+    return
