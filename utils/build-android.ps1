@@ -5,6 +5,8 @@
 #   .\build-android.ps1 -Bundle              # 生成 .aab bundle
 #   .\build-android.ps1 -OutputDir "./dist"  # 指定输出目录
 #   .\build-android.ps1 -Bundle -OutputDir "./dist" -Install
+#   .\build-android.ps1 -Proxy "127.0.0.1:7890"  # 指定构建代理
+#   .\build-android.ps1 -NoProxy             # 禁用默认代理
 #
 
 param(
@@ -12,6 +14,8 @@ param(
     [string]$ProjectBase = "J:\MAS\MonikaModDev-zhCN\Monika After Story",
     [string]$DDLCBase = "J:\MAS\MonikaModDev-zhCN\.DDLC_BASE",
     [string]$OutputDir = "",
+    [string]$Proxy = "localhost:7890",
+    [switch]$NoProxy = $false,
     [switch]$Bundle = $false,
     [switch]$Install = $false,
     [switch]$Launch = $false,
@@ -39,6 +43,83 @@ function Write-Info {
 function Write-Warning-Custom {
     param([string]$Message)
     Write-Host "⚠ $Message" -ForegroundColor Yellow
+}
+
+function Get-NormalizedProxyUri {
+    param([string]$ProxyValue)
+
+    if ([string]::IsNullOrWhiteSpace($ProxyValue)) {
+        throw "代理地址不能为空；如需禁用代理，请使用 -NoProxy"
+    }
+
+    if ($ProxyValue -notmatch '^[a-zA-Z][a-zA-Z0-9+.-]*://') {
+        $ProxyValue = "http://$ProxyValue"
+    }
+
+    try {
+        $proxyUri = [System.Uri]$ProxyValue
+    } catch {
+        throw "代理地址格式无效: $ProxyValue"
+    }
+
+    if (-not $proxyUri.Host -or $proxyUri.Port -le 0) {
+        throw "代理地址必须包含 host 和 port: $ProxyValue"
+    }
+
+    return $proxyUri
+}
+
+function Enable-BuildProxy {
+    param([string]$ProxyValue)
+
+    $proxyUri = Get-NormalizedProxyUri -ProxyValue $ProxyValue
+    $proxyUrl = $proxyUri.AbsoluteUri.TrimEnd('/')
+    $proxyHost = $proxyUri.Host
+    $proxyPort = $proxyUri.Port
+    $proxyOptions = "-Dhttp.proxyHost=$proxyHost -Dhttp.proxyPort=$proxyPort -Dhttps.proxyHost=$proxyHost -Dhttps.proxyPort=$proxyPort"
+
+    $keys = @(
+        "HTTP_PROXY",
+        "HTTPS_PROXY",
+        "ALL_PROXY",
+        "GRADLE_OPTS",
+        "JAVA_TOOL_OPTIONS"
+    )
+
+    $backup = @{}
+    foreach ($key in $keys) {
+        $backup[$key] = [Environment]::GetEnvironmentVariable($key, "Process")
+    }
+
+    [Environment]::SetEnvironmentVariable("HTTP_PROXY", $proxyUrl, "Process")
+    [Environment]::SetEnvironmentVariable("HTTPS_PROXY", $proxyUrl, "Process")
+    [Environment]::SetEnvironmentVariable("ALL_PROXY", $proxyUrl, "Process")
+
+    $existingGradleOpts = [Environment]::GetEnvironmentVariable("GRADLE_OPTS", "Process")
+    $existingJavaToolOptions = [Environment]::GetEnvironmentVariable("JAVA_TOOL_OPTIONS", "Process")
+    [Environment]::SetEnvironmentVariable("GRADLE_OPTS", "$existingGradleOpts $proxyOptions".Trim(), "Process")
+    [Environment]::SetEnvironmentVariable("JAVA_TOOL_OPTIONS", "$existingJavaToolOptions $proxyOptions".Trim(), "Process")
+
+    Write-Info "已启用构建代理: $proxyUrl"
+    return $backup
+}
+
+function Restore-BuildProxy {
+    param([hashtable]$Backup)
+
+    if (-not $Backup) {
+        return
+    }
+
+    foreach ($key in $Backup.Keys) {
+        if ($null -eq $Backup[$key]) {
+            Remove-Item -Path "Env:\$key" -ErrorAction SilentlyContinue
+        } else {
+            [Environment]::SetEnvironmentVariable($key, $Backup[$key], "Process")
+        }
+    }
+
+    Write-Info "已恢复构建前的代理环境变量"
 }
 
 # 复制目录函数（递归，覆盖模式，排除不必要的文件）
@@ -243,6 +324,18 @@ if ($Launch) {
     Write-Info "构建后将在设备上启动游戏"
 }
 
+if ($NoProxy) {
+    Write-Info "构建代理: 已禁用"
+} else {
+    try {
+        $proxyPreview = Get-NormalizedProxyUri -ProxyValue $Proxy
+        Write-Info "构建代理: $($proxyPreview.AbsoluteUri.TrimEnd('/'))"
+    } catch {
+        Write-Error-Custom $_
+        exit 1
+    }
+}
+
 # 显示完整命令
 Write-Info "完整命令:"
 if (Test-Path $pythonExe) {
@@ -310,9 +403,19 @@ Write-Success "SDK PIL 目录已清理"
 
 Write-Host "---" -ForegroundColor Gray
 
+$proxyEnvBackup = $null
+$pushedRenPyLocation = $false
+
 try {
+    if ($NoProxy) {
+        Write-Info "跳过构建代理设置"
+    } else {
+        $proxyEnvBackup = Enable-BuildProxy -ProxyValue $Proxy
+    }
+
     # 从 Ren'Py SDK 目录运行命令
     Push-Location $RenPySDK
+    $pushedRenPyLocation = $true
 
     if (Test-Path $pythonExe) {
         & "$pythonExe" "$renpyPy" @cmdArgs
@@ -323,6 +426,7 @@ try {
     $buildExitCode = $LASTEXITCODE
 
     Pop-Location
+    $pushedRenPyLocation = $false
 
     if ($buildExitCode -eq 0) {
         Write-Success "Android 构建完成！"
@@ -374,6 +478,12 @@ try {
 } catch {
     Write-Error-Custom "执行构建时出错: $_"
     exit 1
+} finally {
+    if ($pushedRenPyLocation) {
+        Pop-Location
+    }
+
+    Restore-BuildProxy -Backup $proxyEnvBackup
 }
 
 Write-Host "---" -ForegroundColor Gray

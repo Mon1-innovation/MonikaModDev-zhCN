@@ -31,36 +31,12 @@ python early:
     renpy.config.debug = p_debug
     renpy.config.console = p_debug
     renpy.config.save_on_mobile_background = False
-    p_perms = [
-        "android.permission.INTERNET",# 开启联网权限 用于备份
-        "android.permission.WRITE_EXTERNAL_STORAGE", # 读写权限
-        "android.permission.READ_EXTERNAL_STORAGE",
-        #"android.permission.MANAGE_EXTERNAL_STORAGE"
-    ]
-    build.android_permissions = p_perms
-    # 权限请求
+    # Kept for compatibility with older debug code that inspected request state.
     p_perm_dict = {}
-    def req_perm():
-        for i in p_perms:
-            if not renpy.check_permission(i):
-                try:
-                    p_perm_dict[i] = renpy.request_permission(i)
-                    if not p_perm_dict[i]:
-                        android_toast("无法申请权限 {}".format(i))
-                except Exception:
-                    
-                    window = AndroidAlertDialog(
-                        title="抱歉, 但是你好像没有授权MAS必要的权限...",
-                        message="MAS运行需要以下权限才能正常工作:\n 外部存储读写权限\n用于对MAS文件夹进行操作\n\n联网权限\n允许相关子模组连接网络\n\n请在设置中打开以上权限",
-                        positive_text="",
-                        negative_text="关闭",
-                    )
-                    window.AsyncTaskerCheck.wait()
-                    renpy.quit()
-        pass
+
     def p_raise():
         raise Exception("Raise Exception for Debugging")
-    req_perm()
+
     import os
     gamesyncTask = None
     if renpy.android and os.path.exists("/storage/emulated/0/MAS/use_filetransfer"):
@@ -89,7 +65,7 @@ python early:
         renpy.config.basedir = ANDROID_MASBASE
         renpy.config.gamedir = os.path.join(renpy.config.basedir, "game")
     
-    if not os.path.exists("/storage/emulated/0/MAS/use_android_savedir") and renpy.check_permission("android.permission.WRITE_EXTERNAL_STORAGE"):
+    if renpy.android and not os.path.exists("/storage/emulated/0/MAS/use_android_savedir") and mas_android_has_permission():
         renpy.config.savedir = os.path.join(ANDROID_MASBASE, "saves")
         ANDROID_SAVEDIR_CHANGED = True
 
