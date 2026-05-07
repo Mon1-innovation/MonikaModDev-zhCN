@@ -330,6 +330,10 @@ label before_main_menu:
     return
 
 label quit:
+    if renpy.android and mas_android_selected_farewell_label:
+        $ MAS_AndroidNotifs_CheckFarewell(mas_android_selected_farewell_label)
+        $ mas_android_selected_farewell_label = None
+
     python:
         store.mas_calendar.saveCalendarDatabase(CustomEncoder)
         persistent.sessions['last_session_end']=datetime.datetime.now()

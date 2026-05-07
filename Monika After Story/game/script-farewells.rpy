@@ -12,6 +12,9 @@
 #Flag to mark if the player stayed up late last night. Kept as a generic name in case it can be used on other farewells/greetings
 default persistent.mas_late_farewell = False
 
+# Android notification hook: tracks the farewell selected during this session.
+default mas_android_selected_farewell_label = None
+
 init -1 python in mas_farewells:
     import datetime
     import store
@@ -169,6 +172,8 @@ init -1 python in mas_farewells:
 
 # farewells selection label
 label mas_farewell_start:
+    $ mas_android_selected_farewell_label = None
+
     # TODO: if we ever have another special farewell like long absence
     # that let's the player go after selecting the farewell we'll need
     # to define a system to handle those.
@@ -229,6 +234,7 @@ label mas_farewell_start:
 
         if _return != -1:
             $ mas_setEventPause(None)
+            $ mas_android_selected_farewell_label = _return.eventlabel
             #Push the selected event
             $ MASEventList.push(_return.eventlabel, skipeval=True)
             return
@@ -236,6 +242,7 @@ label mas_farewell_start:
     $ mas_setEventPause(None)
     # otherwise, select a random farewell
     $ farewell = store.mas_farewells.selectFarewell()
+    $ mas_android_selected_farewell_label = farewell.eventlabel
     $ MASEventList.push(farewell.eventlabel, skipeval=True)
 
     return

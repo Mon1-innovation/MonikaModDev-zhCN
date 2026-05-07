@@ -734,6 +734,10 @@ init python:
             persistent._mas_windowreacts_notif_filters[group] = False
 
         notif_success = False
+        notif_body = renpy.substitute(renpy.random.choice(body))
+
+        if renpy.android and hasattr(store, "mas_android_display_notif"):
+            return store.mas_android_display_notif(title, notif_body)
 
         if (
             skip_checks
@@ -746,7 +750,7 @@ init python:
             #Now we make the notif
             notif_success = mas_windowutils._tryShowNotif(
                 renpy.substitute(title),
-                renpy.substitute(renpy.random.choice(body))
+                notif_body
             )
             if notif_success:
                 # Flash the window if needed

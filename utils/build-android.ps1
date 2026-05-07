@@ -443,11 +443,21 @@ try {
                 New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
             }
 
-            # 复制所有 APK 到输出目录
+            $latestApk = $generatedApks | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+            $destPath = Join-Path $OutputDir $latestApk.Name
+            Copy-Item -Path $latestApk.FullName -Destination $destPath -Force
+            Write-Success "最新 APK 已复制: $destPath"
+
+            Get-ChildItem -Path $OutputDir -Filter "*.apk" -ErrorAction SilentlyContinue | ForEach-Object {
+                if ($_.FullName -ne $destPath) {
+                    Remove-Item -Path $_.FullName -Force -ErrorAction SilentlyContinue
+                    Write-Info "已删除旧 APK: $($_.FullName)"
+                }
+            }
+
             $generatedApks | ForEach-Object {
-                $destPath = Join-Path $OutputDir $_.Name
-                Copy-Item -Path $_.FullName -Destination $destPath -Force
-                Write-Success "APK 已复制: $destPath"
+                Remove-Item -Path $_.FullName -Force -ErrorAction SilentlyContinue
+                Write-Info "已清理 SDK APK: $($_.FullName)"
             }
         } else {
             Write-Warning-Custom "未在 SDK 目录中发现生成的 APK 文件"

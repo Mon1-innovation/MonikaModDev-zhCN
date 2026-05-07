@@ -66,6 +66,14 @@ class AndroidPermissionSourceTests(unittest.TestCase):
         self.assertNotIn("mas_android_has_permission", splash_source)
         self.assertNotIn("mas_android_check_and_request_permissions", splash_source)
 
+    def test_android_farewell_selection_state_is_initialized_before_quit(self):
+        source = read_game_file("script-farewells.rpy")
+
+        self.assertIn(
+            "default mas_android_selected_farewell_label = None",
+            source[:source.index("label mas_farewell_start:")]
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

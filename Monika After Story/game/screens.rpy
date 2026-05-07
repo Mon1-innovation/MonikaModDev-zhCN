@@ -31,6 +31,21 @@ init -1 python:
     layout.MAS_TT_G_NOTIF = _(
         "Enables notifications for the selected group."
     )
+    layout.MAS_TT_ANDROID_SOUND = _(
+        "If enabled, Monika's Android notifications will play a sound."
+    )
+    layout.MAS_TT_ANDROID_VIBRATION = _(
+        "If enabled, Monika's Android notifications will vibrate your device."
+    )
+    layout.MAS_TT_ANDROID_CALENDAR = _(
+        "Enable special Android notifications for important dates."
+    )
+    layout.MAS_TT_ANDROID_RETURN = _(
+        "Enable Android reminders after you say goodbye to Monika."
+    )
+    layout.MAS_TT_ANDROID_FREQ = _(
+        "Adjust how long Monika waits before sending an Android return reminder."
+    )
     layout.MAS_TT_ACTV_WND = (
         "Enabling this will allow Monika to see your active window "
         "and offer some comments based on what you're doing."
@@ -42,6 +57,14 @@ init -1 python:
         "See the patch notes {a=https://github.com/Monika-After-Story/MonikaModDev/releases/latest}{i}{u}here{/u}{/i}{/a}.\n"
         "Confused about some features? Take a look at our {a=https://github.com/Monika-After-Story/MonikaModDev/wiki}{i}{u}wiki page{/u}{/i}{/a}."
     )
+
+    layout.MAS_ANDROID_FREQ_MAP = {
+        1: _("Every 3 hours"),
+        2: _("Every 2 hours"),
+        3: _("Every hour"),
+        4: _("Every 30 minutes"),
+        5: _("Every 15 minutes")
+    }
 
 
 init -2 python in mas_layout:
@@ -1833,34 +1856,73 @@ screen notif_settings():
 
         default tooltip = Tooltip("")
 
-        vbox:
-            style_prefix "generic_fancy_check"
+        if renpy.android:
+            vbox:
+                style_prefix "generic_fancy_check"
+                hbox:
+                    spacing 25
+                    textbutton _("Sounds"):
+                        action ToggleField(persistent, "mas_android_notif_sound")
+                        selected persistent.mas_android_notif_sound
+                        hovered tooltip.Action(layout.MAS_TT_ANDROID_SOUND)
+
+                    textbutton _("Vibration"):
+                        action ToggleField(persistent, "mas_android_notif_vibration")
+                        selected persistent.mas_android_notif_vibration
+                        hovered tooltip.Action(layout.MAS_TT_ANDROID_VIBRATION)
+
+                label _("Notification Types")
+
             hbox:
+                style_prefix "generic_fancy_check"
+                box_wrap True
                 spacing 25
-                textbutton _("Use Notifications"):
-                    action ToggleField(persistent, "_mas_enable_notifications")
-                    selected persistent._mas_enable_notifications
-                    hovered tooltip.Action(layout.MAS_TT_NOTIF)
 
-                textbutton _("Sounds"):
-                    action ToggleField(persistent, "_mas_notification_sounds")
-                    selected persistent._mas_notification_sounds
-                    hovered tooltip.Action(layout.MAS_TT_NOTIF_SOUND)
+                textbutton _("Special Dates"):
+                    action ToggleField(persistent, "mas_android_calendar_events")
+                    selected persistent.mas_android_calendar_events
+                    hovered tooltip.Action(layout.MAS_TT_ANDROID_CALENDAR)
 
-            label _("Alert Filters")
+                textbutton _("Return Reminders"):
+                    action ToggleField(persistent, "mas_android_return_reminders")
+                    selected persistent.mas_android_return_reminders
+                    hovered tooltip.Action(layout.MAS_TT_ANDROID_RETURN)
 
-        hbox:
-            style_prefix "generic_fancy_check"
-            box_wrap True
-            spacing 25
+            vbox:
+                style_prefix "slider"
+                xsize 450
+                label _("[[ " + layout.MAS_ANDROID_FREQ_MAP.get(persistent.mas_android_frequency_index, "Error") + " ]") xmaximum None
+                bar value FieldValue(persistent, "mas_android_frequency_index", range=4, offset=1, style="slider") hovered tooltip.Action(layout.MAS_TT_ANDROID_FREQ)
 
-            #Dynamically populate this
-            for item in persistent._mas_windowreacts_notif_filters:
-                if item != "Window Reactions" or persistent._mas_windowreacts_windowreacts_enabled:
-                    textbutton _(item):
-                        action ToggleDict(persistent._mas_windowreacts_notif_filters, item)
-                        selected persistent._mas_windowreacts_notif_filters.get(item)
-                        hovered tooltip.Action(layout.MAS_TT_G_NOTIF)
+        else:
+            vbox:
+                style_prefix "generic_fancy_check"
+                hbox:
+                    spacing 25
+                    textbutton _("Use Notifications"):
+                        action ToggleField(persistent, "_mas_enable_notifications")
+                        selected persistent._mas_enable_notifications
+                        hovered tooltip.Action(layout.MAS_TT_NOTIF)
+
+                    textbutton _("Sounds"):
+                        action ToggleField(persistent, "_mas_notification_sounds")
+                        selected persistent._mas_notification_sounds
+                        hovered tooltip.Action(layout.MAS_TT_NOTIF_SOUND)
+
+                label _("Alert Filters")
+
+            hbox:
+                style_prefix "generic_fancy_check"
+                box_wrap True
+                spacing 25
+
+                #Dynamically populate this
+                for item in persistent._mas_windowreacts_notif_filters:
+                    if item != "Window Reactions" or persistent._mas_windowreacts_windowreacts_enabled:
+                        textbutton _(item):
+                            action ToggleDict(persistent._mas_windowreacts_notif_filters, item)
+                            selected persistent._mas_windowreacts_notif_filters.get(item)
+                            hovered tooltip.Action(layout.MAS_TT_G_NOTIF)
 
 
     text tooltip.value:
