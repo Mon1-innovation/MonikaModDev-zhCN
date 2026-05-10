@@ -262,7 +262,7 @@ init -1 python in mas_hangman:
                 float(splitword[2]),
                 float(splitword[3]),
                 0
-            ))
+            )._hangman())
         if not renpy.android:
             poemwords.close()
 

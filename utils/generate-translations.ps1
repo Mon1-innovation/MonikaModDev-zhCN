@@ -14,7 +14,7 @@ param(
     [string]$RenPySDK = "J:\Renpy\renpy-8.2.3-sdk",
     [string]$ProjectBase = "J:\MAS\MonikaModDev-zhCN\Monika After Story",
     [string]$DDLCBase = "J:\MAS\MonikaModDev-zhCN\.DDLC_BASE",
-    [string]$Language = "chinese2",
+    [string]$Language = "chinese",
     [switch]$KeepSourceText = $false,
     [switch]$StringsOnly = $false,
     [switch]$NoTodo = $false,
