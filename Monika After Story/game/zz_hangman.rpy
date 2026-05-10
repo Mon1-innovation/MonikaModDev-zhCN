@@ -455,7 +455,7 @@ label mas_hangman_game_loop:
                 and len(persistent.playername) <= 15
             ):
             display_word = mas_hmg.wordToDisplay(persistent.playername.lower())
-            hm_hint = mas_hmg.HM_HINT.format("I")
+            hm_hint = mas_hmg.HM_HINT.format(renpy.substitute()_("I{#mas_hangman_game_loop}"))
             word = persistent.playername.lower()
             player_word = True
             persistent._mas_hangman_playername = True
