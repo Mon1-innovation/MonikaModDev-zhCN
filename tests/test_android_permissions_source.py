@@ -69,6 +69,26 @@ class AndroidPermissionSourceTests(unittest.TestCase):
         self.assertFalse((GAME_DIR / "0_0filetransfer_ren.py").exists())
         self.assertFalse((GAME_DIR / "_ft_test.py").exists())
 
+    def test_android_chess_supports_arm64_and_armeabi_v7a_stockfish(self):
+        mobile_source = read_game_file("0mobile.rpy")
+        chess_source = read_game_file("chess.rpy")
+
+        for binary_name in (
+            "stockfish-8-arm64-v8a",
+            "stockfish-8-armeabi-v7a",
+        ):
+            self.assertIn(binary_name, mobile_source)
+            self.assertIn(binary_name, chess_source)
+
+        self.assertIn("ANDROID_STOCKFISH_BINARIES", chess_source)
+        self.assertIn("SUPPORTED_ABIS", chess_source)
+        self.assertIn("android.os.Build", chess_source)
+        self.assertIn("def get_android_stockfish_binary", chess_source)
+        self.assertNotIn(
+            'fp = "/data/user/0/and.sirp.masmobile/files/game/mod_assets/games/chess/stockfish-8-arm64-v8a"',
+            chess_source
+        )
+
     def test_android_permission_request_is_registered_before_splashscreen(self):
         source = read_game_file("0_0android_permissions.rpy")
 

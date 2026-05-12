@@ -3449,7 +3449,7 @@ init python:
                         store.mas_ptod.rst_cn()
                         local_ctx = {
                             "basedir": renpy.config.basedir,
-                            "android_stockfish_path": "/data/user/0/and.sirp.masmobile/files/game/mod_assets/games/chess/stockfish-8-arm64-v8a"
+                            "android_stockfish_path": path
                         }
                         renpy.show("monika", at_list=[t22])
                         renpy.show_screen("mas_py_console_teaching")
@@ -3500,8 +3500,28 @@ init python:
                 renpy.jump("mas_chess_cannot_work_embarrassing")
 
             is_64_bit = sys.maxsize > 2**32
+            ANDROID_STOCKFISH_BINARIES = {
+                "arm64-v8a": "stockfish-8-arm64-v8a",
+                "armeabi-v7a": "stockfish-8-armeabi-v7a",
+            }
+
+            def get_android_stockfish_binary():
+                try:
+                    from jnius import autoclass
+                    supported_abis = list(autoclass("android.os.Build").SUPPORTED_ABIS)
+                except Exception:
+                    supported_abis = ("arm64-v8a",) if is_64_bit else ("armeabi-v7a",)
+
+                for abi in supported_abis:
+                    if abi in ANDROID_STOCKFISH_BINARIES:
+                        return ANDROID_STOCKFISH_BINARIES[abi]
+
+                return ANDROID_STOCKFISH_BINARIES["arm64-v8a" if is_64_bit else "armeabi-v7a"]
+
             if renpy.android:
-                fp = "/data/user/0/and.sirp.masmobile/files/game/mod_assets/games/chess/stockfish-8-arm64-v8a"
+                fp = "/data/user/0/and.sirp.masmobile/files/game/mod_assets/games/chess/{0}".format(
+                    get_android_stockfish_binary()
+                )
                 os.chmod(fp, 0o755)
                 self.stockfish = open_stockfish(fp)
             elif renpy.windows:

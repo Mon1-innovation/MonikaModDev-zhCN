@@ -181,6 +181,7 @@ init python:
         extract_file("mod_assets/games/piano/songs/happybirthday.json")
         extract_file("mod_assets/games/piano/songs/yourreality.json")
         extract_file("mod_assets/games/chess/stockfish-8-arm64-v8a")
+        extract_file("mod_assets/games/chess/stockfish-8-armeabi-v7a")
         extract_file("python-packages/certifi/cacert.pem")
         extract_file("magick")
         extract_file("libc++_shared.so")
