@@ -51,6 +51,24 @@ class AndroidPermissionSourceTests(unittest.TestCase):
         self.assertIn("renpy.android and not os.path.exists", source)
         self.assertIn("mas_android_has_permission()", source)
 
+    def test_android_filetransfer_runtime_is_retired(self):
+        mobile_source = read_game_file("0mobile.rpy")
+        chess_source = read_game_file("chess.rpy")
+
+        for retired_symbol in (
+            "ANDROID_FTSKIPED",
+            "ANDROID_DEFBASEDIR",
+            "use_filetransfer",
+            "pure_sync",
+            "gamesyncTask",
+            "gameSyncer",
+        ):
+            self.assertNotIn(retired_symbol, mobile_source)
+            self.assertNotIn(retired_symbol, chess_source)
+
+        self.assertFalse((GAME_DIR / "0_0filetransfer_ren.py").exists())
+        self.assertFalse((GAME_DIR / "_ft_test.py").exists())
+
     def test_android_permission_request_is_registered_before_splashscreen(self):
         source = read_game_file("0_0android_permissions.rpy")
 

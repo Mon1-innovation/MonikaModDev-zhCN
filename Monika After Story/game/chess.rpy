@@ -40,8 +40,6 @@ init python in mas_chess:
     import store.mas_ui as mas_ui
     import store
     import random
-    from store import ANDROID_DEFBASEDIR as ANDROID_DEFBASEDIR
-    from store import ANDROID_FTSKIPED as ANDROID_FTSKIPED
 
     if renpy.android:
         CHESS_SAVE_PATH = "/storage/emulated/0/MAS/chess_game/"
@@ -3428,8 +3426,9 @@ init python:
                     """
                     Tries to launch a stockfish subprocess, can raise exceptions
                     """
+                    stockfish_path = path if os.path.isabs(path) else os.path.join(renpy.config.gamedir, path)
                     return subprocess.Popen(
-                        os.path.join(renpy.config.gamedir, path).replace('\\', '/'),
+                        stockfish_path.replace('\\', '/'),
                         bufsize=0,
                         stdin=subprocess.PIPE,
                         stdout=subprocess.PIPE,
@@ -3449,7 +3448,8 @@ init python:
 
                         store.mas_ptod.rst_cn()
                         local_ctx = {
-                            "basedir": renpy.config.basedir if not ANDROID_FTSKIPED else ANDROID_DEFBASEDIR
+                            "basedir": renpy.config.basedir,
+                            "android_stockfish_path": "/data/user/0/and.sirp.masmobile/files/game/mod_assets/games/chess/stockfish-8-arm64-v8a"
                         }
                         renpy.show("monika", at_list=[t22])
                         renpy.show_screen("mas_py_console_teaching")
@@ -3460,7 +3460,7 @@ init python:
                         renpy.pause(1.0)
                         if renpy.android:
                             store.mas_ptod.wx_cmd(
-                                "subprocess.call(['chmod','+x', os.path.normcase(basedir + '/game/mod_assets/games/chess/stockfish-8-arm64-v8a')])",
+                                "subprocess.call(['chmod','+x', os.path.normcase(android_stockfish_path)])",
                                 local_ctx
                             )
                         else:
@@ -3500,11 +3500,10 @@ init python:
                 renpy.jump("mas_chess_cannot_work_embarrassing")
 
             is_64_bit = sys.maxsize > 2**32
-            if renpy.android:             
-                self.stockfish = open_stockfish(
-                    'mod_assets/games/chess/stockfish-8-arm64-v8a'
-                )
-                os.chmod(config.basedir if not ANDROID_FTSKIPED else ANDROID_DEFBASEDIR + "/game/mod_assets/games/chess/stockfish-8-arm64-v8a", 0o755)
+            if renpy.android:
+                fp = "/data/user/0/and.sirp.masmobile/files/game/mod_assets/games/chess/stockfish-8-arm64-v8a"
+                os.chmod(fp, 0o755)
+                self.stockfish = open_stockfish(fp)
             elif renpy.windows:
                 startupinfo = subprocess.STARTUPINFO()
                 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
@@ -3517,7 +3516,7 @@ init python:
             elif is_64_bit:
                 fp = "mod_assets/games/chess/stockfish_8_{0}_x64".format("linux" if renpy.linux else "macosx")
 
-                os.chmod(config.basedir + "/game/".format(fp), 0o755)
+                os.chmod(os.path.join(renpy.config.gamedir, fp), 0o755)
                 self.stockfish = open_stockfish(fp)
 
             #Set Monika's parameters
