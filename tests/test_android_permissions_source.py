@@ -76,18 +76,52 @@ class AndroidPermissionSourceTests(unittest.TestCase):
         for binary_name in (
             "stockfish-8-arm64-v8a",
             "stockfish-8-armeabi-v7a",
+            "libmas_stockfish.so",
         ):
-            self.assertIn(binary_name, mobile_source)
             self.assertIn(binary_name, chess_source)
 
         self.assertIn("ANDROID_STOCKFISH_BINARIES", chess_source)
+        self.assertIn("ANDROID_NATIVE_STOCKFISH_NAME", chess_source)
         self.assertIn("SUPPORTED_ABIS", chess_source)
         self.assertIn("android.os.Build", chess_source)
+        self.assertIn('autoclass("android.os.Build$VERSION")', chess_source)
+        self.assertIn("VERSION.SDK_INT", chess_source)
         self.assertIn("def get_android_stockfish_binary", chess_source)
+        self.assertIn("def get_android_stockfish_path", chess_source)
+        self.assertIn("nativeLibraryDir", chess_source)
         self.assertNotIn(
             'fp = "/data/user/0/and.sirp.masmobile/files/game/mod_assets/games/chess/stockfish-8-arm64-v8a"',
             chess_source
         )
+
+    def test_chess_quicksave_uses_python3_stringio_constructor(self):
+        chess_source = read_game_file("chess.rpy")
+
+        self.assertIn("from io import StringIO", chess_source)
+        self.assertIn("StringIO(persistent._mas_chess_quicksave)", chess_source)
+        self.assertNotIn("StringIO.StringIO", chess_source)
+
+    def test_spread_json_keeps_android_stockfish_for_legacy_sdk_fallback(self):
+        source = read_game_file("0mobile.rpy")
+        spread_json_source = source[source.index("def spread_json():"):source.index("def spread_readme():")]
+
+        self.assertIn("ANDROID_STOCKFISH_FILES", source)
+        self.assertIn("def android_uses_legacy_stockfish_files", source)
+        self.assertIn('autoclass("android.os.Build$VERSION")', source)
+        self.assertIn("VERSION.SDK_INT < 29", source)
+        self.assertIn("def chmod_executable", source)
+        self.assertIn("if android_uses_legacy_stockfish_files():", spread_json_source)
+        self.assertIn("for stockfish_file in ANDROID_STOCKFISH_FILES:", spread_json_source)
+        self.assertIn("chmod_executable(target_path)", spread_json_source)
+
+    def test_dev_chess_stockfish_load_test_uses_native_lib_for_modern_android(self):
+        source = (GAME_DIR / "dev" / "dev_chess_stockfish_load_test.rpy").read_text(encoding="utf-8")
+
+        self.assertIn("libmas_stockfish.so", source)
+        self.assertIn("nativeLibraryDir", source)
+        self.assertIn('autoclass("android.os.Build$VERSION")', source)
+        self.assertIn("VERSION.SDK_INT >= 29", source)
+        self.assertIn("should_chmod", source)
 
     def test_android_permission_request_is_registered_before_splashscreen(self):
         source = read_game_file("0_0android_permissions.rpy")

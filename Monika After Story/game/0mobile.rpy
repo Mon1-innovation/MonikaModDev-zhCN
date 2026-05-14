@@ -3,7 +3,12 @@ python early:
 
     ANDROID_MASBASE = "/storage/emulated/0/MAS/"
     ANDROID_SAVEDIR_CHANGED = False
-    ANDROID_MAGICK_BINPATH = os.path.join("/data/user/0/and.sirp.masmobile/files/game", "magick")
+    ANDROID_APP_GAME_DIR = "/data/user/0/and.sirp.masmobile/files/game"
+    ANDROID_MAGICK_BINPATH = os.path.join(ANDROID_APP_GAME_DIR, "magick")
+    ANDROID_STOCKFISH_FILES = (
+        "mod_assets/games/chess/stockfish-8-arm64-v8a",
+        "mod_assets/games/chess/stockfish-8-armeabi-v7a",
+    )
 
     if renpy.android and os.path.exists(ANDROID_MAGICK_BINPATH):
         os.chmod(ANDROID_MAGICK_BINPATH, 0o755)
@@ -150,12 +155,12 @@ init python:
         # 解压文件, 仅限于game目录下的文件
         if not renpy.loadable(file):
             store.mas_utils.mas_log.error(f"extract_file: 无法释放文件，因为无法加载'{file}'")
-            return
+            return []
         
         # 定义目标路径
         target_path = [
             os.path.join("/storage/emulated/0/MAS/game", file),
-            os.path.join("/data/user/0/and.sirp.masmobile/files/game", file),
+            os.path.join(ANDROID_APP_GAME_DIR, file),
             ]
         for t in target_path:
             target_dir = os.path.dirname(t)
@@ -166,6 +171,27 @@ init python:
             # 写入文件
             with open(t, "wb") as f:
                 f.write(renpy.loader.load_from_apk(file).read())
+
+        return target_path
+
+    def chmod_executable(path):
+        if path.startswith(ANDROID_APP_GAME_DIR):
+            try:
+                os.chmod(path, 0o755)
+            except Exception as e:
+                store.mas_utils.mas_log.error(f"chmod_executable: 无法赋予'{path}'可执行权限: {e}")
+
+    def android_uses_legacy_stockfish_files():
+        if not renpy.android:
+            return False
+
+        try:
+            from jnius import autoclass
+            VERSION = autoclass("android.os.Build$VERSION")
+            return VERSION.SDK_INT < 29
+
+        except Exception:
+            return True
 
     def firstrun_spread():
         spread_json()
@@ -180,8 +206,10 @@ init python:
         extract_file("mod_assets/monika/NjM2ODZmNjM2ZjZjNjE3NDY1NzM=")
         extract_file("mod_assets/games/piano/songs/happybirthday.json")
         extract_file("mod_assets/games/piano/songs/yourreality.json")
-        extract_file("mod_assets/games/chess/stockfish-8-arm64-v8a")
-        extract_file("mod_assets/games/chess/stockfish-8-armeabi-v7a")
+        if android_uses_legacy_stockfish_files():
+            for stockfish_file in ANDROID_STOCKFISH_FILES:
+                for target_path in extract_file(stockfish_file):
+                    chmod_executable(target_path)
         extract_file("python-packages/certifi/cacert.pem")
         extract_file("magick")
         extract_file("libc++_shared.so")
@@ -469,7 +497,7 @@ init 5 python:
     addEvent(
         Event(
             persistent.event_database,
-            eventlabel="create_nomedia_files",
+            eventlabel="install_datapack",
             category=["维护功能"],
             prompt="安装数据包",
             pool=True,

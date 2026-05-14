@@ -654,7 +654,7 @@ label game_chess:
         # quicksave holds the pgn game in plaintext
         python:
             quicksaved_game = chess.pgn.read_game(
-                StringIO.StringIO(persistent._mas_chess_quicksave)
+                StringIO(persistent._mas_chess_quicksave)
             )
 
             quicksaved_game = mas_chess._checkInProgressGame(
@@ -3504,6 +3504,7 @@ init python:
                 "arm64-v8a": "stockfish-8-arm64-v8a",
                 "armeabi-v7a": "stockfish-8-armeabi-v7a",
             }
+            ANDROID_NATIVE_STOCKFISH_NAME = "libmas_stockfish.so"
 
             def get_android_stockfish_binary():
                 try:
@@ -3518,12 +3519,29 @@ init python:
 
                 return ANDROID_STOCKFISH_BINARIES["arm64-v8a" if is_64_bit else "armeabi-v7a"]
 
-            if renpy.android:
+            def get_android_stockfish_path():
+                try:
+                    from jnius import autoclass
+                    VERSION = autoclass("android.os.Build$VERSION")
+
+                    if VERSION.SDK_INT >= 29:
+                        activity = autoclass("org.renpy.android.PythonSDLActivity").mActivity
+                        return os.path.join(
+                            activity.getApplicationInfo().nativeLibraryDir,
+                            ANDROID_NATIVE_STOCKFISH_NAME
+                        )
+
+                except Exception as ex:
+                    mas_utils.mas_log.exception(ex)
+
                 fp = "/data/user/0/and.sirp.masmobile/files/game/mod_assets/games/chess/{0}".format(
                     get_android_stockfish_binary()
                 )
                 os.chmod(fp, 0o755)
-                self.stockfish = open_stockfish(fp)
+                return fp
+
+            if renpy.android:
+                self.stockfish = open_stockfish(get_android_stockfish_path())
             elif renpy.windows:
                 startupinfo = subprocess.STARTUPINFO()
                 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
