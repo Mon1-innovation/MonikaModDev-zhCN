@@ -4,6 +4,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 GAME_DIR = ROOT / "Monika After Story" / "game"
+RAPT_BUILD = Path("J:/Renpy/renpy-8.2.3-sdk/rapt/buildlib/rapt/build.py")
 
 
 def read_game_file(name):
@@ -114,6 +115,24 @@ class AndroidPermissionSourceTests(unittest.TestCase):
         self.assertIn("for stockfish_file in ANDROID_STOCKFISH_FILES:", spread_json_source)
         self.assertIn("chmod_executable(target_path)", spread_json_source)
 
+    def test_android_magick_uses_native_lib_for_modern_android(self):
+        source = read_game_file("0mobile.rpy")
+        spread_json_source = source[source.index("def spread_json():"):source.index("def spread_readme():")]
+
+        self.assertIn("ANDROID_LEGACY_MAGICK_NAME", source)
+        self.assertIn("ANDROID_NATIVE_MAGICK_NAME", source)
+        self.assertIn("libmas_magick.so", source)
+        self.assertIn("def get_android_magick_path", source)
+        self.assertIn("nativeLibraryDir", source)
+        self.assertIn('autoclass("android.os.Build$VERSION")', source)
+        self.assertIn("VERSION.SDK_INT >= 29", source)
+        self.assertIn("os.path.dirname(ANDROID_MAGICK_BINPATH)", source)
+        self.assertIn("os.pathsep.join", source)
+        self.assertIn("def android_uses_legacy_magick_file", source)
+        self.assertIn("VERSION.SDK_INT < 29", source)
+        self.assertIn("if android_uses_legacy_magick_file():", spread_json_source)
+        self.assertIn("chmod_executable(target_path)", spread_json_source)
+
     def test_dev_chess_stockfish_load_test_uses_native_lib_for_modern_android(self):
         source = (GAME_DIR / "dev" / "dev_chess_stockfish_load_test.rpy").read_text(encoding="utf-8")
 
@@ -122,6 +141,30 @@ class AndroidPermissionSourceTests(unittest.TestCase):
         self.assertIn('autoclass("android.os.Build$VERSION")', source)
         self.assertIn("VERSION.SDK_INT >= 29", source)
         self.assertIn("should_chmod", source)
+
+    def test_dev_magick_env_uses_native_lib_for_modern_android(self):
+        source = (GAME_DIR / "dev" / "dev_magick_env.rpy").read_text(encoding="utf-8")
+
+        self.assertIn("libmas_magick.so", source)
+        self.assertIn("nativeLibraryDir", source)
+        self.assertIn("ANDROID_MAGICK_BINPATH", source)
+        self.assertIn("ANDROID_MAGICK_SHOULD_CHMOD", source)
+        self.assertIn("调用前chmod", source)
+
+    def test_rapt_packages_android_native_executables(self):
+        if not RAPT_BUILD.exists():
+            self.skipTest("RAPT SDK build.py is not available")
+
+        source = RAPT_BUILD.read_text(encoding="utf-8")
+
+        self.assertIn("def copy_mas_android_native_executables", source)
+        self.assertIn("libmas_stockfish.so", source)
+        self.assertIn("libmas_magick.so", source)
+        self.assertIn("libomp.so", source)
+        self.assertIn('os.path.join(game_dir, "magick")', source)
+        self.assertIn('os.path.join(game_dir, "libomp.so")', source)
+        self.assertIn("project/app/src/main/jniLibs/", source)
+        self.assertIn("copy_mas_android_native_executables(assets_dir)", source)
 
     def test_android_permission_request_is_registered_before_splashscreen(self):
         source = read_game_file("0_0android_permissions.rpy")

@@ -4,17 +4,59 @@ python early:
     ANDROID_MASBASE = "/storage/emulated/0/MAS/"
     ANDROID_SAVEDIR_CHANGED = False
     ANDROID_APP_GAME_DIR = "/data/user/0/and.sirp.masmobile/files/game"
-    ANDROID_MAGICK_BINPATH = os.path.join(ANDROID_APP_GAME_DIR, "magick")
+    ANDROID_LEGACY_MAGICK_NAME = "magick"
+    ANDROID_NATIVE_MAGICK_NAME = "libmas_magick.so"
+    ANDROID_MAGICK_BINPATH = os.path.join(ANDROID_APP_GAME_DIR, ANDROID_LEGACY_MAGICK_NAME)
+    ANDROID_MAGICK_SHOULD_CHMOD = False
     ANDROID_STOCKFISH_FILES = (
         "mod_assets/games/chess/stockfish-8-arm64-v8a",
         "mod_assets/games/chess/stockfish-8-armeabi-v7a",
     )
 
+    def android_uses_legacy_magick_file():
+        if not renpy.android:
+            return False
+
+        try:
+            from jnius import autoclass
+            VERSION = autoclass("android.os.Build$VERSION")
+            return VERSION.SDK_INT < 29
+
+        except Exception:
+            return True
+
+    def get_android_magick_path():
+        if not renpy.android:
+            return os.path.join(ANDROID_APP_GAME_DIR, ANDROID_LEGACY_MAGICK_NAME)
+
+        try:
+            from jnius import autoclass
+            VERSION = autoclass("android.os.Build$VERSION")
+
+            if VERSION.SDK_INT >= 29:
+                activity = autoclass("org.renpy.android.PythonSDLActivity").mActivity
+                return os.path.join(
+                    activity.getApplicationInfo().nativeLibraryDir,
+                    ANDROID_NATIVE_MAGICK_NAME
+                )
+
+        except Exception:
+            pass
+
+        return os.path.join(ANDROID_APP_GAME_DIR, ANDROID_LEGACY_MAGICK_NAME)
+
+    if renpy.android:
+        ANDROID_MAGICK_BINPATH = get_android_magick_path()
+        ANDROID_MAGICK_SHOULD_CHMOD = android_uses_legacy_magick_file()
+
     if renpy.android and os.path.exists(ANDROID_MAGICK_BINPATH):
-        os.chmod(ANDROID_MAGICK_BINPATH, 0o755)
-        os.environ['TMPDIR'] = os.path.join("/data/user/0/and.sirp.masmobile/files/game", "tmp")
-        os.environ['MAGICK_HOME'] = os.path.join("/data/user/0/and.sirp.masmobile/files/game")
-        os.environ['LD_LIBRARY_PATH'] = os.path.join("/data/user/0/and.sirp.masmobile/files/game")
+        if ANDROID_MAGICK_SHOULD_CHMOD:
+            os.chmod(ANDROID_MAGICK_BINPATH, 0o755)
+        android_magick_home = os.path.join("/data/user/0/and.sirp.masmobile/files/game")
+        android_magick_lib_dir = os.path.dirname(ANDROID_MAGICK_BINPATH)
+        os.environ['TMPDIR'] = os.path.join(android_magick_home, "tmp")
+        os.environ['MAGICK_HOME'] = android_magick_home
+        os.environ['LD_LIBRARY_PATH'] = os.pathsep.join((android_magick_lib_dir, android_magick_home))
 
     #config.savedir = os.path.join(ANDROID_MASBASE, "saves")
 
@@ -211,7 +253,9 @@ init python:
                 for target_path in extract_file(stockfish_file):
                     chmod_executable(target_path)
         extract_file("python-packages/certifi/cacert.pem")
-        extract_file("magick")
+        if android_uses_legacy_magick_file():
+            for target_path in extract_file(ANDROID_LEGACY_MAGICK_NAME):
+                chmod_executable(target_path)
         extract_file("libc++_shared.so")
         extract_file("libomp.so")
         extract_file("audio.rpa")

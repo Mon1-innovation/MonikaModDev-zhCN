@@ -1,27 +1,30 @@
-# Android Stockfish Native Library Packaging Summary
+# Android Native Executable Packaging Summary
 
 Date: 2026-05-14
 
-This documents the Android chess engine packaging change for MAS Chinese Android builds.
+This documents the Android native executable packaging change for MAS Chinese Android builds.
 
 ## Background
 
-The old Android chess engine flow released Stockfish as a data file under:
+The old Android executable flow released Stockfish and ImageMagick as data files under:
 
 ```text
 /data/user/0/and.sirp.masmobile/files/game/mod_assets/games/chess/stockfish-8-*
+/data/user/0/and.sirp.masmobile/files/game/magick
 ```
 
-and then tried to `chmod 755` before launching it with `subprocess.Popen`.
+and then tried to `chmod 755` before launching them with `subprocess.Popen` or
+`subprocess.check_output`.
 
 For Android 10/API 29 and newer this is no longer reliable because executing binaries from an app-writable data directory violates Android's W^X policy. `/data/data` and `/data/user/0` are not a meaningful workaround here; for the primary user they point to the same app-private data area.
 
 ## New Behavior
 
-Android API 29+ launches Stockfish from the APK native library directory:
+Android API 29+ launches native executables from the APK native library directory:
 
 ```text
 <nativeLibraryDir>/libmas_stockfish.so
+<nativeLibraryDir>/libmas_magick.so
 ```
 
 The APK now contains:
@@ -29,9 +32,14 @@ The APK now contains:
 ```text
 lib/arm64-v8a/libmas_stockfish.so
 lib/armeabi-v7a/libmas_stockfish.so
+lib/arm64-v8a/libmas_magick.so
+lib/arm64-v8a/libomp.so
 ```
 
 Android API 28 and older keeps the legacy data-file extraction and `chmod` path.
+
+`magick` is currently an arm64-v8a ELF in the repo, so it is only packaged as
+`lib/arm64-v8a/libmas_magick.so`.
 
 ## Project Files Changed
 
@@ -59,13 +67,19 @@ libmas_stockfish.so
 
 ### `Monika After Story/game/0mobile.rpy`
 
-Data package install now releases Stockfish files only when:
+Data package install now releases legacy executable data files only when:
 
 ```python
 VERSION.SDK_INT < 29
 ```
 
-This avoids confusing modern Android builds by releasing a data-file Stockfish that is no longer the primary execution path.
+This avoids confusing modern Android builds by releasing data-file executables that are no longer the primary execution path.
+
+For ImageMagick:
+
+- API 29+: `ANDROID_MAGICK_BINPATH` points at `nativeLibraryDir/libmas_magick.so` and skips `chmod`.
+- API 28 and older: `ANDROID_MAGICK_BINPATH` keeps `/data/user/0/.../files/game/magick` and runs `chmod`.
+- `LD_LIBRARY_PATH` includes the selected Magick binary directory first, so native-library launches can find native-directory dependencies such as `libomp.so`.
 
 ### `Monika After Story/game/dev/dev_chess_stockfish_load_test.rpy`
 
@@ -76,6 +90,16 @@ The dev Stockfish load test follows the same API split as runtime chess:
 
 The test output also prints `Android SDK_INT`, `Android SUPPORTED_ABIS`, the selected engine path, and whether `chmod` will run before launch.
 
+### `Monika After Story/game/dev/dev_magick_env.rpy`
+
+The dev Magick environment test reports:
+
+- Android SDK version.
+- selected `ANDROID_MAGICK_BINPATH`.
+- whether `chmod` will run before launch.
+- legacy data-file path state.
+- modern native-library path state.
+
 ### `tests/test_android_permissions_source.py`
 
 Source-level regression coverage checks that:
@@ -85,6 +109,10 @@ Source-level regression coverage checks that:
 - Android SDK version checks use `autoclass("android.os.Build$VERSION")`.
 - legacy Stockfish extraction is still retained for API 28 and older.
 - the dev Stockfish load test uses the native library path on modern Android.
+- Android Magick knows about `libmas_magick.so`.
+- `0mobile.rpy` uses `nativeLibraryDir` for modern Android Magick and retains legacy extraction for API 28 and older.
+- the dev Magick environment test reports the selected path and whether `chmod` will run.
+- RAPT copies MAS Android native executables into `jniLibs`.
 - quicksave `StringIO` compatibility remains fixed.
 
 ## RAPT SDK Files Changed
@@ -97,27 +125,31 @@ J:\Renpy\renpy-8.2.3-sdk
 
 ### `rapt/buildlib/rapt/build.py`
 
-Added `copy_mas_stockfish_native_libs(assets_dir)`.
+Added `copy_mas_android_native_executables(assets_dir)`.
 
-After `split_renpy()`, RAPT places game assets under the returned `assets_dir`. The Stockfish source path is:
+After `split_renpy()`, RAPT places game assets under the returned `assets_dir`. The function copies:
 
 ```text
 <assets_dir>/game/mod_assets/games/chess/stockfish-8-arm64-v8a
 <assets_dir>/game/mod_assets/games/chess/stockfish-8-armeabi-v7a
+<assets_dir>/game/magick
+<assets_dir>/game/libomp.so
 ```
 
-The function copies them into:
+into:
 
 ```text
 project/app/src/main/jniLibs/arm64-v8a/libmas_stockfish.so
 project/app/src/main/jniLibs/armeabi-v7a/libmas_stockfish.so
+project/app/src/main/jniLibs/arm64-v8a/libmas_magick.so
+project/app/src/main/jniLibs/arm64-v8a/libomp.so
 ```
 
 It is called after `copy_libs()`:
 
 ```python
 copy_libs()
-copy_mas_stockfish_native_libs(assets_dir)
+copy_mas_android_native_executables(assets_dir)
 ```
 
 ### `rapt/templates/app-build.gradle`
@@ -132,7 +164,9 @@ packaging {
 }
 ```
 
-This makes Android extract native libraries to a real filesystem path so `subprocess.Popen` can launch `nativeLibraryDir/libmas_stockfish.so`.
+This makes Android extract native libraries to a real filesystem path so
+`subprocess.Popen` can launch `nativeLibraryDir/libmas_stockfish.so` and
+`subprocess.check_output` can launch `nativeLibraryDir/libmas_magick.so`.
 
 ### `rapt/project/app/build.gradle`
 
@@ -156,13 +190,6 @@ Run:
 python -m unittest discover -s tests
 ```
 
-Expected result:
-
-```text
-Ran 15 tests
-OK
-```
-
 Build with:
 
 ```powershell
@@ -175,17 +202,13 @@ Then inspect the newest APK in:
 J:\MAS\dists
 ```
 
-The verified build produced:
+The APK should include:
 
 ```text
-J:\MAS\dists\and.sirp.masmobile-0.13.0-1778745895-release.apk
-```
-
-and included:
-
-```text
-lib/arm64-v8a/libmas_stockfish.so   674192 bytes
-lib/armeabi-v7a/libmas_stockfish.so 464712 bytes
+lib/arm64-v8a/libmas_stockfish.so
+lib/armeabi-v7a/libmas_stockfish.so
+lib/arm64-v8a/libmas_magick.so
+lib/arm64-v8a/libomp.so
 ```
 
 ## Troubleshooting
@@ -210,3 +233,12 @@ autoclass("android.os.Build$VERSION")
 ```
 
 and rebuild the APK so the updated `.rpy` logic is included.
+
+If the dev Magick test still points at:
+
+```text
+/data/user/0/and.sirp.masmobile/files/game/magick
+```
+
+on Android API 29+, confirm `0mobile.rpy` uses `nativeLibraryDir/libmas_magick.so`
+and the RAPT SDK `build.py` contains `copy_mas_android_native_executables`.
