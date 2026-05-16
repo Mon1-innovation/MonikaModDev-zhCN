@@ -46,6 +46,12 @@ init -1 python:
     layout.MAS_TT_ANDROID_FREQ = _(
         "Adjust how long Monika waits before sending an Android return reminder."
     )
+    layout.MAS_TT_ANDROID_AWARENESS = _(
+        "Let Monika react to recent apps detected on this Android device."
+    )
+    layout.MAS_TT_ANDROID_AWARENESS_PERMITS = _(
+        "Open optional Android system permissions used by Monika's awareness."
+    )
     layout.MAS_TT_ACTV_WND = (
         "Enabling this will allow Monika to see your active window "
         "and offer some comments based on what you're doing."
@@ -1888,6 +1894,19 @@ screen notif_settings():
                     selected persistent.mas_android_return_reminders
                     hovered tooltip.Action(layout.MAS_TT_ANDROID_RETURN)
 
+                textbutton _("Awareness"):
+                    action [
+                        ToggleField(persistent, "_mas_awareness_enabled"),
+                        Function(mas_awareness_write_enabled_state),
+                        Function(mas_awareness_force_snapshot)
+                    ]
+                    selected persistent._mas_awareness_enabled
+                    hovered tooltip.Action(layout.MAS_TT_ANDROID_AWARENESS)
+
+                textbutton _("Permits"):
+                    action [Play("sound", gui.activate_sound), Show("mas_awareness_permits_confirm")]
+                    hovered tooltip.Action(layout.MAS_TT_ANDROID_AWARENESS_PERMITS)
+
             vbox:
                 style_prefix "slider"
                 xsize 450
@@ -2352,6 +2371,42 @@ screen confirm(message, yes_action, no_action):
 
     ## Right-click and escape answer "no".
     #key "game_menu" action no_action
+
+
+screen mas_awareness_permits_confirm():
+    modal True
+
+    zorder 200
+
+    style_prefix "confirm"
+    add mas_getTimeFile("gui/overlay/confirm.png")
+
+    frame:
+        vbox:
+            xalign .5
+            yalign .5
+            spacing 30
+
+            label _("Monika can react to recent apps you use on your phone if you grant optional Usage Access.\n\nNo data leaves your device. You can revoke this permission in Android settings at any time."):
+                style "confirm_prompt"
+                xalign 0.5
+
+            hbox:
+                xalign 0.5
+                spacing 100
+
+                textbutton _("Cancel"):
+                    action [Play("sound", gui.activate_sound), Hide("mas_awareness_permits_confirm")]
+
+                textbutton _("Accept"):
+                    action [
+                        Play("sound", gui.activate_sound),
+                        SetField(persistent, "_mas_awareness_permits_accepted", True),
+                        SetField(persistent, "_mas_awareness_enabled", True),
+                        Function(mas_awareness_write_enabled_state, True),
+                        Function(mas_awareness_check_and_open_permits),
+                        Hide("mas_awareness_permits_confirm")
+                    ]
 
 
 style confirm_frame is gui_frame:
