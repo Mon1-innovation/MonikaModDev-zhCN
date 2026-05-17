@@ -85,6 +85,9 @@ python early:
     if renpy.android:
         renpy.config.basedir = ANDROID_MASBASE
         renpy.config.gamedir = os.path.join(renpy.config.basedir, "game")
+        renpy.config.logdir = os.path.join(ANDROID_MASBASE, "log")
+        if not os.path.exists(renpy.config.logdir):
+            os.makedirs(renpy.config.logdir, 0o777)
     
     if renpy.android and not os.path.exists("/storage/emulated/0/MAS/use_android_savedir") and mas_android_has_permission():
         renpy.config.savedir = os.path.join(ANDROID_MASBASE, "saves")
@@ -103,51 +106,20 @@ python early:
     #        print("    ", outer, " - ", each)
     #renpy.loader.scandirfiles_callbacks.append(scan_outer_resource)
 
-    def _error_copyer():
-        # 目标目录（游戏根目录下的error_logs文件夹）
-        dest_dir = os.path.join(ANDROID_MASBASE, "log")
-
-        try:
-            # 确保目标目录存在
-            os.makedirs(dest_dir, exist_ok=True)
-            
-            # 获取当前时间戳
-            timestamp = time.strftime("%Y%m%d-%H%M%S")
-            
-            # 要复制的文件列表
-            log_files = [
-                ("error.txt", f"error-{timestamp}.txt"),
-                ("log.txt", f"log-{timestamp}.txt"),
-                ("traceback.txt", f"traceback-{timestamp}.txt")
-            ]
-            
-            # 复制文件
-            for src_name, dest_name in log_files:
-                src_path = os.path.join(config.logdir, src_name)
-                dest_path = os.path.join(dest_dir,  src_name)
-                
-                if os.path.exists(src_path):
-                    shutil.copy2(src_path, dest_path)
-
-        except Exception as e:
-            print(f"日志保存失败: {str(e)}")
-    
     original_report_exception = renpy.renpy.error.report_exception
     def new_report_exception(*args, **kwargs):
         res = original_report_exception(*args, **kwargs)
         if renpy.android:
-            _error_copyer()
-            android_toast("x_x 游戏崩溃了, 请查看log文件夹以获取详细信息")
+            AndroidClipboard().copy_to_clipboard(res[1])
+            android_toast("x_x 游戏崩溃了, 报错堆栈已复制到剪贴板")
 
         if renpy.is_init_phase() and renpy.android:
-            import time
-            window = AndroidAlertDialog(
+            AndroidAlertDialog(
                 title="抱歉, 但是游戏发生了异常...",
-                message=res[0]+"\n将在10秒后自动退出...",
+                message=res[0]+"\n\n完整报错堆栈已复制到剪贴板。",
                 positive_text="",
                 negative_text="关闭",
             )
-            window.AsyncTaskerCheck.wait()
         return res
     renpy.renpy.error.report_exception = new_report_exception
 

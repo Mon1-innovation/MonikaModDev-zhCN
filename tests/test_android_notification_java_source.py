@@ -41,6 +41,18 @@ class AndroidNotificationJavaSourceTests(unittest.TestCase):
         self.assertIn("deleteNotificationChannel", source)
         self.assertIn("Locale.getDefault().getLanguage()", source)
 
+    def test_telemetry_logger_writes_monitor_log_under_log_directory(self):
+        source = read_java_file("TelemetryLogger.java")
+
+        self.assertIn('new File("/storage/emulated/0/MAS/log")', source)
+        self.assertIn('new File(baseDir, "log")', source)
+        self.assertIn("if (!dir.exists() && !dir.mkdirs())", source)
+        self.assertIn('new File(dir, "tec_android_monitor.txt")', source)
+        self.assertLess(
+            source.index('new File("/storage/emulated/0/MAS/log")'),
+            source.index('new File(baseDir, "log")')
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

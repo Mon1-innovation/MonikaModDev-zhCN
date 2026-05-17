@@ -70,7 +70,10 @@ class AndroidAlertDialog:
             ColorDrawable = autoclass('android.graphics.drawable.ColorDrawable')
 
             context = PythonSDLActivity.mActivity
-            scale = context.getResources().getDisplayMetrics().density
+            display_metrics = context.getResources().getDisplayMetrics()
+            scale = display_metrics.density
+            dialog_width = int(display_metrics.widthPixels * 0.92)
+            max_scroll_height = int(display_metrics.heightPixels * 0.58)
 
             # 主布局
             main_layout = LinearLayout(context)
@@ -94,7 +97,8 @@ class AndroidAlertDialog:
 
             # Scrollable 内容
             scroll = ScrollView(context)
-            scroll_params = LayoutParams(LayoutParams.MATCH_PARENT, int(200 * scale))
+            scroll.setFillViewport(False)
+            scroll_params = LayoutParams(LayoutParams.MATCH_PARENT, max_scroll_height)
             scroll.setLayoutParams(scroll_params)
 
             msg_container = LinearLayout(context)
@@ -146,7 +150,7 @@ class AndroidAlertDialog:
 
             window = self.dialog.getWindow()
             window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            window.setLayout(int(600 * scale), WindowManagerLayoutParams.WRAP_CONTENT)
+            window.setLayout(dialog_width, WindowManagerLayoutParams.WRAP_CONTENT)
             window.setType(WindowManagerLayoutParams.TYPE_APPLICATION)
 
             self.dialog.show()

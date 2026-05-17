@@ -113,9 +113,25 @@ init 5 python:
 
         return _dev_android_event_labels
 
+    def dev_android_awareness_get_active_window_from_state(state):
+        if not store._mas_awareness_is_dict(state):
+            return ""
+
+        _dev_android_apps = state.get("recent_apps", [])
+        if not store._mas_awareness_is_list(_dev_android_apps) or not _dev_android_apps:
+            return ""
+
+        _dev_android_recent_app = store._mas_awareness_get_latest_app(_dev_android_apps)
+        if not store._mas_awareness_is_dict(_dev_android_recent_app):
+            return ""
+
+        _dev_android_app_label = _dev_android_recent_app.get("label", "") or ""
+        _dev_android_package_name = _dev_android_recent_app.get("package", "") or ""
+        return "{} {}".format(_dev_android_app_label, _dev_android_package_name).strip()
+
     def dev_android_awareness_collect_debug_values():
         _dev_android_state = (
-            _mas_dev_android_debug_call(lambda: store.mas_awareness_read_state(), None)
+            _mas_dev_android_debug_call(lambda: store.mas_awareness_read_state(log_state=False), None)
             if hasattr(store, "mas_awareness_read_state")
             else None
         )
@@ -153,7 +169,10 @@ init 5 python:
             _dev_android_activity = {}
             _dev_android_state_keys = []
 
-        _dev_android_active_window = _mas_dev_android_debug_call(mas_getActiveWindowHandle, "")
+        _dev_android_active_window = _mas_dev_android_debug_call(
+            lambda: dev_android_awareness_get_active_window_from_state(_dev_android_state),
+            ""
+        )
         _dev_android_wrs_matches = _mas_dev_android_debug_call(
             lambda: dev_android_awareness_get_wrs_window_matches(_dev_android_active_window),
             {}
@@ -211,7 +230,7 @@ screen dev_android_awareness_debug_screen():
                     xalign 1.0
                     action Hide("dev_android_awareness_debug_screen")
 
-            text _("这些值是从 Java 层即时读取的；完整 raw state 已写入 mas_log 和 logcat。") size 18
+            text _("这些值是从 Java 层即时读取的；不会写入 raw state 日志。") size 18
 
             viewport:
                 ymaximum 560

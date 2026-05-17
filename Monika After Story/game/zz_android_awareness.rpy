@@ -127,7 +127,7 @@ init -5 python:
 
         return latest_app
 
-    def mas_awareness_read_state():
+    def mas_awareness_read_state(log_state=True):
         global _mas_awareness_last_state_error
         global _mas_awareness_last_state_parsed_type
         global _mas_awareness_last_state_raw
@@ -155,27 +155,21 @@ init -5 python:
             _mas_awareness_last_state_raw_type = type(content).__name__
             if not content:
                 _mas_awareness_last_state_error = "Java buildState returned empty content"
-                _mas_awareness_log(_mas_awareness_last_state_error)
+                if log_state:
+                    _mas_awareness_log(_mas_awareness_last_state_error)
                 return None
 
             content_text = _mas_awareness_as_python_string(content).strip()
             _mas_awareness_last_state_raw = content_text[:500]
-            _mas_awareness_log(
-                "Java state raw_type={0}, raw_len={1}, raw={2}".format(
-                    _mas_awareness_last_state_raw_type,
-                    len(content_text),
-                    content_text
-                )
-            )
             if not content_text:
                 _mas_awareness_last_state_error = "Java buildState returned blank text"
-                _mas_awareness_log(_mas_awareness_last_state_error)
+                if log_state:
+                    _mas_awareness_log(_mas_awareness_last_state_error)
                 return None
 
             try:
                 parsed_state = json.loads(content_text)
                 if _mas_awareness_is_string(parsed_state):
-                    _mas_awareness_log("Java state was JSON-encoded twice; parsing inner string.")
                     parsed_state = json.loads(parsed_state)
 
                 _mas_awareness_last_state_parsed_type = type(parsed_state).__name__
@@ -185,20 +179,22 @@ init -5 python:
                         "Java state parsed as non-dict: "
                         + _mas_awareness_last_state_parsed_type
                     )
-                    _mas_awareness_log(_mas_awareness_last_state_error)
+                    if log_state:
+                        _mas_awareness_log(_mas_awareness_last_state_error)
                     return None
 
-                _mas_awareness_log("Java state parsed as dict successfully")
                 return parsed_state
 
             except Exception as e:
                 _mas_awareness_last_state_error = "json.loads failed: " + str(e)
-                _mas_awareness_log("Error parsing Java state: " + str(e))
+                if log_state:
+                    _mas_awareness_log("Error parsing Java state: " + str(e))
                 return None
 
         except Exception as e:
             _mas_awareness_last_state_error = str(e)
-            _mas_awareness_log("Error reading Java state: " + str(e))
+            if log_state:
+                _mas_awareness_log("Error reading Java state: " + str(e))
             return None
 
     def mas_awareness_get_last_state_debug():
