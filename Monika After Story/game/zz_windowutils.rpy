@@ -806,6 +806,16 @@ init python:
         notif_success = False
         notif_body = renpy.substitute(renpy.random.choice(body))
 
+        def _log_test_notif_failure(reason):
+            if skip_checks:
+                store.mas_utils.mas_log.error(
+                    "mas_display_notif: test notification failed ({0}). title={1!r}, group={2!r}".format(
+                        reason,
+                        title,
+                        group
+                    )
+                )
+
         if renpy.android and hasattr(store, "mas_android_display_notif"):
             if (
                 skip_checks
@@ -815,7 +825,11 @@ init python:
                     and mas_notifsEnabledForGroup(group)
                 )
             ):
-                return store.mas_android_display_notif(title, notif_body)
+                notif_success = store.mas_android_display_notif(title, notif_body)
+                if not notif_success:
+                    _log_test_notif_failure("android display backend returned False")
+
+                return notif_success
 
             return False
 
@@ -840,6 +854,9 @@ init python:
                 #Play the notif sound if we have that enabled and notif was successful
                 if persistent._mas_notification_sounds:
                     renpy.sound.play("mod_assets/sounds/effects/notif.wav")
+
+            else:
+                _log_test_notif_failure("desktop display backend returned False")
 
         #Now we return true if notif was successful, false otherwise
         return notif_success

@@ -4,6 +4,7 @@
 ## of a desktop window title, so desktop WRS keywords need mobile app matches.
 
 init 20 python:
+    # category[0] only
     MAS_ANDROID_WRS_CATEGORIES = {
         "mas_wrs_pinterest": [
             r"(?i)(^|\s)(pinterest|com\.pinterest)(\s|$)"
@@ -69,7 +70,7 @@ init 20 python:
 
     def mas_update_android_wrs_categories():
         """
-        Updates WRS categories to Android app-label/package-name regexes.
+        Updates WRS category[0] to Android app-label/package-name regexes.
 
         OUT:
             list of updated event labels
@@ -81,10 +82,6 @@ init 20 python:
             if ev is not None:
                 ev.category = list(android_category)
                 updated_labels.append(ev_label)
-
-            persistent_ev = persistent._mas_windowreacts_database.get(ev_label, None)
-            if persistent_ev is not None and persistent_ev is not ev:
-                persistent_ev.category = list(android_category)
 
         return updated_labels
 

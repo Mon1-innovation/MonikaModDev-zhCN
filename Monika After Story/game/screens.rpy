@@ -1914,35 +1914,34 @@ screen notif_settings():
                 label _("[[ " + layout.MAS_ANDROID_FREQ_MAP.get(persistent.mas_android_frequency_index, "Error") + " ]") xmaximum None
                 bar value FieldValue(persistent, "mas_android_frequency_index", range=4, offset=1, style="slider") hovered tooltip.Action(layout.MAS_TT_ANDROID_FREQ)
 
-        else:
-            vbox:
-                style_prefix "generic_fancy_check"
-                hbox:
-                    spacing 25
-                    textbutton _("Use Notifications"):
-                        action ToggleField(persistent, "_mas_enable_notifications")
-                        selected persistent._mas_enable_notifications
-                        hovered tooltip.Action(layout.MAS_TT_NOTIF)
-
-                    textbutton _("Sounds"):
-                        action ToggleField(persistent, "_mas_notification_sounds")
-                        selected persistent._mas_notification_sounds
-                        hovered tooltip.Action(layout.MAS_TT_NOTIF_SOUND)
-
-                label _("Alert Filters")
-
+        vbox:
+            style_prefix "generic_fancy_check"
             hbox:
-                style_prefix "generic_fancy_check"
-                box_wrap True
                 spacing 25
+                textbutton _("Use Notifications"):
+                    action ToggleField(persistent, "_mas_enable_notifications")
+                    selected persistent._mas_enable_notifications
+                    hovered tooltip.Action(layout.MAS_TT_NOTIF)
 
-                #Dynamically populate this
-                for item in persistent._mas_windowreacts_notif_filters:
-                    if item != "Window Reactions" or persistent._mas_windowreacts_windowreacts_enabled:
-                        textbutton _(item):
-                            action ToggleDict(persistent._mas_windowreacts_notif_filters, item)
-                            selected persistent._mas_windowreacts_notif_filters.get(item)
-                            hovered tooltip.Action(layout.MAS_TT_G_NOTIF)
+                textbutton _("Sounds"):
+                    action ToggleField(persistent, "_mas_notification_sounds")
+                    selected persistent._mas_notification_sounds
+                    hovered tooltip.Action(layout.MAS_TT_NOTIF_SOUND)
+
+            label _("Alert Filters")
+
+        hbox:
+            style_prefix "generic_fancy_check"
+            box_wrap True
+            spacing 25
+
+            #Dynamically populate this
+            for item in persistent._mas_windowreacts_notif_filters:
+                if item != "Window Reactions" or persistent._mas_windowreacts_windowreacts_enabled:
+                    textbutton _(item):
+                        action ToggleDict(persistent._mas_windowreacts_notif_filters, item)
+                        selected persistent._mas_windowreacts_notif_filters.get(item)
+                        hovered tooltip.Action(layout.MAS_TT_G_NOTIF)
 
 
     text tooltip.value:

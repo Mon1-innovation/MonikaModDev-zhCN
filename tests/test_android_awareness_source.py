@@ -15,6 +15,7 @@ RAPT_TEMPLATE_MANIFEST = Path("J:/Renpy/renpy-8.2.3-sdk/rapt/templates/app-Andro
 WINDOWUTILS_RPY = GAME_DIR / "zz_windowutils.rpy"
 DEV_ANDROID_AWARENESS_RPY = GAME_DIR / "dev" / "dev_android_awareness_debug.rpy"
 ANDROID_WRS_CATEGORIES_RPY = GAME_DIR / "zz_android_windowreact_categories.rpy"
+CHINESE_EGGS_WINDOWREACTS_RPY = GAME_DIR / "tl" / "chinese" / "eggs" / "windowreacts.rpy"
 
 
 def read_text(path):
@@ -65,8 +66,24 @@ class AndroidAwarenessSourceTests(unittest.TestCase):
 
         self.assertIn("if renpy.android:", source)
         self.assertIn("store.mas_update_android_wrs_categories", source)
-        self.assertIn("persistent._mas_windowreacts_database", source)
         self.assertIn("store.mas_windowreacts.windowreact_db", source)
+
+    def test_chinese_windowreact_eggs_use_existing_notification_helper(self):
+        source = read_text(CHINESE_EGGS_WINDOWREACTS_RPY)
+
+        self.assertIn("mas_display_notif(", source)
+        self.assertNotIn("display_notif(", source.replace("mas_display_notif(", ""))
+
+    def test_android_wrs_category_script_replaces_category_zero_for_android_matching(self):
+        source = read_text(ANDROID_WRS_CATEGORIES_RPY)
+
+        self.assertIn("# category[0] only", source)
+        self.assertIn("ev.category = list(android_category)", source)
+        self.assertIn("Updates WRS category[0] to Android app-label/package-name regexes.", source)
+        self.assertNotIn("mas_android_merge_wrs_category", source)
+        self.assertNotIn("persistent_ev.category", source)
+        self.assertNotIn("persistent._mas_windowreacts_database.get", source)
+        self.assertNotIn("persistent_ev.category = list(android_category)", source)
 
     def test_awareness_module_defines_direct_java_bridge_and_reaction_helpers(self):
         source = read_text(AWARENESS_RPY)
@@ -147,7 +164,8 @@ class AndroidAwarenessSourceTests(unittest.TestCase):
         self.assertIn('prompt="Android 感知调试"', source)
         self.assertIn("screen dev_android_awareness_debug_screen():", source)
         self.assertIn("timer 1.0 action Function(dev_android_awareness_refresh_debug_values) repeat True", source)
-        self.assertIn("call screen dev_android_awareness_debug_screen", source)
+        self.assertIn("show screen dev_android_awareness_debug_screen", source)
+        self.assertIn('action Hide("dev_android_awareness_debug_screen")', source)
         self.assertIn("for _dev_android_debug_label, _dev_android_debug_value in store.dev_android_awareness_debug_values:", source)
         self.assertIn("text _dev_android_debug_label", source)
         self.assertIn("text _dev_android_debug_value", source)
@@ -252,7 +270,9 @@ class AndroidAwarenessSourceTests(unittest.TestCase):
         self.assertIn("skip_checks", display_notif_source)
         self.assertIn("mas_notifsEnabledForGroup(group)", display_notif_source)
         self.assertIn("not mas_isFocused()", display_notif_source)
-        self.assertIn("return store.mas_android_display_notif(title, notif_body)", display_notif_source)
+        self.assertIn("notif_success = store.mas_android_display_notif(title, notif_body)", display_notif_source)
+        self.assertIn('android display backend returned False', display_notif_source)
+        self.assertIn("return notif_success", display_notif_source)
 
     def test_awareness_java_state_includes_mas_activity_state(self):
         source = read_text(RAPT_JAVA)
