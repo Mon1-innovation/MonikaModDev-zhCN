@@ -7609,6 +7609,15 @@ default persistent._mas_game_crashed = False
 default persistent.seen_monika_in_room = False
 # NOTE: For convenience this will automatically add new keys as we add new games, the default value is False
 default persistent._mas_ever_won = collections.defaultdict(bool)
+init 1 python:
+    if (
+        not isinstance(persistent._mas_ever_won, collections.defaultdict)
+        or persistent._mas_ever_won.default_factory is not bool
+    ):
+        persistent._mas_ever_won = collections.defaultdict(
+            bool,
+            dict(persistent._mas_ever_won)
+        )
 # TODO: Delete this as depricated
 # default persistent.ever_won = {'pong':False,'chess':False,'hangman':False,'piano':False}
 default persistent.sessions = {
