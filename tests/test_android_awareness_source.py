@@ -14,6 +14,7 @@ RAPT_MANIFEST = RAPT_MAIN / "AndroidManifest.xml"
 RAPT_TEMPLATE_MANIFEST = Path("J:/Renpy/renpy-8.2.3-sdk/rapt/templates/app-AndroidManifest.xml")
 WINDOWUTILS_RPY = GAME_DIR / "zz_windowutils.rpy"
 DEV_ANDROID_AWARENESS_RPY = GAME_DIR / "dev" / "dev_android_awareness_debug.rpy"
+ANDROID_WRS_CATEGORIES_RPY = GAME_DIR / "zz_android_windowreact_categories.rpy"
 
 
 def read_text(path):
@@ -30,6 +31,42 @@ def extract_init_python_block(source, label):
 
 
 class AndroidAwarenessSourceTests(unittest.TestCase):
+
+    def test_android_wrs_category_script_covers_existing_window_reactions(self):
+        source = read_text(ANDROID_WRS_CATEGORIES_RPY)
+        mapping_match = re.search(
+            r"MAS_ANDROID_WRS_CATEGORIES\s*=\s*(\{.*?\n    \})",
+            source,
+            re.S
+        )
+        self.assertIsNotNone(mapping_match)
+
+        mapping = ast.literal_eval(mapping_match.group(1))
+        wrs_labels = set()
+
+        for path in GAME_DIR.rglob("*.rpy"):
+            if path == ANDROID_WRS_CATEGORIES_RPY:
+                continue
+
+            wrs_labels.update(
+                re.findall(
+                    r'eventlabel\s*=\s*"(mas_wrs_[^"]+)"',
+                    read_text(path)
+                )
+            )
+
+        self.assertEqual(wrs_labels, set(mapping))
+
+        for ev_label, patterns in mapping.items():
+            self.assertIsInstance(patterns, list, ev_label)
+            self.assertTrue(patterns, ev_label)
+            for pattern in patterns:
+                re.compile(pattern)
+
+        self.assertIn("if renpy.android:", source)
+        self.assertIn("store.mas_update_android_wrs_categories", source)
+        self.assertIn("persistent._mas_windowreacts_database", source)
+        self.assertIn("store.mas_windowreacts.windowreact_db", source)
 
     def test_awareness_module_defines_direct_java_bridge_and_reaction_helpers(self):
         source = read_text(AWARENESS_RPY)
