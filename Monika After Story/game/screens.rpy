@@ -1898,13 +1898,14 @@ screen notif_settings():
                     action [
                         ToggleField(persistent, "_mas_awareness_enabled"),
                         Function(mas_awareness_write_enabled_state),
-                        Function(mas_awareness_force_snapshot)
+                        Function(mas_awareness_refresh_state)
                     ]
                     selected persistent._mas_awareness_enabled
                     hovered tooltip.Action(layout.MAS_TT_ANDROID_AWARENESS)
 
                 textbutton _("Permits"):
                     action [Play("sound", gui.activate_sound), Show("mas_awareness_permits_confirm")]
+                    selected store.mas_awareness_has_permission("usage_stats")
                     hovered tooltip.Action(layout.MAS_TT_ANDROID_AWARENESS_PERMITS)
 
             vbox:

@@ -1,7 +1,7 @@
 ## Android awareness bridge.
 ##
-## Java writes a small JSON snapshot to /log/.awareness; this module reads it
-## and exposes optional app-context reactions to Ren'Py.
+## Ren'Py asks Java for the current awareness state directly. The bridge does
+## does not save or read a mirrored state file.
 
 init -10 python:
     if persistent._mas_awareness_enabled is None:
@@ -22,11 +22,17 @@ init -5 python:
     import os
     import time
 
-    _MAS_AWARENESS_SNAPSHOT_PATH = "/storage/emulated/0/Monika After Story/log/.awareness"
     _MAS_AWARENESS_ENABLED_PATH = "/storage/emulated/0/Monika After Story/log/.awareness_enabled"
-    _MAS_AWARENESS_POLL_INTERVAL = 10
-    _mas_awareness_last_snapshot = None
-    _mas_awareness_last_read_time = 0
+    _mas_awareness_last_state_error = ""
+    _mas_awareness_last_state_parsed_type = ""
+    _mas_awareness_last_state_raw = ""
+    _mas_awareness_last_state_raw_type = ""
+
+    def _mas_awareness_log(message):
+        try:
+            store.mas_utils.mas_log.info("[MAS_AWARENESS] " + str(message))
+        except Exception:
+            print("[MAS_AWARENESS] " + str(message))
 
     MAS_APP_CATEGORIES = {
         "YouTube": "video",
@@ -65,57 +71,169 @@ init -5 python:
         "Google Play Games": "gaming",
     }
 
-    def mas_awareness_read_snapshot():
-        global _mas_awareness_last_snapshot, _mas_awareness_last_read_time
-
-        now = time.time()
-        if now - _mas_awareness_last_read_time < _MAS_AWARENESS_POLL_INTERVAL:
-            return _mas_awareness_last_snapshot
-
-        _mas_awareness_last_read_time = now
+    def _mas_awareness_as_python_string(value):
+        if value is None:
+            return ""
 
         try:
-            if not os.path.exists(_MAS_AWARENESS_SNAPSHOT_PATH):
-                return None
+            if hasattr(value, "toString"):
+                return str(value.toString())
+        except Exception:
+            pass
 
-            with open(_MAS_AWARENESS_SNAPSHOT_PATH, "r") as snapshot_file:
-                content = snapshot_file.read().strip()
+        try:
+            return str(value)
+        except Exception:
+            return ""
 
-            if not content:
-                return None
+    def _mas_awareness_is_string(value):
+        try:
+            return isinstance(value, basestring)
+        except NameError:
+            return isinstance(value, str)
 
-            _mas_awareness_last_snapshot = json.loads(content)
-            return _mas_awareness_last_snapshot
+    def _mas_awareness_is_dict(value):
+        return (
+            hasattr(value, "get")
+            and hasattr(value, "keys")
+            and hasattr(value, "__getitem__")
+        )
 
-        except Exception as e:
-            print("[MAS_AWARENESS] Error reading snapshot: " + str(e))
+    def _mas_awareness_is_list(value):
+        return (
+            not _mas_awareness_is_string(value)
+            and hasattr(value, "__iter__")
+            and hasattr(value, "__len__")
+            and hasattr(value, "__getitem__")
+            and not _mas_awareness_is_dict(value)
+        )
+
+    def _mas_awareness_get_latest_app(apps):
+        latest_app = None
+        latest_timestamp = -1
+
+        for app in apps:
+            if not _mas_awareness_is_dict(app):
+                continue
+
+            try:
+                app_timestamp = int(app.get("last_used", 0) or 0)
+            except Exception:
+                app_timestamp = 0
+
+            if latest_app is None or app_timestamp >= latest_timestamp:
+                latest_app = app
+                latest_timestamp = app_timestamp
+
+        return latest_app
+
+    def mas_awareness_read_state():
+        global _mas_awareness_last_state_error
+        global _mas_awareness_last_state_parsed_type
+        global _mas_awareness_last_state_raw
+        global _mas_awareness_last_state_raw_type
+
+        _mas_awareness_last_state_error = ""
+        _mas_awareness_last_state_parsed_type = ""
+        _mas_awareness_last_state_raw = ""
+        _mas_awareness_last_state_raw_type = ""
+
+        if not renpy.android:
+            _mas_awareness_last_state_error = "renpy.android is false"
             return None
 
+        try:
+            from jnius import autoclass as _mas_awareness_autoclass
+
+            try:
+                PythonActivity = _mas_awareness_autoclass("org.renpy.android.PythonSDLActivity")
+            except Exception:
+                PythonActivity = _mas_awareness_autoclass("org.renpy.android.PythonActivity")
+
+            AwarenessService = _mas_awareness_autoclass("com.monikaafterstory.tec.es.AwarenessService")
+            content = AwarenessService.buildState(PythonActivity.mActivity)
+            _mas_awareness_last_state_raw_type = type(content).__name__
+            if not content:
+                _mas_awareness_last_state_error = "Java buildState returned empty content"
+                _mas_awareness_log(_mas_awareness_last_state_error)
+                return None
+
+            content_text = _mas_awareness_as_python_string(content).strip()
+            _mas_awareness_last_state_raw = content_text[:500]
+            _mas_awareness_log(
+                "Java state raw_type={0}, raw_len={1}, raw={2}".format(
+                    _mas_awareness_last_state_raw_type,
+                    len(content_text),
+                    content_text
+                )
+            )
+            if not content_text:
+                _mas_awareness_last_state_error = "Java buildState returned blank text"
+                _mas_awareness_log(_mas_awareness_last_state_error)
+                return None
+
+            try:
+                parsed_state = json.loads(content_text)
+                if _mas_awareness_is_string(parsed_state):
+                    _mas_awareness_log("Java state was JSON-encoded twice; parsing inner string.")
+                    parsed_state = json.loads(parsed_state)
+
+                _mas_awareness_last_state_parsed_type = type(parsed_state).__name__
+
+                if not _mas_awareness_is_dict(parsed_state):
+                    _mas_awareness_last_state_error = (
+                        "Java state parsed as non-dict: "
+                        + _mas_awareness_last_state_parsed_type
+                    )
+                    _mas_awareness_log(_mas_awareness_last_state_error)
+                    return None
+
+                _mas_awareness_log("Java state parsed as dict successfully")
+                return parsed_state
+
+            except Exception as e:
+                _mas_awareness_last_state_error = "json.loads failed: " + str(e)
+                _mas_awareness_log("Error parsing Java state: " + str(e))
+                return None
+
+        except Exception as e:
+            _mas_awareness_last_state_error = str(e)
+            _mas_awareness_log("Error reading Java state: " + str(e))
+            return None
+
+    def mas_awareness_get_last_state_debug():
+        return {
+            "error": _mas_awareness_last_state_error,
+            "parsed_type": _mas_awareness_last_state_parsed_type,
+            "raw": _mas_awareness_last_state_raw,
+            "raw_type": _mas_awareness_last_state_raw_type,
+        }
+
     def mas_awareness_get_recent_apps():
-        snapshot = mas_awareness_read_snapshot()
-        if not snapshot:
+        state = mas_awareness_read_state()
+        if not state:
             return []
 
-        apps = snapshot.get("recent_apps", [])
-        if isinstance(apps, list):
+        apps = state.get("recent_apps", [])
+        if _mas_awareness_is_list(apps):
             return apps
 
         return []
 
     def mas_awareness_get_most_recent_app():
         apps = mas_awareness_get_recent_apps()
-        return apps[-1] if apps else None
+        return _mas_awareness_get_latest_app(apps)
 
     def mas_awareness_get_app_category(app_label):
         return MAS_APP_CATEGORIES.get(app_label, "unknown")
 
     def mas_awareness_has_permission(perm_type):
-        snapshot = mas_awareness_read_snapshot()
-        if not snapshot:
+        state = mas_awareness_read_state()
+        if not state:
             return False
 
-        perms = snapshot.get("permissions", {})
-        if not isinstance(perms, dict):
+        perms = state.get("permissions", {})
+        if not _mas_awareness_is_dict(perms):
             return False
 
         return bool(perms.get(perm_type, False))
@@ -125,14 +243,14 @@ init -5 python:
             return False
 
         history = persistent._mas_awareness_last_app_mention
-        if not isinstance(history, dict):
+        if not _mas_awareness_is_dict(history):
             history = {}
             persistent._mas_awareness_last_app_mention = history
 
         return (time.time() - history.get(app_label, 0)) >= 21600
 
     def mas_awareness_mark_app_reacted(app_label):
-        if not isinstance(persistent._mas_awareness_last_app_mention, dict):
+        if not _mas_awareness_is_dict(persistent._mas_awareness_last_app_mention):
             persistent._mas_awareness_last_app_mention = {}
 
         persistent._mas_awareness_last_app_mention[app_label] = time.time()
@@ -152,7 +270,8 @@ init -5 python:
         except Exception as e:
             print("[MAS_AWARENESS] Error writing enabled state: " + str(e))
 
-    store.mas_awareness_read_snapshot = mas_awareness_read_snapshot
+    store.mas_awareness_read_state = mas_awareness_read_state
+    store.mas_awareness_get_last_state_debug = mas_awareness_get_last_state_debug
     store.mas_awareness_get_recent_apps = mas_awareness_get_recent_apps
     store.mas_awareness_get_most_recent_app = mas_awareness_get_most_recent_app
     store.mas_awareness_get_app_category = mas_awareness_get_app_category
@@ -160,6 +279,9 @@ init -5 python:
     store.mas_awareness_should_react_app = mas_awareness_should_react_app
     store.mas_awareness_mark_app_reacted = mas_awareness_mark_app_reacted
     store.mas_awareness_write_enabled_state = mas_awareness_write_enabled_state
+    store._mas_awareness_is_dict = _mas_awareness_is_dict
+    store._mas_awareness_is_list = _mas_awareness_is_list
+    store._mas_awareness_get_latest_app = _mas_awareness_get_latest_app
 
 
 init 5 python:
@@ -178,21 +300,10 @@ init 5 python:
             except Exception as e:
                 print("[MAS_AWARENESS] requestUsagePermission error: " + str(e))
 
-        def mas_awareness_force_snapshot():
-            try:
-                try:
-                    PythonActivity = autoclass("org.renpy.android.PythonSDLActivity")
-                except Exception:
-                    PythonActivity = autoclass("org.renpy.android.PythonActivity")
-
-                AwarenessService = autoclass("com.monikaafterstory.tec.es.AwarenessService")
-                AwarenessService.writeSnapshot(PythonActivity.mActivity)
-
-            except Exception as e:
-                print("[MAS_AWARENESS] forceSnapshot error: " + str(e))
+        def mas_awareness_refresh_state():
+            return mas_awareness_read_state()
 
         def mas_awareness_check_and_open_permits():
-            mas_awareness_force_snapshot()
             mas_awareness_request_usage_permission()
 
     else:
@@ -200,20 +311,19 @@ init 5 python:
         def mas_awareness_request_usage_permission():
             print("[MAS_AWARENESS] (Simulated) Opening Usage Access settings")
 
-        def mas_awareness_force_snapshot():
-            print("[MAS_AWARENESS] (Simulated) Writing awareness snapshot")
+        def mas_awareness_refresh_state():
+            print("[MAS_AWARENESS] (Simulated) Reading awareness state")
+            return mas_awareness_read_state()
 
         def mas_awareness_check_and_open_permits():
             print("[MAS_AWARENESS] (Simulated) Opening awareness permits")
 
     store.mas_awareness_request_usage_permission = mas_awareness_request_usage_permission
-    store.mas_awareness_force_snapshot = mas_awareness_force_snapshot
+    store.mas_awareness_refresh_state = mas_awareness_refresh_state
     store.mas_awareness_check_and_open_permits = mas_awareness_check_and_open_permits
 
     def mas_awareness_startup_sync():
         mas_awareness_write_enabled_state()
-        if persistent._mas_awareness_enabled:
-            mas_awareness_force_snapshot()
 
     if renpy.android:
         config.start_callbacks.append(mas_awareness_startup_sync)
