@@ -4,7 +4,7 @@
 
 ## 目标
 
-激活 Android 通知投递链路，并将通知 UI/UX 更新到 Android 11+ 的 conversation notification 风格。
+激活 Android 通知投递链路，并按小米通知样式文档使用系统原生通知模板与 `largeIcon` 展示 Monika 头像。
 
 ## 当前状态
 
@@ -51,24 +51,23 @@ label quit:
 
 ## 2. Java/UI Layer
 
-`NotificationHelper.java` 已从 legacy `BigTextStyle` 迁移到：
+`NotificationHelper.java` 使用系统原生通知模板：
 
 ```java
-NotificationCompat.MessagingStyle
+NotificationCompat.BigTextStyle
 ```
 
-通知现在使用 Monika 的 `Person` 信息构建 conversation-style UI，并注册系统 conversation shortcut：
+通知内容区域只提供昵称和文本，头像使用 Android 标准 `setLargeIcon(...)`：
 
 ```java
-ShortcutInfoCompat shortcut = new ShortcutInfoCompat.Builder(context, "monika_chat_shortcut")
-    .setPerson(monikaUser)
-    .setCategories(categories) // android.shortcut.conversation
-    .build();
-ShortcutManagerCompat.pushDynamicShortcut(context, shortcut);
-builder.setShortcutId("monika_chat_shortcut");
+builder.setContentTitle(title)
+       .setContentText(message)
+       .setStyle(new NotificationCompat.BigTextStyle().bigText(message));
+
+builder.setLargeIcon(circularBitmap);
 ```
 
-这会让 Android 11+ 将通知归类为对话，提升头像和会话展示优先级。
+该路线不使用 `MessagingStyle`、`Person` 或 conversation shortcut。依据小米 MIUI/HyperOS 通知样式文档，普通通知也可通过 `largeIcon` 提供联系人头像，并由系统处理应用来源标识。
 
 ## 3. Channel Architecture v7-v10
 
@@ -135,13 +134,13 @@ monika_contact_icon
 android:icon="@mipmap/icon"
 ```
 
-通知 small icon 优先使用 `@mipmap/icon`，联系人头像/large icon 优先使用 `monika_contact_icon`。联系人头像 fallback 顺序：
+通知 small icon 优先使用 `@mipmap/icon`，联系人头像优先使用 `monika_contact_icon`。联系人头像 fallback 顺序：
 
 - `notify_icon`
 - `monika_profile`
 - Android 系统默认图标
 
-`IconCompat.createWithBitmap(...)` 和 `setLargeIcon(...)` 都有 `circularBitmap != null` 防护。头像资源缺失或解码失败时，通知仍会发出，只是不显示头像大图。
+`setLargeIcon(...)` 有 `circularBitmap != null` 防护。头像资源缺失或解码失败时，通知仍会发出，只是不显示 Monika 头像。
 
 ## 6. Java Source Snapshot
 
@@ -169,9 +168,11 @@ python -m unittest tests.test_android_notification_java_source
 
 该测试锁定以下关键行为：
 
-- `MessagingStyle`
-- conversation shortcut
-- `builder.setShortcutId("monika_chat_shortcut")`
+- `BigTextStyle`
+- `monika_contact_icon`
+- `builder.setLargeIcon(circularBitmap)`
+- 不包含 `MessagingStyle`
+- 不包含 conversation shortcut / `builder.setShortcutId(...)`
 - `mas_v7` 到 `mas_v10`
 - `NotificationChannelGroup`
 - v1-v6 cleanup
@@ -197,4 +198,4 @@ python -m unittest tests.test_android_notification_java_source
 - `Android通知测试` -> `5秒后通知`
 - 正常 farewell 后退出应用，等待对应提醒
 - Android 系统通知设置中确认渠道归到 `Monika After Story`
-- Android 11+ 上确认通知以 conversation 样式显示 Monika 头像
+- HyperOS / Android 上确认通知尽量呈现左侧 Monika 头像、中间标题和正文的消息通知样式

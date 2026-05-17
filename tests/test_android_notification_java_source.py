@@ -12,16 +12,22 @@ def read_java_file(name):
 
 class AndroidNotificationJavaSourceTests(unittest.TestCase):
 
-    def test_notification_helper_uses_conversation_notification_layout(self):
+    def test_notification_helper_uses_xiaomi_native_large_icon_layout(self):
         source = read_java_file("NotificationHelper.java")
 
-        self.assertIn("NotificationCompat.MessagingStyle", source)
+        self.assertIn("NotificationCompat.BigTextStyle", source)
+        self.assertIn(".bigText(message)", source)
+        self.assertIn(".setContentTitle(title)", source)
+        self.assertIn(".setContentText(message)", source)
         self.assertIn('getIdentifier("monika_contact_icon", "drawable"', source)
         self.assertIn('getIdentifier("icon", "mipmap"', source)
-        self.assertIn("ShortcutInfoCompat", source)
-        self.assertIn("ShortcutManagerCompat.pushDynamicShortcut", source)
-        self.assertIn('builder.setShortcutId("monika_chat_shortcut")', source)
-        self.assertIn('"android.shortcut.conversation"', source)
+        self.assertIn("builder.setLargeIcon(circularBitmap)", source)
+        self.assertNotIn("NotificationCompat.MessagingStyle", source)
+        self.assertNotIn("new Person.Builder()", source)
+        self.assertNotIn("ShortcutInfoCompat", source)
+        self.assertNotIn("ShortcutManagerCompat.pushDynamicShortcut", source)
+        self.assertNotIn("setShortcutId", source)
+        self.assertNotIn('"android.shortcut.conversation"', source)
 
     def test_notification_helper_uses_v7_to_v10_channel_architecture(self):
         source = read_java_file("NotificationHelper.java")

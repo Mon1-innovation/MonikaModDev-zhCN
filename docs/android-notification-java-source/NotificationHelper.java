@@ -22,13 +22,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.Person;
-import androidx.core.content.pm.ShortcutInfoCompat;
-import androidx.core.content.pm.ShortcutManagerCompat;
-import androidx.core.graphics.drawable.IconCompat;
-import java.util.HashSet;
 import java.util.Locale;
-import java.util.Set;
 
 public class NotificationHelper {
 
@@ -39,7 +33,6 @@ public class NotificationHelper {
     private static final String CHANNEL_ID_BIRTHDAY = "mas_v8";
     private static final String CHANNEL_ID_RANDOM = "mas_v9";
     private static final String CHANNEL_ID_SPECIAL = "mas_v10";
-    private static final String SHORTCUT_ID = "monika_chat_shortcut";
     private static boolean legacyChannelsCleaned = false;
 
     public static final int NOTIFICATION_ID_STICKY = 777;
@@ -114,26 +107,11 @@ public class NotificationHelper {
         originalBitmap = decodeSampledBitmapFromResource(context.getResources(), monikaResId, 256, 256);
         Bitmap circularBitmap = getCircleBitmap(originalBitmap);
 
-        Person.Builder personBuilder = new Person.Builder()
-                .setName(title)
-                .setImportant(true)
-                .setBot(false);
-        if (circularBitmap != null) {
-            personBuilder.setIcon(IconCompat.createWithBitmap(circularBitmap));
-        }
-        Person monikaUser = personBuilder.build();
-        NotificationCompat.MessagingStyle style = new NotificationCompat.MessagingStyle(monikaUser)
-                .setGroupConversation(false)
-                .addMessage(message, System.currentTimeMillis(), monikaUser);
-
-        builder.setStyle(style)
-                .addPerson(monikaUser);
-        builder.setShortcutId("monika_chat_shortcut");
+        builder.setStyle(new NotificationCompat.BigTextStyle()
+                .bigText(message));
         if (circularBitmap != null) {
             builder.setLargeIcon(circularBitmap);
         }
-
-        registerConversationShortcut(context, monikaUser, circularBitmap, launchIntent);
 
         if (type == TYPE_INTERACTIVE) {
             if (action1 != null && action1.length() > 0 && launchIntent != null) {
@@ -289,36 +267,6 @@ public class NotificationHelper {
     private static String text(String english, String spanish) {
         String language = Locale.getDefault().getLanguage();
         return "es".equals(language) ? spanish : english;
-    }
-
-    private static void registerConversationShortcut(Context context, Person monikaUser, Bitmap circularBitmap,
-            Intent launchIntent) {
-        try {
-            if (launchIntent == null) {
-                return;
-            }
-
-            Set<String> categories = new HashSet<String>();
-            categories.add("android.shortcut.conversation");
-
-            ShortcutInfoCompat.Builder shortcutBuilder = new ShortcutInfoCompat.Builder(context, SHORTCUT_ID)
-                    .setShortLabel("Monika")
-                    .setLongLabel("Monika After Story")
-                    .setPerson(monikaUser)
-                    .setCategories(categories)
-                    .setIntent(launchIntent)
-                    .setLongLived(true);
-
-            if (circularBitmap != null) {
-                shortcutBuilder.setIcon(IconCompat.createWithBitmap(circularBitmap));
-            }
-
-            ShortcutInfoCompat shortcut = shortcutBuilder.build();
-            ShortcutManagerCompat.pushDynamicShortcut(context, shortcut);
-        } catch (Exception e) {
-            TelemetryLogger.logError(context, "NotificationHelper", "Failed to register conversation shortcut", e,
-                    TelemetryLogger.CODE_500);
-        }
     }
 
     private static Bitmap getCircleBitmap(Bitmap bitmap) {

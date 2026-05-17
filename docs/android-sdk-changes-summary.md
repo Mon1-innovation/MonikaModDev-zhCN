@@ -153,16 +153,18 @@ at com.monikaafterstory.tec.es.NotificationHelper.buildNotification
 
 当前行为：
 
-如果 `monika_contact_icon`、`notify_icon` 或 fallback 图像资源解码失败，通知仍会继续构建，只是不设置 `Person` icon / large icon。
+如果 `monika_contact_icon`、`notify_icon` 或 fallback 图像资源解码失败，通知仍会继续构建，只是不设置 Monika 头像。
 
-## 6. Conversation UI 和 v7-v10 渠道
+## 6. 原生 largeIcon 通知模板和 v7-v10 渠道
 
-`NotificationHelper.java` 已完成 Android 11+ conversation notification 现代化：
+`NotificationHelper.java` 当前按小米通知样式文档使用系统原生通知模板：
 
-- 使用 `NotificationCompat.MessagingStyle` 替换 legacy big text 展示。
-- 使用 `androidx.core.app.Person` 表示 Monika。
-- 使用 `ShortcutInfoCompat` / `ShortcutManagerCompat.pushDynamicShortcut(...)` 注册 `monika_chat_shortcut`。
-- 通知构建时调用 `builder.setShortcutId("monika_chat_shortcut")`。
+- 使用 `NotificationCompat.BigTextStyle` 展示长文本。
+- 通过 `setContentTitle(title)` 和 `setContentText(message)` 设置标题与正文。
+- 通过 `setLargeIcon(circularBitmap)` 设置 Monika 联系人图。
+- 不使用 `NotificationCompat.MessagingStyle`。
+- 不使用 `androidx.core.app.Person`。
+- 不注册 conversation shortcut，也不调用 `builder.setShortcutId(...)`。
 
 固定通知渠道：
 
