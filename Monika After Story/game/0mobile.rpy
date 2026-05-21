@@ -82,12 +82,28 @@ python early:
     def p_raise():
         raise Exception("Raise Exception for Debugging")
 
+    def choose_android_logdir(preferred, fallback):
+        for path in (preferred, fallback):
+            try:
+                if not os.path.exists(path):
+                    os.makedirs(path, 0o777)
+
+                test_fn = os.path.join(path, ".mas-log-test")
+                with open(test_fn, "w") as test_file:
+                    test_file.write("")
+                os.remove(test_fn)
+                return path
+
+            except Exception:
+                pass
+
+        return fallback
+
     if renpy.android:
         renpy.config.basedir = ANDROID_MASBASE
         renpy.config.gamedir = os.path.join(renpy.config.basedir, "game")
-        renpy.config.logdir = os.path.join(ANDROID_MASBASE, "log")
-        if not os.path.exists(renpy.config.logdir):
-            os.makedirs(renpy.config.logdir, 0o777)
+        android_default_logdir = os.environ.get('ANDROID_PUBLIC', ANDROID_MASBASE)
+        renpy.config.logdir = choose_android_logdir(os.path.join(ANDROID_MASBASE, "log"), android_default_logdir)
     
     if renpy.android and not os.path.exists("/storage/emulated/0/MAS/use_android_savedir") and mas_android_has_permission():
         renpy.config.savedir = os.path.join(ANDROID_MASBASE, "saves")
@@ -110,16 +126,17 @@ python early:
     def new_report_exception(*args, **kwargs):
         res = original_report_exception(*args, **kwargs)
         if renpy.android:
-            AndroidClipboard().copy_to_clipboard(res[1])
-            android_toast("x_x 游戏崩溃了, 报错堆栈已复制到剪贴板")
+            android_toast("x_x 游戏崩溃了, 请查看log文件夹以获取详细信息")
 
         if renpy.is_init_phase() and renpy.android:
-            AndroidAlertDialog(
+            import time
+            window = AndroidAlertDialog(
                 title="抱歉, 但是游戏发生了异常...",
-                message=res[0]+"\n\n完整报错堆栈已复制到剪贴板。",
+                message=res[0]+"\n将在10秒后自动退出...",
                 positive_text="",
                 negative_text="关闭",
             )
+            window.AsyncTaskerCheck.wait()
         return res
     renpy.renpy.error.report_exception = new_report_exception
 

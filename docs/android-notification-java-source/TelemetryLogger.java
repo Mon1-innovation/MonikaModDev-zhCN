@@ -20,16 +20,48 @@ public class TelemetryLogger {
     public static final String CODE_102 = "102 (Alarma Exacta Denegada)";
     public static final String CODE_500 = "500 (Excepcion Interna)";
 
+    private static File getWritableLogDir(Context context) throws Exception {
+        File baseDir = context.getExternalFilesDir(null);
+        File dir = new File("/storage/emulated/0/MAS/log");
+
+        if (!dir.exists() && !dir.mkdirs()) {
+            if (baseDir == null) {
+                return null;
+            }
+            dir = new File(baseDir, "log");
+            dir.mkdirs();
+        }
+
+        if (!dir.canWrite()) {
+            if (baseDir == null) {
+                return null;
+            }
+            dir = new File(baseDir, "log");
+            dir.mkdirs();
+        }
+
+        File testFile = new File(dir, ".mas-log-test");
+        try {
+            FileWriter testWriter = new FileWriter(testFile);
+            testWriter.write("");
+            testWriter.close();
+            testFile.delete();
+        } catch (Exception e) {
+            if (baseDir == null) {
+                return null;
+            }
+            dir = new File(baseDir, "log");
+            dir.mkdirs();
+        }
+
+        return dir;
+    }
+
     public static void log(Context context, String level, String component, String message, String metadata) {
         try {
-            File dir = new File("/storage/emulated/0/MAS/log");
-            if (!dir.exists() && !dir.mkdirs()) {
-                File baseDir = context.getExternalFilesDir(null);
-                if (baseDir == null) {
-                    return;
-                }
-                dir = new File(baseDir, "log");
-                dir.mkdirs();
+            File dir = getWritableLogDir(context);
+            if (dir == null) {
+                return;
             }
 
             File logFile = new File(dir, "tec_android_monitor.txt");

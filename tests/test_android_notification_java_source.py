@@ -47,6 +47,10 @@ class AndroidNotificationJavaSourceTests(unittest.TestCase):
         self.assertIn('new File("/storage/emulated/0/MAS/log")', source)
         self.assertIn('new File(baseDir, "log")', source)
         self.assertIn("if (!dir.exists() && !dir.mkdirs())", source)
+        self.assertIn("if (!dir.canWrite())", source)
+        self.assertIn("dir = new File(baseDir, \"log\")", source)
+        self.assertIn("FileWriter testWriter = new FileWriter(testFile)", source)
+        self.assertIn('new File(dir, ".mas-log-test")', source)
         self.assertIn('new File(dir, "tec_android_monitor.txt")', source)
         self.assertLess(
             source.index('new File("/storage/emulated/0/MAS/log")'),
