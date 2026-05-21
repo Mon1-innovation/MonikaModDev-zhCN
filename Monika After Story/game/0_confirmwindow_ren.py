@@ -16,18 +16,41 @@ def safe_java_string(py_str):
         jstr = autoclass('java.lang.String')(py_str, 'utf-8')
     return cast('java.lang.CharSequence', jstr)
 
+
+def _estimate_alert_scroll_height(message, short_side, scale):
+    max_scroll_height = int(short_side * 0.34)
+    min_scroll_height = int(72 * scale)
+    line_height = int(23 * scale)
+    vertical_padding = int(12 * scale)
+    visual_lines = 0
+
+    if isinstance(message, six.text_type):
+        message_text = message
+    else:
+        message_text = six.text_type(message, "utf-8", "replace")
+
+    for line in message_text.splitlines():
+        line_len = max(len(line), 1)
+        visual_lines += max(1, (line_len + 53) // 54)
+
+    visual_lines = max(visual_lines, 1)
+    estimated_height = vertical_padding + (visual_lines * line_height)
+
+    return min(max(estimated_height, min_scroll_height), max_scroll_height)
+
+
 # 定义按钮回调接口（用于监听按钮点击）
 class OnClickListener(PythonJavaClass):
-    __javainterfaces__ = ['android.content.DialogInterface$OnClickListener']
+    __javainterfaces__ = ['android.view.View$OnClickListener']
     __javacontext__ = 'app'
 
     def __init__(self, callback):
         super(OnClickListener, self).__init__()
         self.callback = callback
 
-    @java_method('(Landroid/content/DialogInterface;I)V')
-    def onClick(self, dialog, which):
-        self.callback(which)
+    @java_method('(Landroid/view/View;)V')
+    def onClick(self, view):
+        self.callback()
 import time
 class AndroidAlertDialog:
     
@@ -72,8 +95,14 @@ class AndroidAlertDialog:
             context = PythonSDLActivity.mActivity
             display_metrics = context.getResources().getDisplayMetrics()
             scale = display_metrics.density
-            dialog_width = int(display_metrics.widthPixels * 0.92)
-            max_scroll_height = int(display_metrics.heightPixels * 0.58)
+            long_side = max(display_metrics.widthPixels, display_metrics.heightPixels)
+            short_side = min(display_metrics.widthPixels, display_metrics.heightPixels)
+            dialog_width = min(int(short_side * 1.72), int(long_side * 0.92))
+            scroll_height = _estimate_alert_scroll_height(
+                self.message,
+                short_side,
+                scale
+            )
 
             # 主布局
             main_layout = LinearLayout(context)
@@ -93,12 +122,16 @@ class AndroidAlertDialog:
             title_view.setTextColor(Color.BLACK)
             title_view.setPadding(0, 0, 0, int(12 * scale))
             title_view.setTypeface(None, 1)  # BOLD
+            title_view.setLayoutParams(LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.WRAP_CONTENT
+            ))
             main_layout.addView(title_view)
 
             # Scrollable 内容
             scroll = ScrollView(context)
             scroll.setFillViewport(False)
-            scroll_params = LayoutParams(LayoutParams.MATCH_PARENT, max_scroll_height)
+            scroll_params = LayoutParams(LayoutParams.MATCH_PARENT, scroll_height)
             scroll.setLayoutParams(scroll_params)
 
             msg_container = LinearLayout(context)
@@ -119,29 +152,39 @@ class AndroidAlertDialog:
             btn_layout.setOrientation(LinearLayout.HORIZONTAL)
             btn_layout.setGravity(Gravity.END)
             btn_layout.setPadding(0, int(12 * scale), 0, 0)
+            btn_layout.setLayoutParams(LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.WRAP_CONTENT
+            ))
+            has_buttons = False
 
             # Negative 按钮
-            neg_button = Button(context)
-            neg_button.setText(safe_java_string(self.negative_text))
-            neg_button.setTextColor(Color.parseColor("#F44336"))  # Material Red
-            neg_button.setBackgroundColor(Color.TRANSPARENT)
-            neg_button.setOnClickListener(OnClickListener(lambda: self._handle_result(False)))
-            btn_layout.addView(neg_button)
-
-            # Spacing
-            spacer = TextView(context)
-            spacer.setWidth(int(16 * scale))
-            btn_layout.addView(spacer)
+            if self.negative_text:
+                neg_button = Button(context)
+                neg_button.setText(safe_java_string(self.negative_text))
+                neg_button.setTextColor(Color.parseColor("#F44336"))  # Material Red
+                neg_button.setBackgroundColor(Color.TRANSPARENT)
+                neg_button.setOnClickListener(OnClickListener(lambda: self._handle_result(False)))
+                btn_layout.addView(neg_button)
+                has_buttons = True
 
             # Positive 按钮
-            pos_button = Button(context)
-            pos_button.setText(safe_java_string(self.positive_text))
-            pos_button.setTextColor(Color.parseColor("#2196F3"))  # Material Blue
-            pos_button.setBackgroundColor(Color.TRANSPARENT)
-            pos_button.setOnClickListener(OnClickListener(lambda: self._handle_result(True)))
-            btn_layout.addView(pos_button)
+            if self.positive_text:
+                if has_buttons:
+                    spacer = TextView(context)
+                    spacer.setWidth(int(16 * scale))
+                    btn_layout.addView(spacer)
 
-            main_layout.addView(btn_layout)
+                pos_button = Button(context)
+                pos_button.setText(safe_java_string(self.positive_text))
+                pos_button.setTextColor(Color.parseColor("#2196F3"))  # Material Blue
+                pos_button.setBackgroundColor(Color.TRANSPARENT)
+                pos_button.setOnClickListener(OnClickListener(lambda: self._handle_result(True)))
+                btn_layout.addView(pos_button)
+                has_buttons = True
+
+            if has_buttons:
+                main_layout.addView(btn_layout)
 
             # Dialog 显示
             self.dialog = Dialog(context)
@@ -150,10 +193,12 @@ class AndroidAlertDialog:
 
             window = self.dialog.getWindow()
             window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            window.setLayout(dialog_width, WindowManagerLayoutParams.WRAP_CONTENT)
             window.setType(WindowManagerLayoutParams.TYPE_APPLICATION)
 
             self.dialog.show()
+            window = self.dialog.getWindow()
+            window.setGravity(Gravity.CENTER)
+            window.setLayout(dialog_width, WindowManagerLayoutParams.WRAP_CONTENT)
             print("[AlertDialog] Custom dialog shown")
 
         except Exception as e:
