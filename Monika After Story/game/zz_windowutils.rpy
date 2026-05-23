@@ -772,7 +772,7 @@ init python:
     def mas_display_notif(
         title: str,
         body: list[str],
-        group: None,
+        group=None,
         skip_checks: bool = False,
         flash_window: bool = False
     ) -> bool:
