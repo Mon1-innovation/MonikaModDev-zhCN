@@ -39,6 +39,7 @@ python early in mas_per_check:
     mas_backup_copy_failed = False
     mas_backup_copy_filename = None
     mas_bad_backups = list()
+    mas_per_raw_errors = list()
 
     # unstable specific
     mas_unstable_per_in_stable = False
@@ -80,6 +81,13 @@ python early in mas_per_check:
         """
         Persistent is incompatible
         """
+
+
+    def _record_per_raw_error(filename, error_detail):
+        """
+        Records raw persistent-load errors for Android startup reporting.
+        """
+        mas_per_raw_errors.append((filename, error_detail))
 
 
     def reset_incompat_per_flags():
@@ -394,7 +402,9 @@ python early in mas_per_check:
 
             # regular corruption flow
             mas_corrupted_per = True
-            early_log.error("persistent was corrupted! : \n" + traceback.format_exc())
+            error_detail = traceback.format_exc()
+            _record_per_raw_error("persistent", error_detail)
+            early_log.error("persistent was corrupted! : \n" + error_detail)
             # " this comment is to fix syntax highlighting issues on vim
 
         # if we got here, we had a corrupted persistent.
@@ -444,9 +454,11 @@ python early in mas_per_check:
                         sel_back = _this_file
 
                 except Exception as e:
+                    error_detail = traceback.format_exc()
                     early_log.error(
                         "'{0}' was corrupted: {1}".format(_this_file, repr(e))
                     )
+                    _record_per_raw_error(_this_file, error_detail)
                     sel_back = None
                     mas_bad_backups.append(_this_file)
 
@@ -481,6 +493,7 @@ python early in mas_per_check:
         except Exception as e:
             mas_backup_copy_failed = True
             mas_backup_copy_filename = sel_back
+            _record_per_raw_error(sel_back, traceback.format_exc())
             early_log.error(
                 "Failed to copy backup persistent: " + repr(e)
             )
