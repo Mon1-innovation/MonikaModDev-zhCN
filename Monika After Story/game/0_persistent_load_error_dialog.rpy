@@ -86,7 +86,7 @@ init -850 python:
                 positive_text="知道了",
                 negative_text=""
             )
-            window.AsyncTaskerCheck.wait()
+            #window.AsyncTaskerCheck.wait()
 
         except Exception:
             import traceback
