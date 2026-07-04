@@ -177,9 +177,64 @@ function Copy-DirectoryRecursive {
     }
 }
 
+function Sync-AndroidNotificationSources {
+    param(
+        [string]$ProjectRoot,
+        [string]$RenPySDK,
+        [string]$ProjectBase,
+        [string]$TempBuildDir
+    )
+
+    $sourceDir = Join-Path $ProjectRoot "docs\android-notification-java-source"
+    $targetJavaDir = Join-Path $RenPySDK "rapt\project\app\src\main\java\com\monikaafterstory\tec\es"
+    $targetDrawableDir = Join-Path $RenPySDK "rapt\project\app\src\main\res\drawable-nodpi"
+
+    if (-not (Test-Path $sourceDir)) {
+        Write-Warning-Custom "Android notification Java source snapshot missing: $sourceDir"
+        return
+    }
+
+    New-Item -ItemType Directory -Path $targetJavaDir -Force | Out-Null
+    New-Item -ItemType Directory -Path $targetDrawableDir -Force | Out-Null
+
+    $javaFiles = @(
+        "AwarenessService.java",
+        "NotificationHelper.java",
+        "NotificationActionReceiver.java",
+        "NotificationWorker.java",
+        "ExactAlarmReceiver.java",
+        "TelemetryLogger.java"
+    )
+
+    foreach ($javaFile in $javaFiles) {
+        $sourceFile = Join-Path $sourceDir $javaFile
+        if (-not (Test-Path $sourceFile)) {
+            Write-Error-Custom "Android notification source missing: $sourceFile"
+            exit 1
+        }
+        Copy-Item -Path $sourceFile -Destination (Join-Path $targetJavaDir $javaFile) -Force
+    }
+
+    $drawableSourceDir = Join-Path $sourceDir "res\drawable"
+    if (Test-Path $drawableSourceDir) {
+        Get-ChildItem -Path $drawableSourceDir -Filter "monika_*.png" | ForEach-Object {
+            Copy-Item -Path $_.FullName -Destination (Join-Path $targetDrawableDir $_.Name) -Force
+        }
+    }
+
+    $notificationJsonSource = Join-Path $ProjectBase "game\notifications.json"
+    $notificationJsonTarget = Join-Path $TempBuildDir "game\notifications.json"
+    if (-not (Test-Path $notificationJsonSource)) {
+        Write-Error-Custom "notifications.json missing: $notificationJsonSource"
+        exit 1
+    }
+    Copy-Item -Path $notificationJsonSource -Destination $notificationJsonTarget -Force
+    Write-Success "Android notification Java sources and notifications.json synced"
+}
+
 # 设置默认输出目录（如果未指定）
+$projectRoot = Split-Path $ProjectBase -Parent
 if (-not $OutputDir) {
-    $projectRoot = Split-Path $ProjectBase -Parent
     $OutputDir = Join-Path $projectRoot "dists"
     Write-Info "未指定输出目录，使用默认值: $OutputDir"
 }
@@ -259,6 +314,8 @@ Write-Success "已清理 .pyc 文件"
 Write-Info "复制 Monika After Story 文件（覆盖重复项）..."
 Copy-DirectoryRecursive -Source $ProjectBase -Destination $tempBuildDir
 Write-Success "Monika After Story 文件已复制"
+
+Sync-AndroidNotificationSources -ProjectRoot $projectRoot -RenPySDK $RenPySDK -ProjectBase $ProjectBase -TempBuildDir $tempBuildDir
 
 # 再次清理（确保没有重复的 .pyc）
 Write-Info "最终清理 .pyc 文件..."

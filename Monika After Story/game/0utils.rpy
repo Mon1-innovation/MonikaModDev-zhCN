@@ -200,10 +200,7 @@ python early in mas_logging:
 
 
     #We always log to renpy.config.basedir/log
-    if renpy.android:
-        LOG_PATH = os.path.join("/storage/emulated/0/MAS/log")
-    else:
-        LOG_PATH = os.path.join(renpy.config.basedir + "/log")
+    LOG_PATH = os.path.join(renpy.config.basedir + "/log")
 
     LOG_MAXSIZE_B = 5242880 #5 mb
 

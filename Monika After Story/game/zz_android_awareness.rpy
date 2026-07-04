@@ -29,10 +29,7 @@ init -5 python:
     _mas_awareness_last_state_raw_type = ""
 
     def _mas_awareness_log(message):
-        try:
-            store.mas_utils.mas_log.info("[MAS_AWARENESS] " + str(message))
-        except Exception:
-            print("[MAS_AWARENESS] " + str(message))
+        return
 
     MAS_APP_CATEGORIES = {
         "YouTube": "video",

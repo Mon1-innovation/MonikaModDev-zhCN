@@ -10,7 +10,7 @@ init 20 python:
             r"(?i)(^|\s)(pinterest|com\.pinterest)(\s|$)"
         ],
         "mas_wrs_duolingo": [
-            r"(?i)(^|\s)(duolingo|com\.duolingo)(\s|$)"
+            r"(?i)(^|\s)(w|com\.duolingo)(\s|$)"
         ],
         "mas_wrs_wikipedia": [
             r"(?i)(^|\s)(wikipedia|org\.wikipedia)(\s|$)"
