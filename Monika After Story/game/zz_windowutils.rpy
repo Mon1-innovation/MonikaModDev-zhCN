@@ -500,6 +500,9 @@ init python in mas_windowutils:
         """
         Android notifications are handled by store.mas_android_display_notif.
         """
+        if hasattr(store, "mas_android_display_notif"):
+            return store.mas_android_display_notif(title, body)
+
         return False
 
     #Mouse Position related funcs
@@ -816,7 +819,7 @@ init python:
                     )
                 )
 
-        if renpy.android and hasattr(store, "mas_android_display_notif"):
+        if renpy.android:
             if (
                 skip_checks
                 or (
@@ -825,7 +828,7 @@ init python:
                     and mas_notifsEnabledForGroup(group)
                 )
             ):
-                notif_success = store.mas_android_display_notif(title, notif_body)
+                notif_success = mas_windowutils._tryShowNotif(title, notif_body)
                 if not notif_success:
                     _log_test_notif_failure("android display backend returned False")
 

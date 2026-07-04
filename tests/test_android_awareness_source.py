@@ -276,11 +276,11 @@ class AndroidAwarenessSourceTests(unittest.TestCase):
         source = read_text(WINDOWUTILS_RPY)
         display_notif_source = source[source.index("def mas_display_notif("):source.index("    def mas_isFocused():")]
 
-        self.assertIn("if renpy.android and hasattr(store, \"mas_android_display_notif\"):", display_notif_source)
+        self.assertIn("if renpy.android:", display_notif_source)
         self.assertIn("skip_checks", display_notif_source)
         self.assertIn("mas_notifsEnabledForGroup(group)", display_notif_source)
         self.assertIn("not mas_isFocused()", display_notif_source)
-        self.assertIn("notif_success = store.mas_android_display_notif(title, notif_body)", display_notif_source)
+        self.assertIn("notif_success = mas_windowutils._tryShowNotif(title, notif_body)", display_notif_source)
         self.assertIn('android display backend returned False', display_notif_source)
         self.assertIn("return notif_success", display_notif_source)
 

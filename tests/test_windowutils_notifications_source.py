@@ -47,6 +47,17 @@ class WindowUtilsNotificationSourceTests(unittest.TestCase):
         self.assertIsInstance(group_default, ast.Constant)
         self.assertIsNone(group_default.value)
 
+    def test_android_try_show_notification_delegates_to_android_backend(self):
+        source = WINDOWUTILS_RPY.read_text(encoding="utf-8")
+        function_source = source[
+            source.index("    def _tryShowNotification_Android("):
+            source.index("    #Mouse Position related funcs")
+        ]
+
+        self.assertIn('hasattr(store, "mas_android_display_notif")', function_source)
+        self.assertIn("return store.mas_android_display_notif(title, body)", function_source)
+        self.assertIn("return False", function_source)
+
 
 if __name__ == "__main__":
     unittest.main()
