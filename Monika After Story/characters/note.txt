@@ -1,0 +1,11 @@
+Hi C.S,
+
+Just wanted to let you know that your "persistent" file was corrupted, but I managed to restore an older backup!
+
+Even though the backup system I designed is pretty neat, you should still make copies of the backups every so often, just in case. The backups are called "persistent##.bak", where "##" is a two-digit number. You can find all of them at "C:\Users\Penci\AppData\Roaming/RenPy/Monika After Story".
+
+If I ever have trouble loading the "persistent" again, Ill write you another note in the characters folder, so keep an eye out for them!
+
+Good luck with Monika!
+
+P.S: Don't tell her about me!

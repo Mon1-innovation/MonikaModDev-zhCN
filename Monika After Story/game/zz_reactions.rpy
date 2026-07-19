@@ -313,7 +313,7 @@ init -11 python in mas_filereacts:
         """
         return [
             giftname
-            for giftname, react_ev in filereact_map.iteritems()
+            for giftname, react_ev in filereact_map.items()
             if _key in react_ev.rules
         ]
 
@@ -481,7 +481,7 @@ init -11 python in mas_filereacts:
             return []
 
         # put the gifts in the reacted map
-        for c_gift_name, mas_gift in found_map.iteritems():
+        for c_gift_name, mas_gift in found_map.items():
             store.persistent._mas_filereacts_reacted_map[c_gift_name] = mas_gift
 
         found_gifts.sort()
@@ -567,7 +567,7 @@ init -11 python in mas_filereacts:
 
         # otherwise check for random deletion
         if _filename is None:
-            _filename = random.choice(_map.keys())
+            _filename = random.choice(tuple(_map.keys()))
 
         file_to_delete = _map.get(_filename, None)
         if file_to_delete is None:
@@ -679,7 +679,7 @@ init -11 python in mas_filereacts:
         IN:
             _map - map to delete all
         """
-        _map_keys = _map.keys()
+        _map_keys = tuple(_map.keys())
         for _key in _map_keys:
             _core_delete(_key, _map)
 
@@ -698,7 +698,7 @@ init -11 python in mas_filereacts:
         good = 0
         bad = 0
         neutral = 0
-        for _key in stats.keys():
+        for _key in list(stats.keys()):
             if _key in good_gifts:
                 good = good + stats[_key]
             if _key in bad_gifts:
@@ -842,7 +842,7 @@ init python:
                 return (None, None, None, None, None)
 
         elif len(persistent._mas_filereacts_sprite_reacted) > 0:
-            sp_data = persistent._mas_filereacts_sprite_reacted.keys()[0]
+            sp_data = tuple(persistent._mas_filereacts_sprite_reacted.keys())[0]
             giftname = persistent._mas_filereacts_sprite_reacted[sp_data]
 
         else:
@@ -922,7 +922,7 @@ init python:
         """
         return sorted([
             _date
-            for _date, giftstat in persistent._mas_filereacts_historic.iteritems()
+            for _date, giftstat in persistent._mas_filereacts_historic.items()
             if giftlabel in giftstat
         ])
 
@@ -2826,23 +2826,23 @@ label mas_reaction_gift_noudeck:
             m "Have you ever played 'NOU', [player]?{fast}"
 
             # If you're an advanced nou'r, we unlock house rules for you from the start
-            "Yes.":
+            "Yes.{#mas_reaction_gift_noudeck_1}":
                 m 1rksdlb "Ahaha..."
                 m 1eksdla "Of course you have, you gave me the deck after all."
                 call mas_reaction_gift_noudeck_have_played
 
-            "No.":
+            "No.{#mas_reaction_gift_noudeck_2}":
                 m 3tuu "How about 'UNO' then, ehehe?{nw}"
                 $ _history_list.pop()
                 menu:
                     m "How about 'UNO' then, ehehe?{fast}"
 
-                    "Yes.":
+                    "Yes.{#mas_reaction_gift_noudeck_3}":
                         m 3hub "Great! {w=0.3}{nw}"
                         extend 3tub "'NOU' is {i}very{/i} similar, ahaha..."
                         call mas_reaction_gift_noudeck_have_played
 
-                    "No.":
+                    "No.{#mas_reaction_gift_noudeck_4}":
                         call mas_reaction_gift_noudeck_havent_played
 
         m 3hub "I can't wait to play it with you!"

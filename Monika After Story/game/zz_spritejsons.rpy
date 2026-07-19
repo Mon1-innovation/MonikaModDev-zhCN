@@ -6,6 +6,10 @@
 #
 # Shared JSON props:
 # {
+#   "version": integer version of sprite json format
+#       - REQUIRED
+#       - integer
+#       - for old style sprites, 3. For new style sprites, see SP_JSON_VER
 #   "type": integer type of sprite object this is,
 #       - REQUIRED
 #       - integer
@@ -121,6 +125,18 @@
 #   "mid_hair_map": {Pose Map object}
 #       - optional
 #       - denotes which poses support the mid hair layer
+#   "use_numeric_layer_ids": True means the sprites use number suffix codes for
+#       each layer instead of strings.
+#       - optional
+#       - if True, then the sprites need to use numeric ids instead of string.
+#           For example, `hair-down-0.png` instead of `hair-down-back.png`.
+#           The mapping between the numeric ids and strings are as follows:
+#           - back = 0
+#           - mid = 5
+#           - front = 10
+#       - if False, then the sprites need to use the string suffixes:
+#           (back, mid, front)
+#       - Default: False
 # }
 #
 # CLOTHES only props:
@@ -394,7 +410,7 @@ default persistent._mas_sprites_json_gifted_sprites = {}
 
 
 init -21 python in mas_sprites_json:
-    import __builtin__
+    import builtins
     import json
     import store
     import store.mas_utils as mas_utils
@@ -402,9 +418,12 @@ init -21 python in mas_sprites_json:
     from collections import defaultdict
     import logging
 
-    SP_JSON_VER = 3
-    VERSION_TXT = "version"
     # CURRENT SPRITE VERSION. Change if fundamental sprite format chagnes.
+    SP_JSON_VER = 4
+    VERSION_TXT = "version"
+
+    # file-name based format version (aka use_folders = False)
+    FILENAME_FMT_VER = 3
 
     # these imports are for the classes
     from store.mas_ev_data_ver import _verify_bool, _verify_str, \
@@ -448,14 +467,12 @@ init -21 python in mas_sprites_json:
             RETURNS: string to be logged
             """
             self.update_levelname(record)
-            return self.replace_lf(
-                self.apply_newline_prefix(
-                    record,
-                    "[{0}]:  {1}{2}".format(
-                        record.levelname,
-                        " " * (record.indent_lvl * 2),
-                        record.msg
-                    )
+            return self.apply_newline_prefix(
+                record,
+                "[{0}]:  {1}{2}".format(
+                    record.levelname,
+                    " " * (record.indent_lvl * 2),
+                    record.msg
                 )
             )
 
@@ -467,8 +484,8 @@ init -21 python in mas_sprites_json:
         adapter_ctor=SpriteJsonLogAdapter
     )
 
-    py_list = __builtin__.list
-    py_dict = __builtin__.dict
+    py_list = builtins.list
+    py_dict = builtins.dict
 
     sprite_station = store.MASDockingStation(
         renpy.config.basedir + "/game/mod_assets/monika/j/"
@@ -540,6 +557,7 @@ init -21 python in mas_sprites_json:
     SP_SUCCESS_DRY = "{0} sprite object '{1}' loaded successfully! DRY RUN"
     VER_NOT_FOUND = "version not found"
     VER_BAD = "version mismatch. expected '{0}', found '{1}'"
+    FILENAME_FMT = "using filename-based structure - consider updating to folder-based structure"
 
     BAD_TYPE = "property '{0}' - expected type {1}, got {2}"
     EXTRA_PROP = "extra property '{0}' found"
@@ -736,6 +754,9 @@ init -21 python in mas_sprites_json:
         "giftname": (str, _verify_str),
     }
 
+    OPT_HA_SHARED_PARAM_NAMES = {
+    }
+
     OPT_ACS_PARAM_NAMES = {
         # this is handled differently
 #        "rec_layer": None,
@@ -748,6 +769,7 @@ init -21 python in mas_sprites_json:
         "keep_on_desk": (bool, _verify_bool),
     }
     OPT_ACS_PARAM_NAMES.update(OPT_AC_SHARED_PARAM_NAMES)
+    OPT_ACS_PARAM_NAMES.update(OPT_HA_SHARED_PARAM_NAMES)
 
     OPT_HC_SHARED_PARAM_NAMES = {
 #        "fallback": (bool, _verify_bool),
@@ -757,7 +779,9 @@ init -21 python in mas_sprites_json:
         # object-based verification is different
 #        "split": None,
         "unlock": (bool, _verify_bool),
+        "use_numeric_layer_ids": (bool, _verify_bool),
     }
+    OPT_HAIR_PARAM_NAMES.update(OPT_HA_SHARED_PARAM_NAMES)
 
     OPT_CLOTH_PARAM_NAMES = {
         # object-based verificaiton is different
@@ -936,12 +960,12 @@ init 189 python in mas_sprites_json:
             _sel_list = sml.CLOTH_SEL_SL
 
         # remvoe from sprite object map
-        if sp_name in _item_map:
+        if sp_name in tuple(_item_map.keys()):
             _item_map.pop(sp_name)
 
         if sml.get_sel(sp_obj) is not None:
             # remove from selectable map
-            if sp_name in _sel_map:
+            if sp_name in tuple(_sel_map.keys()):
                 _sel_map.pop(sp_name)
 
             # remove from selectable list
@@ -1350,7 +1374,7 @@ init 189 python in mas_sprites_json:
         allow_none = not required
         is_bad = False
 
-        for param_name, verifier_info in param_dict.iteritems():
+        for param_name, verifier_info in param_dict.items():
             if param_name in jobj:
                 param_val = jobj.pop(param_name)
                 desired_type, verifier = verifier_info
@@ -1663,6 +1687,7 @@ init 189 python in mas_sprites_json:
 
         Props validated:
             - unlock
+            - use_numeric_layer_ids
             - highlight
 
         IN:
@@ -1686,6 +1711,10 @@ init 189 python in mas_sprites_json:
             indent_lvl
         ):
             return False
+
+        # default some params if not available
+        if "use_numeric_layer_ids" not in save_obj:
+            save_obj["use_numeric_layer_ids"] = False
 
         # mid hair map
         if "mid_hair_map" in obj_based:
@@ -1822,7 +1851,7 @@ init 189 python in mas_sprites_json:
             hair_map = obj_based.pop("hair_map")
             is_bad = False
 
-            for hair_key,hair_value in hair_map.iteritems():
+            for hair_key, hair_value in hair_map.items():
                 # start with type validations
 
                 # key
@@ -1964,7 +1993,7 @@ init 189 python in mas_sprites_json:
         ex_props = obj_based.pop("ex_props")
 
         isbad = False
-        for ep_key,ep_val in ex_props.iteritems():
+        for ep_key,ep_val in ex_props.items():
             if not _verify_str(ep_key):
                 msg_log.append((
                     MSG_ERR_T,
@@ -2262,7 +2291,7 @@ init 189 python in mas_sprites_json:
             dry_run = True
 
         # get rid of __keys
-        for jkey in jobj.keys():
+        for jkey in tuple(jobj.keys()):
             if jkey.startswith("__"):
                 jobj.pop(jkey)
 
@@ -2281,7 +2310,12 @@ init 189 python in mas_sprites_json:
             return
 
         # check version match
-        if version != SP_JSON_VER:
+        if version == FILENAME_FMT_VER:
+            # old style sprite version
+            sp_obj_params["use_folders"] = False 
+            log.warning(FILENAME_FMT)
+
+        elif version != SP_JSON_VER:
             log.error(VER_BAD.format(SP_JSON_VER, version))
             return
 
@@ -2303,6 +2337,10 @@ init 189 python in mas_sprites_json:
         sp_type = _validate_type(jobj, msg_log, indent_lvl)
         if parsewritelogs(msg_log):
             return
+
+        # pop use_folders for objects that dont use it
+        if sp_type not in (SP_ACS, SP_HAIR):
+            sp_obj_params.pop("use_folders", None) 
 
         # check name and img_sit
         msg_log = []
@@ -2730,7 +2768,7 @@ init 189 python in mas_sprites_json:
         frs_gifts = store.persistent._mas_filereacts_sprite_gifts
         msj_gifts = store.persistent._mas_sprites_json_gifted_sprites
 
-        for giftname in frs_gifts.keys():
+        for giftname in tuple(frs_gifts.keys()):
             if giftname in giftname_map:
                 # overwrite the gift data if in here
                 frs_gifts[giftname] = giftname_map[giftname]

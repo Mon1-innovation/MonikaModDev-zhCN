@@ -188,10 +188,11 @@ init -1 python in mas_hangman:
 
     def _add_monika_words(wordlist):
         for word in MONI_WORDS:
-            wordlist.append(renpy.store.PoemWord(glitch=False,sPoint=0,yPoint=0,nPoint=0,word=word))
+            wordlist.append(renpy.store.MASPoemWord(sPoint=0,yPoint=0,nPoint=0, mPoint=4, word=word))
 
 
     # file names
+    EASY_LIST = "mod_assets/games/hangman/poemwords.txt"
     NORMAL_LIST = "mod_assets/games/hangman/MASpoemwords.txt"
     HARD_LIST = "mod_assets/games/hangman/1000poemwords.txt"
 
@@ -244,10 +245,27 @@ init -1 python in mas_hangman:
         easy_list = all_hm_words[EASY_MODE]
 
         # lets start with Non Monika words
-        easy_list[:] = [
-            store.MASPoemWord._build(word, 0)._hangman()
-            for word in store.full_wordlist
-        ]
+        print(EASY_LIST)
+        poemwords = renpy.open_file(EASY_LIST, encoding="utf-8")
+        for line in poemwords:
+            line = line.strip()
+
+            #Ignore line if commented/empty
+            if line == '' or line[0] == '#':
+                continue
+
+            # add the word
+            splitword = line.split(",")
+            easy_list.append(store.MASPoemWord(
+                splitword[0],
+                float(splitword[1]),
+                float(splitword[2]),
+                float(splitword[3]),
+                0
+            )._hangman())
+        if not renpy.android:
+            poemwords.close()
+
 
         # now for monika words
         moni_list = list()
@@ -256,7 +274,6 @@ init -1 python in mas_hangman:
             easy_list.append(store.MASPoemWord._build(m_word, 4)._hangman())
 
         copyWordsList(EASY_MODE)
-
 
     def buildNormalList():
         """
@@ -367,22 +384,22 @@ label game_hangman:
 
         # instruction text and other sensitive stuff
         instruct_txt = (
-            "Guess a letter: (Type {0}'!' to give up)"
+            renpy.substitute(_("Guess a letter: (Type {0}'!' to give up)"))
         )
 
-        instruct_txt = instruct_txt.format("'?' to repeat the hint, ")
-        store.mas_hangman.game_name = "Hangman"
+        instruct_txt = instruct_txt.format(renpy.substitute(_("'?' to repeat the hint, ")))
+        store.mas_hangman.game_name = renpy.substitute(_("Hangman"))
 
 label mas_hangman_game_select_diff:
     m "Choose a difficulty.{nw}"
     $ _history_list.pop()
     menu:
         m "Choose a difficulty.{fast}"
-        "Easy.":
+        "Easy.{#mas_hangman_game_select_diff_1}":
             $ hangman_mode = mas_hmg.EASY_MODE
-        "Normal.":
+        "Normal.{#mas_hangman_game_select_diff_2}":
             $ hangman_mode = mas_hmg.NORM_MODE
-        "Hard.":
+        "Hard.{#mas_hangman_game_select_diff_3}":
             $ hangman_mode = mas_hmg.HARD_MODE
 
 label mas_hangman_game_preloop:
@@ -438,7 +455,7 @@ label mas_hangman_game_loop:
                 and len(persistent.playername) <= 15
             ):
             display_word = mas_hmg.wordToDisplay(persistent.playername.lower())
-            hm_hint = mas_hmg.HM_HINT.format("I")
+            hm_hint = mas_hmg.HM_HINT.format(renpy.substitute(_("I{#mas_hangman_game_loop}")))
             word = persistent.playername.lower()
             player_word = True
             persistent._mas_hangman_playername = True
@@ -523,7 +540,7 @@ label mas_hangman_game_loop:
                 $ mas_RaiseShield_core()
 
                 # setup glitch text
-                $ hm_glitch_word = glitchtext(40) + "?"
+                $ hm_glitch_word = mas_glitchText(40) + "?"
                 $ style.say_dialogue = style.edited
 
                 # show hanging sayori
@@ -643,10 +660,10 @@ label mas_hangman_game_loop:
             else:
                 $ guesses += 1
                 python:
-                    if guess in word:
+                    if guess in word.lower():
                         for index in range(0,len(word)):
-                            if guess == word[index]:
-                                display_word[index] = guess
+                            if guess == word[index].lower():
+                                display_word[index] = word[index]
                     else:
                         chances -= 1
                         missed += guess
@@ -668,9 +685,9 @@ label mas_hangman_game_loop:
             show hm_s_win_6 as window_sayori at hangman_sayori_h
 
         if player_word:
-            $ the_word = "your name"
+            $ the_word = _("your name")
         else:
-            $ the_word = "the word"
+            $ the_word = _("the word")
 
         m 1hua "Wow, you guessed [the_word] correctly!"
         m "Good job, [player]!"
@@ -688,7 +705,7 @@ label mas_hangman_game_loop:
     $ _history_list.pop()
     menu:
         m "Would you like to play again?{fast}"
-        "Yes.":
+        "Yes.{#mas_hangman_game_loop_1}":
             $ hang_ev = mas_getEV("mas_hangman")
             if hang_ev:
                 # each game counts as a game played
@@ -697,7 +714,7 @@ label mas_hangman_game_loop:
             show monika at t21
             jump mas_hangman_game_loop
 
-        "No.":
+        "No.{#mas_hangman_game_loop_2}":
             pass
 
             #FALL THROUGH

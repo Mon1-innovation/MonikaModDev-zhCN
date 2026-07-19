@@ -14,7 +14,7 @@ init python:
 
         fo = open(dumppath, "w")
 
-        for key in sorted(dumped_persistent.iterkeys()):
+        for key in sorted(dumped_persistent.keys()):
             fo.write(str(key) + ' - ' + str(type(dumped_persistent[key])) + ' >>> '+ str(dumped_persistent[key]) + '\n\n')
 
         fo.close()
@@ -44,7 +44,7 @@ label import_ddlc_persistent:
         menu:
             "Save data from Doki Doki Literature Club has been merged already. Aborting."
 
-            "Okay.":
+            "Okay.{#import_ddlc_persistent_1}":
                 pass
 
         pause 0.3
@@ -65,6 +65,19 @@ label import_ddlc_persistent:
             else:
                 rv = "~/RenPy/"
                 check_path = os.path.expanduser(rv)
+        elif renpy.android:
+            check_path = [
+                "/storage/emulated/0/Android/data/keyi.ddlc.chs/files/saves/",
+                "/storage/",
+                "/storage/emulated/0/Android/data/com.refii.ddlc/DDLC-1454445547/"
+            ]
+            for cp in check_path:
+                ddlc_save_path = glob(cp + 'persistent')
+                if ddlc_save_path:
+                    check_path = cp
+                    break
+            if isinstance(check_path, list):
+                check_path = ""
 
         else:
             rv = "~/.renpy/"
@@ -81,10 +94,10 @@ label import_ddlc_persistent:
         menu:
             "Would you like to import Doki Doki Literature Club save data into [config.name]?\n(DDLC will not be affected)"
 
-            "Yes, import DDLC save data.":
+            "Yes, import DDLC save data.{#import_ddlc_persistent_2}":
                 pause 0.3
 
-            "No, do not import.":
+            "No, do not import.{#import_ddlc_persistent_3}":
                 pause 0.3
                 return
 
@@ -94,7 +107,7 @@ label import_ddlc_persistent:
         menu:
             "Save data will not be imported at this time."
 
-            "Okay.":
+            "Okay.{#import_ddlc_persistent_4}":
                 pause 0.3
                 return
 
@@ -103,8 +116,7 @@ label import_ddlc_persistent:
         #Open the persistent save file at ddlc_save_path
         ddlc_persistent = None
         try:
-            with open(ddlc_save_path, "rb") as ddlc_pfile:
-                ddlc_persistent = mas_dockstat.cPickle.loads(ddlc_pfile.read().decode("zlib"))
+            ddlc_persistent = store.mas_per_check._load_per_data(ddlc_save_path)
 
         except Exception as e:
             store.mas_utils.mas_log.error("Failed to read/decode DDLC persistent: {0}".format(e))
@@ -122,7 +134,7 @@ label import_ddlc_persistent:
         menu:
             "Couldn't read/decode save data from Doki Doki Literature Club. Aborting."
 
-            "Okay.":
+            "Okay.{#import_ddlc_persistent_5}":
                 pass
 
         pause 0.3
@@ -134,10 +146,10 @@ label import_ddlc_persistent:
         menu:
             "Previous Monika After Story save data has also been found.\nWould you like to merge with DDLC save data?"
 
-            "Merge save data.":
+            "Merge save data.{#import_ddlc_persistent_6}":
                 pass
 
-            "Cancel.":
+            "Cancel.{#import_ddlc_persistent_7}":
                 "DDLC data can be imported later in the Settings menu."
                 return
 
@@ -297,8 +309,8 @@ label import_ddlc_persistent:
 label merge_unmatched_names:
     menu:
         "Player names do not match. Which would you like to keep?"
-        "[ddlc_persistent.playername]":
+        "[ddlc_persistent.playername]{#merge_unmatched_names_1}":
             $ persistent.playername = ddlc_persistent.playername
-        "[persistent.playername]":
+        "[persistent.playername]{#merge_unmatched_names_2}":
             $ persistent.playername
     return
