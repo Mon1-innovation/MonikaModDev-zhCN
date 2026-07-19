@@ -41,7 +41,10 @@ init python in mas_chess:
     import store
     import random
 
-    CHESS_SAVE_PATH = "/chess_games/"
+    if renpy.android:
+        CHESS_SAVE_PATH = "/storage/emulated/0/MAS/chess_game/"
+    else: 
+        CHESS_SAVE_PATH = "/chess_games/"
     CHESS_SAVE_EXT = ".pgn"
     CHESS_SAVE_NAME = "abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ-_0123456789"
     CHESS_PROMPT_FORMAT = "{0} | {1} | Turn: {2} | You: {3}"
@@ -651,7 +654,7 @@ label game_chess:
         # quicksave holds the pgn game in plaintext
         python:
             quicksaved_game = chess.pgn.read_game(
-                StringIO.StringIO(persistent._mas_chess_quicksave)
+                StringIO(persistent._mas_chess_quicksave)
             )
 
             quicksaved_game = mas_chess._checkInProgressGame(
@@ -949,7 +952,7 @@ label mas_chess_remenu:
         return
 
     #We're changing the main group of settings we wish to change
-    elif _return in menu_contents.keys():
+    elif _return in list(menu_contents.keys()):
         $ _history_list.pop()
         $ menu_category = _return
 
@@ -1189,10 +1192,10 @@ label mas_chess_start_chess:
         menu:
             m "Would you like to save this game?{fast}"
 
-            "Yes.":
+            "Yes.{#mas_chess_start_chess_1}":
                 call mas_chess_savegame
 
-            "No.":
+            "No.{#mas_chess_start_chess_2}":
                 pass
 
     # FALL THROUGH
@@ -1203,18 +1206,18 @@ label mas_chess_play_again_ask:
     menu:
         m "Would you like to play again?{fast}"
 
-        "Yes.":
+        "Yes.{#mas_chess_play_again_ask_1}":
             $ mas_assignModifyEVLPropValue("mas_chess", "shown_count", "+=", 1)
             if drew_lots:
                 call mas_chess_draw_lots
 
             jump mas_chess_start_chess
 
-        "Yes, but with different rules.":
+        "Yes, but with different rules.{#mas_chess_play_again_ask_2}":
             $ mas_assignModifyEVLPropValue("mas_chess", "shown_count", "+=", 1)
             jump mas_chess_remenu
 
-        "No.":
+        "No.{#mas_chess_play_again_ask_3}":
             m 1eua "Alright, let's play again soon."
 
     return
@@ -1289,10 +1292,10 @@ label mas_chess_savegame(silent=False, allow_return=True):
             $ _history_list.pop()
             menu:
                 m "Should I overwrite it?{fast}"
-                "Yes.":
+                "Yes.{#mas_chess_play_again_ask_4}":
                     pass
 
-                "No.":
+                "No.{#mas_chess_play_again_ask_5}":
                     #NOTE: Since jumping back to the main label causes arg resets, we jump to a local label inside to prevent that
                     #TODO: Jump with args
                     jump .save_start
@@ -1331,7 +1334,7 @@ label mas_chess_savegame(silent=False, allow_return=True):
                 menu:
                     m "Right, [player]?{fast}"
 
-                    "Of course not.":
+                    "Of course not.{#mas_chess_play_again_ask_6}":
                         m 1hua "Yay~"
 
         if game_result == mas_chess.IS_ONGOING:
@@ -1507,16 +1510,16 @@ label mas_chess_dlg_quickfile_lost:
     menu:
         m "Did you mess with the saves, [player]?{fast}"
 
-        "I deleted the save.":
+        "I deleted the save.{#mas_chess_dlg_quickfile_lost_1}":
             jump mas_chess_dlg_quickfile_lost_deleted
 
-        "It was an accident!":
+        "It was an accident!{#mas_chess_dlg_quickfile_lost_2}":
             jump mas_chess_dlg_quickfile_lost_accident
 
-        "Maybe...":
+        "Maybe...{#mas_chess_dlg_quickfile_lost_3}":
             jump mas_chess_dlg_quickfile_lost_maybe
 
-        "Of course not!":
+        "Of course not!{#mas_chess_dlg_quickfile_lost_4}":
             jump mas_chess_dlg_quickfile_lost_ofcoursenot
 
 
@@ -1529,11 +1532,11 @@ label mas_chess_dlg_quickfile_lost_deleted:
     menu:
         m "Did you not want to continue that game?{fast}"
 
-        "Yeah.":
+        "Yeah.{#mas_chess_dlg_quickfile_lost_deleted_1}":
             m 1eka "I understand, [player]."
             m 1hua "Let's start a new game~"
 
-        "No.":
+        "No.{#mas_chess_dlg_quickfile_lost_deleted_2}":
             m 1etc "Oh?"
             m 1rsc "I guess you just deleted it by mistake then."
             m 1eua "Let's just start a new game."
@@ -1649,7 +1652,7 @@ label mas_chess_quickfile_lost_maybe_filechecker_loop:
     show screen mas_background_timed_jump(4, "mas_chess_quickfile_lost_maybe_filechecker_loop")
     $ seconds += 4
     menu:
-        "I deleted the save...":
+        "I deleted the save...{#mas_chess_quickfile_lost_maybe_filechecker_loop_1}":
             hide screen mas_background_timed_jump
             jump mas_chess_dlg_quickfile_lost_maybe_filechecker_no_file
 
@@ -1705,10 +1708,10 @@ label mas_chess_dlg_quickfile_edited:
     menu:
         m "Did you edit the save file?{fast}"
 
-        "Yes.":
+        "Yes.{#mas_chess_dlg_quickfile_edited_1}":
             jump mas_chess_dlg_quickfile_edited_yes
 
-        "No.":
+        "No.{#mas_chess_dlg_quickfile_edited_2}":
             jump mas_chess_dlg_quickfile_edited_no
 
 
@@ -1725,7 +1728,7 @@ label mas_chess_dlg_quickfile_edited_yes:
         # we want a timed menu here. Let's give the player 5 seconds to say sorry
         show screen mas_background_timed_jump(5, "mas_chess_dlg_quickfile_edited_yes.game_ruined")
         menu:
-            "I'm sorry.":
+            "I'm sorry.{#mas_chess_dlg_quickfile_edited_yes_1}":
                 hide screen mas_background_timed_jump
                 # light affection boost for being honest
                 $ mas_gainAffection(modifier=0.5)
@@ -1733,7 +1736,7 @@ label mas_chess_dlg_quickfile_edited_yes:
                 m 1eua "Luckily, I still remember a little bit of the last game, so we can continue it from there."
                 return store.mas_chess.CHESS_GAME_BACKUP
 
-            "...":
+            "...{#mas_chess_dlg_quickfile_edited_yes_2}":
                 label .game_ruined:
                     pass
 
@@ -1797,7 +1800,7 @@ label mas_chess_dlg_quickfile_edited_no:
         #NOTE: This is the ultimate choice, it dictates whether we delete everything or not
         show screen mas_background_timed_jump(3, "mas_chess_dlg_quickfile_edited_no.menu_silent")
         menu:
-            "I'm sorry.":
+            "I'm sorry.{#mas_chess_dlg_quickfile_edited_no_1}":
                 hide screen mas_background_timed_jump
                 # light affection boost for apologizing
                 $ mas_gainAffection(modifier=0.5)
@@ -1813,7 +1816,7 @@ label mas_chess_dlg_quickfile_edited_no:
                 m 2dktdc "..."
                 return store.mas_chess.CHESS_GAME_BACKUP
 
-            "...":
+            "...{#mas_chess_dlg_quickfile_edited_no_2}":
                 label .menu_silent:
                     hide screen mas_background_timed_jump
                     jump mas_chess_dlg_pre_go_ham
@@ -1954,7 +1957,10 @@ init python:
     #Only add the chess_games folder if we can even do chess
     if mas_games.is_platform_good_for_chess():
         try:
-            file_path = os.path.normcase(config.basedir + mas_chess.CHESS_SAVE_PATH)
+            if renpy.android:
+                file_path = os.path.normcase(mas_chess.CHESS_SAVE_PATH)
+            else:
+                file_path = os.path.normcase(config.basedir + mas_chess.CHESS_SAVE_PATH)
 
             if not os.access(file_path, os.F_OK):
                 os.mkdir(file_path)
@@ -3416,12 +3422,13 @@ init python:
                     path - filepath to the stockfish application
                     startupinfo - startup flags
                 """
-                def start_stockfish_proc(path: str, startupinfo: subprocess.STARTUPINFO) -> subprocess.Popen:
+                def start_stockfish_proc(path: str, startupinfo) -> subprocess.Popen:
                     """
                     Tries to launch a stockfish subprocess, can raise exceptions
                     """
+                    stockfish_path = path if os.path.isabs(path) else os.path.join(renpy.config.gamedir, path)
                     return subprocess.Popen(
-                        os.path.join(renpy.config.gamedir, path).replace('\\', '/'),
+                        stockfish_path.replace('\\', '/'),
                         bufsize=0,
                         stdin=subprocess.PIPE,
                         stdout=subprocess.PIPE,
@@ -3441,7 +3448,8 @@ init python:
 
                         store.mas_ptod.rst_cn()
                         local_ctx = {
-                            "basedir": renpy.config.basedir
+                            "basedir": renpy.config.basedir,
+                            "android_stockfish_path": path
                         }
                         renpy.show("monika", at_list=[t22])
                         renpy.show_screen("mas_py_console_teaching")
@@ -3450,12 +3458,18 @@ init python:
                         renpy.pause(1.0)
                         store.mas_ptod.wx_cmd("import os", local_ctx)
                         renpy.pause(1.0)
-                        store.mas_ptod.wx_cmd(
-                            "subprocess.call(['chmod','+x', os.path.normcase(basedir + '/game/mod_assets/games/chess/stockfish_8_{0}_x64')])".format(
-                                "linux" if renpy.linux else "macosx"
-                            ),
-                            local_ctx
-                        )
+                        if renpy.android:
+                            store.mas_ptod.wx_cmd(
+                                "subprocess.call(['chmod','+x', os.path.normcase(android_stockfish_path)])",
+                                local_ctx
+                            )
+                        else:
+                            store.mas_ptod.wx_cmd(
+                                "subprocess.call(['chmod','+x', os.path.normcase(basedir + '/game/mod_assets/games/chess/stockfish_8_{0}_x64')])".format(
+                                    "linux" if renpy.linux else "macosx"
+                                ),
+                                local_ctx
+                            )
                         renpy.pause(2.0)
 
                         renpy.hide_screen("mas_py_console_teaching")
@@ -3486,8 +3500,49 @@ init python:
                 renpy.jump("mas_chess_cannot_work_embarrassing")
 
             is_64_bit = sys.maxsize > 2**32
+            ANDROID_STOCKFISH_BINARIES = {
+                "arm64-v8a": "stockfish-8-arm64-v8a",
+                "armeabi-v7a": "stockfish-8-armeabi-v7a",
+            }
+            ANDROID_NATIVE_STOCKFISH_NAME = "libmas_stockfish.so"
 
-            if renpy.windows:
+            def get_android_stockfish_binary():
+                try:
+                    from jnius import autoclass
+                    supported_abis = list(autoclass("android.os.Build").SUPPORTED_ABIS)
+                except Exception:
+                    supported_abis = ("arm64-v8a",) if is_64_bit else ("armeabi-v7a",)
+
+                for abi in supported_abis:
+                    if abi in ANDROID_STOCKFISH_BINARIES:
+                        return ANDROID_STOCKFISH_BINARIES[abi]
+
+                return ANDROID_STOCKFISH_BINARIES["arm64-v8a" if is_64_bit else "armeabi-v7a"]
+
+            def get_android_stockfish_path():
+                try:
+                    from jnius import autoclass
+                    VERSION = autoclass("android.os.Build$VERSION")
+
+                    if VERSION.SDK_INT >= 29:
+                        activity = autoclass("org.renpy.android.PythonSDLActivity").mActivity
+                        return os.path.join(
+                            activity.getApplicationInfo().nativeLibraryDir,
+                            ANDROID_NATIVE_STOCKFISH_NAME
+                        )
+
+                except Exception as ex:
+                    mas_utils.mas_log.exception(ex)
+
+                fp = "/data/user/0/and.sirp.masmobile/files/game/mod_assets/games/chess/{0}".format(
+                    get_android_stockfish_binary()
+                )
+                os.chmod(fp, 0o755)
+                return fp
+
+            if renpy.android:
+                self.stockfish = open_stockfish(get_android_stockfish_path())
+            elif renpy.windows:
                 startupinfo = subprocess.STARTUPINFO()
                 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 
@@ -3499,7 +3554,7 @@ init python:
             elif is_64_bit:
                 fp = "mod_assets/games/chess/stockfish_8_{0}_x64".format("linux" if renpy.linux else "macosx")
 
-                os.chmod(config.basedir + "/game/".format(fp), 0o755)
+                os.chmod(os.path.join(renpy.config.gamedir, fp), 0o755)
                 self.stockfish = open_stockfish(fp)
 
             #Set Monika's parameters

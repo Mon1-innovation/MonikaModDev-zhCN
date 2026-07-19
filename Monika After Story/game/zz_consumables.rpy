@@ -708,7 +708,7 @@ init 5 python:
                 list of all consumables Monika is low on (or critical on)
             """
             low_cons = []
-            for _type in store.mas_consumables.consumable_map.keys():
+            for _type in list(store.mas_consumables.consumable_map.keys()):
                 low_cons += MASConsumable._getLowConsType(_type, critical)
 
             return low_cons
@@ -726,7 +726,7 @@ init 5 python:
                 list of all consumables Monika
             """
             low_cons = []
-            for _type in store.mas_consumables.consumable_map.keys():
+            for _type in list(store.mas_consumables.consumable_map.keys()):
                 low_cons += MASConsumable._getLowConsType(_type, critical, exclude_restock_warned=True)
 
             return low_cons
@@ -1169,7 +1169,7 @@ init 5 python:
                 If found, MASConsumable
                 If not found, None
         """
-        for consumable_type in store.mas_consumables.consumable_map.keys():
+        for consumable_type in list(store.mas_consumables.consumable_map.keys()):
             if consumable_id in store.mas_consumables.consumable_map[consumable_type]:
                 return store.mas_consumables.consumable_map[consumable_type][consumable_id]
         return None

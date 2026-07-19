@@ -1084,7 +1084,7 @@ init python:
             IN:
                 per_rule - persistent dict of rules
             """
-            for ev_label in per_rules.keys():
+            for ev_label in list(per_rules.keys()):
                 ev = mas_getEV(ev_label)
                 if ev is not None and MASStripDatesRule.evaluate_rule(ev):
                     ev.stripDates()

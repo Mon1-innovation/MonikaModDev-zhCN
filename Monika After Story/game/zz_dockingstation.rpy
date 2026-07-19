@@ -19,7 +19,7 @@ init -900 python in mas_ics:
     ########################## ISLANDS ########################################
     # islands folder
     ISLANDS_FOLDER = os.path.normcase(
-        os.path.join(renpy.config.gamedir, "mod_assets/location/special/")
+        os.path.join(renpy.config.gamedir if not renpy.android else "/storage/emulated/0/MAS/game/"+ "mod_assets/location/special/")
     )
 
     # NOTE: these checksums are BEFORE b64 encoding
@@ -30,7 +30,7 @@ init -900 python in mas_ics:
     # cg folder
     o31_cg_folder = os.path.normcase(
         renpy.config.basedir + "/game/mod_assets/monika/cg/"
-    )
+    ) 
 
     # marisa cg
     o31_marisa = (
@@ -55,7 +55,7 @@ init -900 python in mas_ics:
     #################################### RPY ##################################
     #game folder
     game_folder = os.path.normcase(
-        renpy.config.basedir + "/game/"
+        renpy.config.basedir + "/game/" #TODO: 手机版路径
     )
     ###########################################################################
 
@@ -77,7 +77,7 @@ init -45 python:
 
         # The default docking station is the characters folder
         DEF_STATION = "/characters/"
-        DEF_STATION_PATH = os.path.normcase(renpy.config.basedir + DEF_STATION)
+        DEF_STATION_PATH = os.path.normcase(renpy.config.basedir if not renpy.android else "/storage/emulated/0/MAS" + DEF_STATION) 
 
         # default read size in bytes
         # NOTE: we use 4095 here since 3 divides evenly into 4095
@@ -263,12 +263,16 @@ init -45 python:
             if len(ext_filter) > 0 and not ext_filter.startswith("."):
                 ext_filter = "." + ext_filter
 
-            return [
-                package
-                for package in os.listdir(self.station)
-                if package.endswith(ext_filter)
-                and not os.path.isdir(self._trackPackage(package))
-            ]
+            try:
+                return [
+                    package
+                    for package in os.listdir(self.station)
+                    if package.endswith(ext_filter)
+                    and not os.path.isdir(self._trackPackage(package))
+                ]
+            except Exception as e:
+                store.mas_utils.mas_log.error("getPackageList failed for station {}:{}".format(self.station, repr(e)))
+                return []
 
 
         def getPackage(self, package_name, log=None):
@@ -990,7 +994,7 @@ init -45 python:
 
             return False
 
-    mas_docking_station = MASDockingStation()
+    mas_docking_station = MASDockingStation() if not renpy.android else MASDockingStation(os.path.normcase("/storage/emulated/0/MAS/" + MASDockingStation.DEF_STATION))
 
 
 default persistent._mas_moni_chksum = None
@@ -1287,7 +1291,7 @@ init 200 python in mas_dockstat:
             return True
 
         except Exception as e:
-            log.write(
+            log.error(
                 "[ERROR]: failed to pickle data: {0}".format(repr(e))
             )
             return False
@@ -2232,6 +2236,7 @@ label mas_dockstat_empty_desk_preloop:
         disable_esc()
         mas_enable_quit()
         promise = mas_dockstat.monikafind_promise
+        renpy.jump("mas_dockstat_found_monika")
 
 label mas_dockstat_empty_desk_from_empty:
 
@@ -2390,7 +2395,7 @@ label mas_dockstat_iostart:
 
         # launch I/O thread
         promise = store.mas_dockstat.monikagen_promise
-        promise.start()
+        #promise.start()
 
     #Jump to the iowait label
     if renpy.has_label(mas_farewells.dockstat_iowait_label):
@@ -2422,7 +2427,7 @@ label mas_dockstat_generic_iowait:
         #Get Moni off screen
         call mas_transition_to_emptydesk
 
-    elif promise.done():
+    else:#promise.done():
         # i/o thread is done!
         #We're ready to go. Let's jump to the rtg label
         if renpy.has_label(mas_farewells.dockstat_rtg_label):
@@ -2434,7 +2439,7 @@ label mas_dockstat_generic_iowait:
     # 4 seconds seems decent enough for waiting.
     show screen mas_background_timed_jump(4, "mas_dockstat_generic_iowait")
     menu:
-        "Hold on a second!":
+        "Hold on a second!{#mas_dockstat_generic_iowait_1}":
             hide screen mas_background_timed_jump
             $ persistent._mas_dockstat_cm_wait_count += 1
 
@@ -2464,7 +2469,7 @@ label mas_dockstat_generic_iowait:
 label mas_dockstat_generic_wait_label:
     menu:
         m "What is it?"
-        "Actually, I can't take you right now.":
+        "Actually, I can't take you right now.{#mas_dockstat_generic_wait_label_1}":
             call mas_dockstat_abort_gen
 
             #Show Monika again
@@ -2477,7 +2482,7 @@ label mas_dockstat_generic_wait_label:
             #Fallback to generic cancel
             jump mas_dockstat_generic_cancel
 
-        "Nothing.":
+        "Nothing.{#mas_dockstat_generic_wait_label_2}":
             # if we get here, we should jump back to the top so we can
             # continue waiting
             m 2hub "Oh, good! Let me finish getting ready."
@@ -2490,7 +2495,7 @@ label mas_dockstat_generic_wait_label:
 #If not set, the generic label will be used
 label mas_dockstat_generic_rtg:
     # io thread should be done by now
-    $ moni_chksum = promise.get()
+    $ moni_chksum = "Ciallo～(∠·ω< )⌒★"#promise.get()
     $ promise = None # clear promise so we dont have any issues elsewhere
     call mas_dockstat_ready_to_go(moni_chksum)
     if _return:
@@ -2550,7 +2555,7 @@ label mas_dockstat_generic_cancelled_still_going_ask:
     $ _history_list.pop()
     menu:
         m "Are you still going to go?{fast}"
-        "Yes.":
+        "Yes.{#mas_dockstat_generic_cancelled_still_going_ask_1}":
             if mas_isMoniNormal(higher=True):
                 m 2eka "All right. I'll be right here waiting for you, as usual..."
                 m 2hub "So hurry back! I love you, [player]!"
@@ -2561,7 +2566,7 @@ label mas_dockstat_generic_cancelled_still_going_ask:
 
             return "quit"
 
-        "No.":
+        "No.{#mas_dockstat_generic_cancelled_still_going_ask_2}":
             if mas_isMoniNormal(higher=True):
                 m 2eka "...Thank you."
                 m "It means a lot that you're going to spend more time with me since I can't come along."
@@ -2581,12 +2586,12 @@ label mas_dockstat_generic_failed_io_still_going_ask:
     $ _history_list.pop()
     menu:
         m "Are you still going to go?{fast}"
-        "Yes.":
+        "Yes.{#mas_dockstat_generic_failed_io_still_going_ask_1}":
             m 2eka "I understand. You have things to do, after all..."
             m 2hub "Be safe out there! I'll be right here waiting for you!"
             return "quit"
 
-        "No.":
+        "No.{#mas_dockstat_generic_failed_io_still_going_ask_2}":
             m 2wub "Really? Are you sure? Even though it's my own fault I can't go with you..."
             m 1eka "...Thank you, [player]. That means more to me than you could possibly understand."
             $ mas_gainAffection()

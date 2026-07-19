@@ -2595,7 +2595,7 @@ init python:
         ASSUMES:
             persistent.event_list
         """
-        MASEventList.push(*args, **kwargs)
+        MASEventList.push(event_label, skipeval, notify)
 
 
     @store.mas_utils.deprecated(use_instead="MASEventList.queue")
@@ -3631,7 +3631,7 @@ label mas_bookmarks_unbookmark(bookmarks_items):
     # sanity check that the user selected something
     if bookmarks_to_remove:
         python:
-            for ev_label in bookmarks_to_remove.keys():
+            for ev_label in list(bookmarks_to_remove.keys()):
                 # remove the bookmark from persist (if in it)
                 if ev_label in persistent._mas_player_bookmarked:
                     persistent._mas_player_bookmarked.remove(ev_label)

@@ -1263,7 +1263,7 @@ label greeting_o31_lingerie:
     pause 2.0
 
     menu:
-        "Hello?":
+        "Hello?{#greeting_o31_lingerie_1}":
             pause 5.0
 
     m "Ehehe!"
@@ -1400,10 +1400,10 @@ label bye_trick_or_treat:
         $ _history_list.pop()
         menu:
             m "Are you {i}sure{/i} you want to go right now?{fast}"
-            "Yes.":
+            "Yes.{#bye_trick_or_treat_1}":
                 m 2etc "Well...{w=1}okay then, [player]..."
 
-            "No.":
+            "No.{#bye_trick_or_treat_1}":
                 m 2hub "Ahaha!"
                 m "Be a little patient, [player]~"
                 m 4eub "Let's just make the most out of it later this evening, okay?"
@@ -1422,13 +1422,13 @@ label bye_trick_or_treat:
         $ _history_list.pop()
         menu:
             m "Are you sure you still want to go?{fast}"
-            "Yes.":
+            "Yes.{#bye_trick_or_treat_2}":
                 m 1eka "...Okay."
                 m "Even though it's only an hour..."
                 m 3hub "At least we're going to spend the rest of Halloween together~"
                 m 3wub "Let's go and make the most of it, [player]!"
 
-            "Actually, it {i}is{/i} a bit late...":
+            "Actually, it {i}is{/i} a bit late...{#bye_trick_or_treat_3}":
                 if persistent._mas_o31_tt_count:
                     m 1hub "Ahaha~"
                     m "I told you."
@@ -1458,7 +1458,7 @@ label bye_trick_or_treat_wait_wait:
     # wait wait flow
     menu:
         m "What is it?"
-        "You're right, it's too early." if too_early_to_go:
+        "You're right, it's too early.{#bye_trick_or_treat_wait_wait_1}" if too_early_to_go:
             call mas_dockstat_abort_gen
             call mas_transition_from_emptydesk(exp="monika 3hub")
 
@@ -1466,7 +1466,7 @@ label bye_trick_or_treat_wait_wait:
             m 1eka "Let's wait 'til evening, okay?"
             return True
 
-        "You're right, it's too late." if too_late_to_go:
+        "You're right, it's too late.{#bye_trick_or_treat_wait_wait_2}" if too_late_to_go:
             call mas_dockstat_abort_gen
 
             if persistent._mas_o31_tt_count:
@@ -1484,7 +1484,7 @@ label bye_trick_or_treat_wait_wait:
 
             return True
 
-        "Actually, I can't take you right now.":
+        "Actually, I can't take you right now.{#bye_trick_or_treat_wait_wait_3}":
             call mas_dockstat_abort_gen
             call mas_transition_from_emptydesk(exp="monika 1euc")
 
@@ -1498,7 +1498,7 @@ label bye_trick_or_treat_wait_wait:
 
             return True
 
-        "Nothing.":
+        "Nothing.{#bye_trick_or_treat_wait_wait_4}":
             m "Okay, let me finish getting ready."
             return
 
@@ -2826,7 +2826,7 @@ label mas_d25_monika_christmas:
                 show screen mas_background_timed_jump(5, "mas_d25_monika_christmas_no_wish")
                 window hide
                 menu:
-                    "Merry Christmas, [m_name].":
+                    "Merry Christmas, [m_name].{#mas_d25_monika_christmas_1}":
                         hide screen mas_background_timed_jump
                         show monika 5ekbfa at t11 zorder MAS_MONIKA_Z with dissolve_monika
                         pause 2.0
@@ -2842,7 +2842,7 @@ label mas_d25_monika_christmas:
                 show screen mas_background_timed_jump(5, "mas_d25_monika_christmas_no_wish")
                 window hide
                 menu:
-                    "Merry Christmas, [m_name].":
+                    "Merry Christmas, [m_name].{#mas_d25_monika_christmas_2}":
                         hide screen mas_background_timed_jump
                         show monika 1ekbfa at t11 zorder MAS_MONIKA_Z with dissolve_monika
                         pause 2.0
@@ -2901,7 +2901,7 @@ label mas_d25_monika_carolling:
     $ _history_list.pop()
     menu:
         m "Do you like singing Christmas carols, [player]?{fast}"
-        "Yes.":
+        "Yes.{#mas_d25_monika_carolling_1}":
             $ persistent._mas_pm_likes_singing_d25_carols = True
             m 1hua "I'm glad you feel the same way, [player]!"
             m 3hub "My favorite song is definitely 'Jingle Bells!'"
@@ -2909,7 +2909,7 @@ label mas_d25_monika_carolling:
             m 1eka "Maybe we can sing together someday."
             m 1hua "Ehehe~"
 
-        "No.":
+        "No.{#mas_d25_monika_carolling_2}":
             $ persistent._mas_pm_likes_singing_d25_carols = False
             m 1euc "Oh...{w=1}really?"
             m 1hksdlb "I see..."
@@ -3007,7 +3007,7 @@ label mas_d25_monika_christmaslights:
     menu:
         m "Do you hang lights up on your house during winter, [player]?{fast}"
 
-        "Yes.":
+        "Yes.{#mas_d25_monika_christmaslights_1}":
             $ persistent._mas_pm_hangs_d25_lights = True
             m 3sub "Really? I bet they're gorgeous!"
             m 2dubsu "I can already imagine us, outside of your house...sitting on our porch together..."
@@ -3020,7 +3020,7 @@ label mas_d25_monika_christmaslights:
             show monika 5ekbfa at t11 zorder MAS_MONIKA_Z with dissolve_monika
             m 5ekbfa "One day, [player]. One day, we can make that a reality."
 
-        "No.":
+        "No.{#mas_d25_monika_christmaslights_2}":
             $ persistent._mas_pm_hangs_d25_lights = False
             m 1eka "Aw, that's okay, [player]."
             m 1dkbla "I'm sure it would still be nice to relax with you on a cold night..."
@@ -3233,7 +3233,7 @@ label mas_d25_spent_time_monika:
         m 6dktua "You truly are my entire world, [player]...{w=1}your love is all I need..."
         window hide
         menu:
-            "I love you, [m_name].":
+            "I love you, [m_name].{#mas_d25_spent_time_monika_1}":
                 $ HKBHideButtons()
                 $ mas_RaiseShield_core()
                 $ disable_esc()
@@ -4391,7 +4391,7 @@ label mas_nye_monika_nyd_fresh_start:
     menu:
         m "What do you say, [player]?{fast}"
 
-        "I would love that.":
+        "I would love that.{#mas_nye_monika_nyd_fresh_start_1}":
             #so we can revert back to previous affection if player continues to mistreat after the second chance. need to determine the threshold the player must stay above for this.
             $ persistent._mas_pm_got_a_fresh_start = True #never forget
             $ persistent._mas_aff_before_fresh_start = _mas_getAffection()
@@ -4409,7 +4409,7 @@ label mas_nye_monika_nyd_fresh_start:
             m 3eka "Let's make this count, okay [player]?"
             return
 
-        "No.":
+        "No.{#mas_nye_monika_nyd_fresh_start_2}":
             $ persistent._mas_pm_got_a_fresh_start = False
 
             # set affection to broken
@@ -4455,14 +4455,14 @@ label monika_resolutions:
         menu:
             m "Did you make any New Year's resolutions last year?{fast}"
 
-            "Yes.":
+            "Yes.{#monika_resolutions_1}":
                 m 3hua "It always makes me so proud to hear that you're trying to better yourself, [player]."
                 m 2eka "That said..."
 
-                call monika_resolutions_accomplished_resolutions_menu("Did you accomplish last year's resolutions?")
+                call monika_resolutions_accomplished_resolutions_menu(_("Did you accomplish last year's resolutions?"))
 
 
-            "No.":
+            "No.{#monika_resolutions_1}":
                 m 2euc "Oh, I see..."
 
                 if mas_isMoniNormal(higher=True):
@@ -4477,21 +4477,21 @@ label monika_resolutions:
 
     #If we made a resolution last year, then we should ask if the player accomplished it
     elif mas_HistVerifyLastYear_k(True, "nye.actions.made_new_years_resolutions"):
-        call monika_resolutions_accomplished_resolutions_menu("Since you made a resolution last year, did you accomplish it?")
+        call monika_resolutions_accomplished_resolutions_menu(_("Since you made a resolution last year, did you accomplish it?"))
 
     #This path will be the first thing you see if you didn't make a resolution last year
     m "Do you have any resolutions for next year?{nw}"
     $ _history_list.pop()
     menu:
         m "Do you have any resolutions for next year?{fast}"
-        "Yes.":
+        "Yes.{#monika_resolutions_2}":
             $ persistent._mas_nye_has_new_years_res = True
 
             m 1eub "That's great!"
             m 3eka "Even if they can be hard to reach or maintain..."
             m 1hua "I'll be here to help you, if need be!"
 
-        "No.":
+        "No.{#monika_resolutions_3}":
             $ persistent._mas_nye_has_new_years_res = False
             m 1eud "Oh, is that so?"
             if mas_isMoniNormal(higher=True):
@@ -4525,7 +4525,7 @@ label monika_resolutions_accomplished_resolutions_menu(question):
     menu:
         m "[question]{fast}"
 
-        "Yes.":
+        "Yes.{#monika_resolutions_4}":
             $ persistent._mas_nye_accomplished_resolutions = True
             if mas_isMoniNormal(higher=True):
                 m 4hub "I'm glad to hear that, [player]!"
@@ -4539,7 +4539,7 @@ label monika_resolutions_accomplished_resolutions_menu(question):
 
             return True
 
-        "No.":
+        "No.{#monika_resolutions_5}":
             $ persistent._mas_nye_accomplished_resolutions = False
             if mas_isMoniNormal(higher=True):
                 m 2eka "Aw...well, sometimes things just don't work out like we plan them to."
@@ -5347,7 +5347,7 @@ label mas_player_bday_opendoor:
 label mas_player_bday_knock_no_listen:
     m "Who is it?"
     menu:
-        "It's me.":
+        "It's me.{#mas_player_bday_knock_no_listen_1}":
             $ mas_disable_quit()
             m "Oh! Can you wait just a moment please?"
             window hide
@@ -5366,12 +5366,12 @@ label mas_player_bday_surprise:
     $ _history_list.pop()
     menu:
         m "Did I surprise you?{fast}"
-        "Yes.":
+        "Yes.{#mas_player_bday_surprise_1}":
             m 1hub "Yay!"
             m 3hua "I always love pulling off a good surprise!"
             m 1tsu "I wish I could've seen the look on your face, ehehe."
 
-        "No.":
+        "No.{#mas_player_bday_surprise_2}":
             m 2lfp "Hmph. Well that's okay."
             m 2tsu "You're probably just saying that because you don't want to admit I caught you off guard..."
             if renpy.seen_label("mas_player_bday_listen"):
@@ -5405,7 +5405,7 @@ label mas_player_bday_knock_listened:
     window hide
     pause 5.0
     menu:
-        "Open the door.":
+        "Open the door.{#mas_player_bday_knock_listened_1}":
             $ mas_disable_quit()
             pause 5.0
             jump mas_player_bday_surprise
@@ -6326,7 +6326,7 @@ label mas_f14_monika_valentines_intro:
 
                     menu:
                         m "So, do you want me to put on the white sundress?{fast}"
-                        "Yes.":
+                        "Yes.{#mas_f14_monika_valentines_intro_1}":
                             m 3hub "Okay!"
                             m 3eua "I'll be right back."
                             call mas_clothes_change(mas_clothes_sundress_white, unlock=True, outfit_mode=True)
@@ -6334,7 +6334,7 @@ label mas_f14_monika_valentines_intro:
                             m 3eua "Something about wearing this dress on Valentine's Day just feels right."
                             m 1eua "..."
 
-                        "No.":
+                        "No.{#mas_f14_monika_valentines_intro_1}":
                             m 1eka "Okay, [player]."
                             m 3hua "This {i}is{/i} a really nice outfit..."
                             m 3eka "And besides, it doesn't matter what I'm wearing..."
@@ -6712,7 +6712,7 @@ label mas_f14_first_kiss:
         m "..."
         window hide
         menu:
-            "I love you, [m_name].":
+            "I love you, [m_name].{#mas_f14_first_kiss_1}":
                 $ HKBHideButtons()
                 $ mas_RaiseShield_core()
                 $ disable_esc()
@@ -7586,7 +7586,7 @@ label mas_bday_surprise_party_reaction:
 label mas_bday_surprise_party_reacton_cake:
     #Let's light candles
     menu:
-        "Light candles.":
+        "Light candles.{#mas_bday_surprise_party_reacton_cake_1}":
             $ mas_bday_cake_lit = True
 
     m 6sub "Ahh, it's so pretty, [player]!"
@@ -7598,7 +7598,7 @@ label mas_bday_surprise_party_reacton_cake:
 
     show screen mas_background_timed_jump(5, "mas_bday_surprise_party_reaction_no_make_wish")
     menu:
-        "Make a wish, [m_name]...":
+        "Make a wish, [m_name]...{#mas_bday_surprise_party_reacton_cake_2}":
             hide screen mas_background_timed_jump
             $ made_wish = True
             show monika 6hua
@@ -8300,7 +8300,7 @@ label mas_monika_cake_on_player_bday:
     m 6wuo "Oh! You made {i}me{/i} a cake!"
 
     menu:
-        "Light candles.":
+        "Light candles.{#mas_monika_cake_on_player_bday_1}":
             $ mas_bday_cake_lit = True
 
     m 6sub "It's {i}so{/i} pretty, [player]!"
