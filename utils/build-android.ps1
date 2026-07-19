@@ -224,12 +224,12 @@ function Sync-AndroidNotificationSources {
 
     $notificationJsonSource = Join-Path $ProjectBase "game\notifications.json"
     $notificationJsonTarget = Join-Path $TempBuildDir "game\notifications.json"
-    if (-not (Test-Path $notificationJsonSource)) {
-        Write-Error-Custom "notifications.json missing: $notificationJsonSource"
-        exit 1
+    if (Test-Path $notificationJsonSource) {
+        Copy-Item -Path $notificationJsonSource -Destination $notificationJsonTarget -Force
+    } else {
+        Write-Warning-Custom "notifications.json not found; skipping optional sync: $notificationJsonSource"
     }
-    Copy-Item -Path $notificationJsonSource -Destination $notificationJsonTarget -Force
-    Write-Success "Android notification Java sources and notifications.json synced"
+    Write-Success "Android notification Java sources synced"
 }
 
 # 设置默认输出目录（如果未指定）

@@ -26,6 +26,45 @@ class AndroidPermissionSourceTests(unittest.TestCase):
         self.assertIn('"android.permission.READ_EXTERNAL_STORAGE"', source)
         self.assertIn('"android.permission.POST_NOTIFICATIONS"', source)
 
+    def test_sdk_28_and_older_uses_legacy_renpy_permission_flow(self):
+        source = read_game_file("0_0android_permissions.rpy")
+        request_source = source[
+            source.index("    def mas_android_check_and_request_permissions():"):
+            source.index("    def mas_android_early_check_and_request_permissions():")
+        ]
+
+        self.assertIn("if sdk_int <= 28:", request_source)
+        legacy_source = request_source[
+            request_source.index("if sdk_int <= 28:"):
+            request_source.index("current_activity = mas_get_current_activity()")
+        ]
+        self.assertIn("renpy.check_permission(permission)", legacy_source)
+        self.assertIn("renpy.request_permission(permission)", legacy_source)
+        self.assertNotIn("current_activity.requestPermissions", legacy_source)
+        self.assertIn("current_activity.requestPermissions([", request_source)
+
+    def test_sdk_28_permission_status_uses_legacy_renpy_permission_checks(self):
+        source = read_game_file("0_0android_permissions.rpy")
+        check_source = source[
+            source.index("    def mas_android_has_permission():"):
+            source.index("    def mas_android_check_and_request_permissions():")
+        ]
+
+        self.assertIn("if sdk_int <= 28:", check_source)
+        legacy_source = check_source[
+            check_source.index("if sdk_int <= 28:"):
+            check_source.index("current_activity = mas_get_current_activity()")
+        ]
+        self.assertIn(
+            'renpy.check_permission("android.permission.WRITE_EXTERNAL_STORAGE")',
+            legacy_source
+        )
+        self.assertIn(
+            'renpy.check_permission("android.permission.READ_EXTERNAL_STORAGE")',
+            legacy_source
+        )
+
+
     def test_android_manifest_permissions_are_declared_in_options_build_config(self):
         source = read_game_file("options.rpy")
 

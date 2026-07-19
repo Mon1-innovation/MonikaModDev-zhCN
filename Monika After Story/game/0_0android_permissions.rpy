@@ -75,11 +75,19 @@ python early:
             if classes is None:
                 return False
 
+            sdk_int = classes["VERSION"].SDK_INT
+
+            if sdk_int <= 28:
+                return (
+                    renpy.check_permission("android.permission.WRITE_EXTERNAL_STORAGE")
+                    and renpy.check_permission("android.permission.READ_EXTERNAL_STORAGE")
+                )
+
             current_activity = mas_get_current_activity()
             if current_activity is None:
                 return False
 
-            if classes["VERSION"].SDK_INT >= 30:
+            if sdk_int >= 30:
                 return classes["Environment"].isExternalStorageManager()
 
             result = current_activity.checkSelfPermission(
@@ -101,11 +109,23 @@ python early:
             if classes is None:
                 return
 
+            sdk_int = classes["VERSION"].SDK_INT
+
+            # Original target-28 releases used Ren'Py's synchronous SDL bridge.
+            if sdk_int <= 28:
+                for permission in (
+                    "android.permission.WRITE_EXTERNAL_STORAGE",
+                    "android.permission.READ_EXTERNAL_STORAGE",
+                ):
+                    if not renpy.check_permission(permission):
+                        renpy.request_permission(permission)
+
+                _mas_android_permissions_requested = True
+                return
+
             current_activity = mas_get_current_activity()
             if current_activity is None:
                 return
-
-            sdk_int = classes["VERSION"].SDK_INT
 
             if sdk_int >= 30:
                 if not classes["Environment"].isExternalStorageManager():
