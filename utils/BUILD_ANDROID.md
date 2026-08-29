@@ -5,7 +5,7 @@
 ## 前置要求
 
 1. **DDLC Base 本体文件**
-   - 将原始DDLC本体文件放在 `.DDLC_BASE/` 目录
+   - 将原始 DDLC 的 `game` 文件夹内容放在 `.DDLC_BASE/` 目录；`.DDLC_BASE` 本身就是构建时的 `game` 目录
    - 这些文件会被加入 `.gitignore` 不提交到版本控制
    - 构建时会自动与MAS文件合并
 
@@ -30,8 +30,8 @@
 
 或者使用以下命令复制：
 ```powershell
-# 从源文件复制到 .DDLC_BASE
-Copy-Item -Path "E:\YourDDLCFolder\*" -Destination ".\.DDLC_BASE" -Recurse -Force
+# 仅复制 DDLC 的 game 文件夹内容到 .DDLC_BASE
+Copy-Item -Path "E:\YourDDLCFolder\game\*" -Destination ".\.DDLC_BASE" -Recurse -Force
 ```
 
 ### 第二步：运行构建脚本
@@ -132,7 +132,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 2. **准备临时构建环境**：
    - 在当前目录创建 `.build_temp` 临时目录
-   - 从 `.DDLC_BASE` 复制原始DDLC文件到临时目录
+   - 从 `.DDLC_BASE` 复制原始 DDLC 的 game 内容到临时目录的 `game` 文件夹
    - 从 `Monika After Story` 复制MAS文件到临时目录（覆盖重复项）
    - 这样确保MAS的修改优先于原始DDLC文件
 
@@ -159,11 +159,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 .DDLC_BASE/
 ├── .gitkeep
-├── game/
-│   ├── *.rpy
-│   └── ...
-├── lib/
-├── renpy/
+├── *.rpy
 └── ...
 ```
 
@@ -204,7 +200,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ### 第一次设置
 
 ```bash
-# 1. 将 DDLC 本体文件复制到 .DDLC_BASE/
+# 1. 将 DDLC 的 game 文件夹内容复制到 .DDLC_BASE/
 #    (手动操作或使用脚本复制)
 
 # 2. 创建 .gitkeep 来保持目录（已由脚本自动完成）

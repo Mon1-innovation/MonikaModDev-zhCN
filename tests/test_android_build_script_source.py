@@ -5,6 +5,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "utils" / "build-android.ps1"
 AUTO_SCRIPT = ROOT / "utils" / "build-android-auto.ps1"
+DDLC_AMERGED = ROOT / ".DDLC_BASE" / "amerged_cgs.rpy"
 AWARENESS_SOURCE = (
     ROOT
     / "docs"
@@ -38,6 +39,35 @@ class AndroidBuildScriptSourceTests(unittest.TestCase):
         self.assertIn("if (Test-Path $notificationJsonSource)", source)
         self.assertIn("notifications.json not found; skipping optional sync", source)
         self.assertNotIn('Write-Error-Custom "notifications.json missing:', source)
+
+    def test_ddlc_base_contents_are_copied_into_the_temporary_game_directory(self):
+        source = SCRIPT.read_text(encoding="utf-8-sig")
+
+        self.assertIn(
+            '$ddlcGameDir = Join-Path $tempBuildDir "game"',
+            source,
+        )
+        self.assertIn(
+            'Copy-DirectoryRecursive -Source $DDLCBase -Destination $ddlcGameDir',
+            source,
+        )
+
+    def test_ddlc_base_merged_events_keep_mas_init_priority(self):
+        if not DDLC_AMERGED.exists():
+            self.skipTest("local .DDLC_BASE is not checked into the repository")
+
+        source = DDLC_AMERGED.read_text(encoding="utf-8")
+
+        gui_offset = source.index("init offset = -2")
+        reset_offset = source.index("init offset = 0", gui_offset)
+        post_gui_init = source.index("init python:\n    class Poem", reset_offset)
+        merged_event_init = source.index(
+            "init 5 python:\n    addEvent(\n        Event(\n            persistent.event_database",
+            post_gui_init,
+        )
+
+        self.assertLess(reset_offset, post_gui_init)
+        self.assertLess(reset_offset, merged_event_init)
 
     def test_output_directory_keeps_only_latest_apk(self):
         source = SCRIPT.read_text(encoding="utf-8-sig")

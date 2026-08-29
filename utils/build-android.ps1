@@ -296,9 +296,10 @@ if (Test-Path $tempBuildDir) {
 New-Item -ItemType Directory -Path $tempBuildDir -Force | Out-Null
 Write-Success "临时构建目录已创建: $tempBuildDir"
 
-# 1. 复制 DDLC Base 文件到临时目录
+# 1. 复制 DDLC Base 的 game 内容到临时项目的 game 目录
 Write-Info "复制 DDLC Base 文件..."
-Copy-DirectoryRecursive -Source $DDLCBase -Destination $tempBuildDir -ExcludePattern '\.gitkeep'
+$ddlcGameDir = Join-Path $tempBuildDir "game"
+Copy-DirectoryRecursive -Source $DDLCBase -Destination $ddlcGameDir -ExcludePattern '\.gitkeep'
 Write-Success "DDLC Base 文件已复制"
 
 # 清理临时目录中的问题 .pyc 和 __pycache__（预防性）
