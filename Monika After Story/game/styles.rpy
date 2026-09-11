@@ -185,7 +185,7 @@ init python:
             setattr(style, alias_name, alias_style_ptr)
 
         # Automagically switch every style which has a dark variant
-        for style_tuple in renpy.style.styles.keys():
+        for style_tuple in list(renpy.style.styles.keys()):
             style_name = style_tuple[0]
             if not mas_isDarkStyle(style_name) and mas_hasDarkStyle(style_name):
                 dark_style_name = style_name + mas_ui.dark_suffix

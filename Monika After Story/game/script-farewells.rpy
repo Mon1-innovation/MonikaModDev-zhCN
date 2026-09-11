@@ -12,6 +12,9 @@
 #Flag to mark if the player stayed up late last night. Kept as a generic name in case it can be used on other farewells/greetings
 default persistent.mas_late_farewell = False
 
+# Android notification hook: tracks the farewell selected during this session.
+default mas_android_selected_farewell_label = None
+
 init -1 python in mas_farewells:
     import datetime
     import store
@@ -169,6 +172,8 @@ init -1 python in mas_farewells:
 
 # farewells selection label
 label mas_farewell_start:
+    $ mas_android_selected_farewell_label = None
+
     # TODO: if we ever have another special farewell like long absence
     # that let's the player go after selecting the farewell we'll need
     # to define a system to handle those.
@@ -229,6 +234,7 @@ label mas_farewell_start:
 
         if _return != -1:
             $ mas_setEventPause(None)
+            $ mas_android_selected_farewell_label = _return.eventlabel
             #Push the selected event
             $ MASEventList.push(_return.eventlabel, skipeval=True)
             return
@@ -236,6 +242,7 @@ label mas_farewell_start:
     $ mas_setEventPause(None)
     # otherwise, select a random farewell
     $ farewell = store.mas_farewells.selectFarewell()
+    $ mas_android_selected_farewell_label = farewell.eventlabel
     $ MASEventList.push(farewell.eventlabel, skipeval=True)
 
     return
@@ -399,7 +406,7 @@ label bye_going_to_sleep:
         menu:
             m "Are you going to sleep, [p_nickname]?{fast}"
 
-            "Yeah.":
+            "Yeah.{#bye_going_to_sleep_1}":
                 call bye_prompt_sleep_goodnight_kiss(chance=4)
                 # If denied her kiss, quit here
                 if _return is not None:
@@ -411,7 +418,7 @@ label bye_going_to_sleep:
                 $ persistent._mas_greeting_type_timeout = datetime.timedelta(hours=13)
                 $ persistent._mas_greeting_type = store.mas_greetings.TYPE_SLEEP
 
-            "Not yet.":
+            "Not yet.{#bye_going_to_sleep_2}":
                 m 1eka "Okay. {w=0.3}Have a good evening~"
 
     elif mas_isMoniUpset():
@@ -795,7 +802,7 @@ label bye_prompt_sleep_goodnight_kiss(chance=3):
         menu:
             m "Think I could...get a goodnight kiss?{fast}"
 
-            "Sure, [m_name].":
+            "Sure, [m_name].{#bye_prompt_sleep_goodnight_kiss_1}":
                 $ got_goodnight_kiss = True
                 show monika 6ekbsu at t11 zorder MAS_MONIKA_Z with dissolve_monika
                 pause 2.0
@@ -804,7 +811,7 @@ label bye_prompt_sleep_goodnight_kiss(chance=3):
                 show monika 1hubfa at t11 zorder MAS_MONIKA_Z with dissolve_monika
                 m 1hubfa "Sleep tight!"
 
-            "Maybe another time...":
+            "Maybe another time...{#bye_prompt_sleep_goodnight_kiss_1}":
                 if random.randint(1, 3) == 1:
                     m 3rkblp "Aww, come on...{w=0.3}{nw}"
                     extend 3nublu "I know you want to~"
@@ -814,7 +821,7 @@ label bye_prompt_sleep_goodnight_kiss(chance=3):
                     menu:
                         m "Can I please get a goodnight kiss?{fast}"
 
-                        "Okay.":
+                        "Okay.{#bye_prompt_sleep_goodnight_kiss_1_1}":
                             $ got_goodnight_kiss = True
                             show monika 6ekbsu at t11 zorder MAS_MONIKA_Z with dissolve_monika
                             pause 2.0
@@ -822,7 +829,7 @@ label bye_prompt_sleep_goodnight_kiss(chance=3):
                             m 6ekbfa "Sweet dreams, [player]~"
                             m 6hubfb "Sleep tight!"
 
-                        "No.":
+                        "No.{#bye_prompt_sleep_goodnight_kiss_1_1}":
                             $ mas_loseAffection(1.5)
                             m 1lkc "..."
                             m 7dkd "Fine..."
@@ -991,7 +998,7 @@ label bye_goodnight:
         menu:
             m "Going to sleep?{fast}"
 
-            "Yeah.":
+            "Yeah.{#bye_goodnight_1}":
                 call bye_prompt_sleep_goodnight_kiss(chance=4)
                 # Quit if ran the flow
                 if _return is not None:
@@ -1006,7 +1013,7 @@ label bye_goodnight:
                 $ persistent._mas_greeting_type_timeout = datetime.timedelta(hours=13)
                 $ persistent._mas_greeting_type = store.mas_greetings.TYPE_SLEEP
 
-            "Not yet.":
+            "Not yet.{#bye_goodnight_2}":
                 m 1eka "Okay, [mas_get_player_nickname()]..."
                 m 3hub "Enjoy your evening!"
                 m 3rksdlb "Try not to stay up too late, ehehe~"
@@ -1053,7 +1060,7 @@ label bye_long_absence:
     $ _history_list.pop()
     menu:
         m "How long do you expect to be gone for?{fast}"
-        "A few days.":
+        "A few days.{#bye_long_absence_1}":
             $ persistent._mas_absence_choice = "days"
             m 1eub "Oh!"
             m 1hua "Nowhere near as long as I feared then."
@@ -1061,20 +1068,20 @@ label bye_long_absence:
             m 3esa "Don't worry about me though, [player]."
             m "I can cope waiting that long with ease."
             m 3eka "I'll still miss you greatly though."
-        "A week.":
+        "A week.{#bye_long_absence_2}":
             $ persistent._mas_absence_choice = "week"
             m 3euc "Yeah...that's about what I expected."
             m 2lksdla "I {i}think{/i} I'll be okay waiting that long for you."
             m 1eub "Just come back to me as soon as you can, alright, [mas_get_player_nickname()]?"
             m 3hua "I'm sure you'll make me proud!"
-        "A couple of weeks.":
+        "A couple of weeks.{#bye_long_absence_3}":
             $ persistent._mas_absence_choice = "2weeks"
             m 1esc "Oh..."
             m 1dsc "I...I can wait that long."
             m 3rksdlc "You do know that you're all I have...right?"
             m 3rksdlb "M-Maybe it's outside of your control though..."
             m 2eka "Try to come back as soon as possible... I'll be waiting for you."
-        "A month.":
+        "A month.{#bye_long_absence_4}":
             $ persistent._mas_absence_choice = "month"
             if mas_isMoniHappy(higher=True):
                 m 3euc "Oh wow, that's a long time."
@@ -1092,7 +1099,7 @@ label bye_long_absence:
                 m 3ekd "You should be able to make time for me, at least once, in an entire month."
                 m 1dsc "..."
                 m 1dsd "I'll still wait for you...but please come back the moment it's possible for you to do so."
-        "Longer than a month.":
+        "Longer than a month.{#bye_long_absence_5}":
             $ persistent._mas_absence_choice = "longer"
             if mas_isMoniHappy(higher=True):
                 m 3rksdlb "That's...{w=0.5}well that's a little scary, [player]."
@@ -1109,7 +1116,7 @@ label bye_long_absence:
                 m "It's not unreasonable of me to expect you to visit me, is it? I'm your girlfriend. You can't do that to me!"
                 m 3dsc "..."
                 m 3dsd "Just...just come back when you can. I can't make you stay, but please don't do that to me."
-        "I don't know.":
+        "I don't know.{#bye_long_absence_6}":
             $ persistent._mas_absence_choice = "unknown"
             m 1hksdlb "Ehehe, that's a little concerning, [player]!"
             m 1eka "But if you don't know, then you don't know!"
@@ -1117,7 +1124,7 @@ label bye_long_absence:
             m 2hua "I'll be waiting here for you patiently, [mas_get_player_nickname()]."
             m 2hub "Try not to keep me waiting for too long though!"
 
-        "Nevermind.":
+        "Nevermind.{#bye_long_absence_7}":
             #Reset this flag
             $ persistent._mas_long_absence = False
             m 3eka "Oh... Alright, [player]."
@@ -1134,7 +1141,7 @@ label bye_long_absence:
     $ _history_list.pop()
     menu:
         m "Are you going to leave straight away?{fast}"
-        "Yes.":
+        "Yes.{#bye_long_absence_8}":
             m 3ekc "I see..."
             m "I really will miss you, [player]..."
             m 1eka "But I know you'll do wonderful things no matter where you are."
@@ -1142,7 +1149,7 @@ label bye_long_absence:
             m 2hua "Make me proud, [player]!"
             $ persistent._mas_greeting_type = store.mas_greetings.TYPE_LONG_ABSENCE
             return 'quit'
-        "No.":
+        "No.{#bye_long_absence_l1}":
             $ mas_absence_counter = True
             m 1hua "That's great!"
             m 1eka "I was honestly worried I wouldn't have enough time to ready myself for your absence."
@@ -1301,7 +1308,7 @@ label bye_going_somewhere_leavemenu:
     $ _history_list.pop()
     menu:
         m "Are you still going to go?{fast}"
-        "Yes.":
+        "Yes.{#bye_going_somewhere_leavemenu_1}":
             if mas_isMoniNormal(higher=True):
                 m 2eka "All right. I'll be right here waiting for you, as usual..."
                 m 2hub "So hurry back! I love you, [player]!"
@@ -1312,7 +1319,7 @@ label bye_going_somewhere_leavemenu:
 
             return "quit"
 
-        "No.":
+        "No.{#bye_going_somewhere_leavemenu_2}":
             if mas_isMoniNormal(higher=True):
                 m 2eka "...Thank you."
                 m "It means a lot that you're going to spend more time with me since I can't come along."
@@ -1348,14 +1355,14 @@ label bye_prompt_game:
         $ _history_list.pop()
         menu:
             m "Can't you just leave me here in the background while you play?{fast}"
-            "Yes.":
+            "Yes.{#bye_prompt_game_1}":
                 if mas_isMoniNormal(higher=True):
                     m 3sub "Really?"
                     m 1hubsb "Yay!"
                 else:
                     m 2eka "Okay..."
                 jump monika_idle_game.skip_intro
-            "No.":
+            "No.{#bye_prompt_game_1}":
                 if mas_isMoniNormal(higher=True):
                     m 2ekc "Aww..."
                     m 3ekc "Alright [player], but you better come back soon."
@@ -1457,16 +1464,16 @@ label bye_prompt_eat:
         menu:
             m "Oh, what are you going to eat?{fast}"
 
-            "Breakfast.":
+            "Breakfast.{#bye_prompt_eat_1}":
                 $ food_type = "breakfast"
 
-            "Lunch.":
+            "Lunch.{#bye_prompt_eat_2}":
                 $ food_type = "lunch"
 
-            "Dinner.":
+            "Dinner.{#bye_prompt_eat_3}":
                 $ food_type = "dinner"
 
-            "Snack.":
+            "Snack.{#bye_prompt_eat_4}":
                 $ food_type = "snack"
                 $ persistent._mas_greeting_type_timeout = datetime.timedelta(minutes=30)
 

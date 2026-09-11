@@ -156,7 +156,7 @@ label introduction:
     if not persistent.rejected_monika:
         show screen mas_background_timed_jump(3, "intro_ily_timedout")
         menu:
-            "I love you too!":
+            "I love you too!{#introduction_1}":
                 hide screen mas_background_timed_jump
                 # bonus aff was saying it before being asked
                 $ mas_gainAffection(7, bypass=True)
@@ -173,7 +173,7 @@ label introduction:
             m "Do you love me, [player]?{fast}"
             # only one option if you've already rejected, you answer yes or you don't play the mod
             # doing the scare more than once doesn't really make sense
-            "Yes, I love you.":
+            "Yes, I love you.{#introduction_2}":
                 m 1hksdlb "Did I scare you last time? Sorry about that!"
                 m 1rsu "I knew you really loved me the whole time."
                 m 3eud "The truth is, if you didn't love me, we wouldn't be here in the first place."
@@ -223,12 +223,12 @@ label intro_ily_timedout:
     $ _history_list.pop()
     menu:
         m "You do love me, [player]...right?{fast}"
-        "Of course I love you.":
+        "Of course I love you.{#intro_ily_timedout_1}":
             #Gain affection for saying I love you too.
             $ mas_gainAffection()
             m 1hua "I'm so happy you feel the same way!"
             jump intro_end
-        "No.":
+        "No.{#intro_ily_timedout_2}":
             #Lose affection for rejecting Monika
             $ mas_loseAffection()
             call chara_monika_scare from _call_chara_monika_scare

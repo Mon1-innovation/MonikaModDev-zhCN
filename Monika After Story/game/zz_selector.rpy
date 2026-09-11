@@ -1058,19 +1058,19 @@ init -10 python in mas_selspr:
                 (Default: False)
         """
         if select_type == SELECT_ACS:
-            new_map_view = new_map.keys()
+            new_map_view = list(new_map.keys())
 
             # determine which map is the "old" and which is "new"
             # we want to remove what is excess from the desired map
             if use_old:
-                old_map_view = old_map.keys()
-                remove_keys = new_map_view - old_map_view
+                old_map_view = list(old_map.keys())
+                remove_keys = [item for item in new_map_view if item not in old_map_view]
                 remove_map = new_map
                 add_map = old_map
 
             else:
-                old_map_view = prev_map.keys()
-                remove_keys = old_map_view - new_map_view
+                old_map_view = list(prev_map.keys())
+                remove_keys = [item for item in old_map_view if item not in new_map_view]
                 remove_map = prev_map
                 add_map = new_map
 
@@ -3334,6 +3334,7 @@ screen mas_selector_sidebar(items, mailbox, confirm, cancel, restore, remover=No
 
                     viewport id "sidebar_scroll_acs":
                         mousewheel True
+                        draggable True
                         yfill False
 
                         vbox:
@@ -3436,6 +3437,7 @@ screen mas_selector_sidebar(items, mailbox, confirm, cancel, restore, remover=No
 
             viewport id "sidebar_scroll":
                 mousewheel True
+                draggable True
                 arrowkeys True
 
                 vbox:
@@ -3665,8 +3667,8 @@ label mas_selector_sidebar_select(items, select_type, preview_selections=True, o
         prev_select_map = dict(select_map)
 
         # also create views that we use for comparisons
-        old_view = old_select_map.keys()
-        new_view = select_map.keys()
+        old_view = list(old_select_map.keys())
+        new_view = list(select_map.keys())
 
         # disable menu interactions to prevent bugs
         disable_esc()

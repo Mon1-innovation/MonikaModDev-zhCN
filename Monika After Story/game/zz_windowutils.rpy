@@ -128,8 +128,14 @@ init python in mas_windowutils:
 
             store.mas_utils.mas_log.warning("Cannot detect current session type, disabling notifications.")
 
+    elif renpy.android:
+        store.mas_windowreacts.can_show_notifs = True
+        store.mas_windowreacts.can_do_windowreacts = True
+
     else:
         store.mas_windowreacts.can_do_windowreacts = False
+        store.mas_windowreacts.can_show_notifs = False
+
 
 
     #Fallback Const Defintion
@@ -200,7 +206,7 @@ init python in mas_windowutils:
             mas_utils.mas_log.error("Failed to get MAS window object: {}".format(e))
             return None
 
-    def __getMASWindowHWND_Windows() -> int|None:
+    def __getMASWindowHWND_Windows():
         """
         Gets the hWnd of the MAS window
 
@@ -336,6 +342,58 @@ init python in mas_windowutils:
         """
         return ""
 
+    def _getActiveWindowHandle_Android() -> str:
+        """
+        Gets the most recently foregrounded non-MAS app on Android.
+
+        OUT:
+            string containing app label and package name, or an empty string
+        """
+        if (
+            not store.persistent._mas_awareness_enabled
+            or not hasattr(store, "mas_awareness_get_most_recent_app")
+        ):
+            return ""
+
+        if hasattr(store, "mas_awareness_has_permission") and not store.mas_awareness_has_permission("usage_stats"):
+            return ""
+
+        try:
+            app = store.mas_awareness_get_most_recent_app()
+        except Exception:
+            return ""
+
+        if not store._mas_awareness_is_dict(app):
+            return ""
+
+        app_label = app.get("label", "") or ""
+        package_name = app.get("package", "") or ""
+        return "{} {}".format(app_label, package_name).strip()
+
+    def _isFocused_Android():
+        """
+        Checks if the MAS Activity is resumed and owns Android window focus.
+        """
+        if not hasattr(store, "mas_awareness_read_state"):
+            return False
+
+        try:
+            state = store.mas_awareness_read_state()
+        except Exception:
+            return False
+
+        if not store._mas_awareness_is_dict(state):
+            return False
+
+        activity = state.get("mas_activity", {})
+        if not store._mas_awareness_is_dict(activity):
+            return False
+
+        return bool(
+            activity.get("resumed", False)
+            and activity.get("has_window_focus", False)
+        )
+
     def _flashMASWindow_Windows():
         """
         Tries to flash MAS window
@@ -437,6 +495,15 @@ init python in mas_windowutils:
         """
         os.system('osascript -e \'display notification "{0}" with title "{1}"\''.format(body, title))
         return True
+
+    def _tryShowNotification_Android(title, body):
+        """
+        Android notifications are handled by store.mas_android_display_notif.
+        """
+        if hasattr(store, "mas_android_display_notif"):
+            return store.mas_android_display_notif(title, body)
+
+        return False
 
     #Mouse Position related funcs
     def _getAbsoluteMousePos_Windows():
@@ -635,6 +702,14 @@ init python in mas_windowutils:
         flashMASWindow = _flashMASWindow_Linux
         focusMASWindow = _focusMASWindow_Linux
 
+    elif renpy.android:
+        _window_get = _getActiveWindowHandle_Android
+        _tryShowNotif = _tryShowNotification_Android
+        flashMASWindow = _flashMASWindow_OSX
+        focusMASWindow = _focusMASWindow_OSX
+        getMASWindowPos = store.dummy
+        getMousePos = store.dummy
+
     else:
         _window_get = _getActiveWindowHandle_OSX
         _tryShowNotif = _tryShowNotification_OSX
@@ -700,7 +775,7 @@ init python:
     def mas_display_notif(
         title: str,
         body: list[str],
-        group: str|None = None,
+        group=None,
         skip_checks: bool = False,
         flash_window: bool = False
     ) -> bool:
@@ -732,6 +807,34 @@ init python:
             persistent._mas_windowreacts_notif_filters[group] = False
 
         notif_success = False
+        notif_body = renpy.substitute(renpy.random.choice(body))
+
+        def _log_test_notif_failure(reason):
+            if skip_checks:
+                store.mas_utils.mas_log.error(
+                    "mas_display_notif: test notification failed ({0}). title={1!r}, group={2!r}".format(
+                        reason,
+                        title,
+                        group
+                    )
+                )
+
+        if renpy.android:
+            if (
+                skip_checks
+                or (
+                    mas_windowreacts.can_show_notifs
+                    and not mas_isFocused()
+                    and mas_notifsEnabledForGroup(group)
+                )
+            ):
+                notif_success = mas_windowutils._tryShowNotif(title, notif_body)
+                if not notif_success:
+                    _log_test_notif_failure("android display backend returned False")
+
+                return notif_success
+
+            return False
 
         if (
             skip_checks
@@ -744,7 +847,7 @@ init python:
             #Now we make the notif
             notif_success = mas_windowutils._tryShowNotif(
                 renpy.substitute(title),
-                renpy.substitute(renpy.random.choice(body))
+                notif_body
             )
             if notif_success:
                 # Flash the window if needed
@@ -755,6 +858,9 @@ init python:
                 if persistent._mas_notification_sounds:
                     renpy.sound.play("mod_assets/sounds/effects/notif.wav")
 
+            else:
+                _log_test_notif_failure("desktop display backend returned False")
+
         #Now we return true if notif was successful, false otherwise
         return notif_success
 
@@ -762,6 +868,9 @@ init python:
         """
         Checks if MAS is the focused window
         """
+        if renpy.android:
+            return store.mas_windowutils._isFocused_Android()
+
         #TODO: Mac vers (if possible)
         return store.mas_windowreacts.can_show_notifs and mas_getActiveWindowHandle() == store.mas_getWindowTitle()
 

@@ -310,7 +310,6 @@ init -979 python:
 init -980 python in mas_api_keys:
     import json
     import os
-    import pygame
     import store
     import store.mas_utils as mas_utils
 
@@ -488,28 +487,14 @@ init -980 python in mas_api_keys:
         if not feature_registered(feature):
             return
 
-        # grab key
-        new_key = pygame.scrap.get(pygame.SCRAP_TEXT).strip()
+        # AndroidClipboard returns text or an empty string on failure.
+        new_key = AndroidClipboard().get_from_clipboard()
         if not new_key:
             # null key is not counted
             return
 
-        try:
-            # clear newlines
-            new_key = clean_key(new_key.decode("utf-8"))
-
-        except UnicodeDecodeError as e:
-            # log the error
-            store.mas_utils.mas_log.error("Failed to decode API key: {}".format(e))
-
-            # show message box
-            store.renpy.show_screen(
-                "dialog",
-                message="Failed to decode API key.",
-                ok_action=store.Hide("dialog")
-            )
-            # can't get a clean key, return here
-            return
+        # Clear newlines before validation and storage.
+        new_key = clean_key(new_key)
 
         # on change
         onchange_rv = _run_on_change(feature, new_key)
