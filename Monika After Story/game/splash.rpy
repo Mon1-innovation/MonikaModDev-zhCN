@@ -4,8 +4,8 @@
 ## If not, display an error message and quit.
 init -100 python:
     #Check for each archive needed
-    for archive in ['audio','images','scripts','fonts']:
-        if not archive in config.archives:
+    for archive in ['audio','images','fonts']:# no 'scripts'
+        if not archive in config.archives and not renpy.android:
             #If one is missing, throw an error and chlose
             renpy.error("DDLC archive files not found in /game folder. Check installation and try again.")
 
@@ -193,7 +193,7 @@ label splashscreen:
         "Game files for Doki Doki Literature Club are required to play this mod and can be downloaded for free at: http://ddlc.moe"
         menu:
             "By playing [config.name] you agree that you have completed Doki Doki Literature Club and accept any spoilers contained within."
-            "I agree.":
+            "I agree.{#splashscreen_1}":
                 pass
         scene tos2
         with Dissolve(1.5)
@@ -206,6 +206,8 @@ label splashscreen:
         if not persistent._mas_imported_saves:
             call import_ddlc_persistent from _call_import_ddlc_persistent
 
+        if renpy.android:
+            call p_old_savefiles_location_check
         $ persistent.first_run = False
 
 #    $ basedir = config.basedir.replace('\\', '/')
@@ -328,6 +330,10 @@ label before_main_menu:
     return
 
 label quit:
+    if renpy.android and mas_android_selected_farewell_label:
+        $ MAS_AndroidNotifs_CheckFarewell(mas_android_selected_farewell_label)
+        $ mas_android_selected_farewell_label = None
+
     python:
         store.mas_calendar.saveCalendarDatabase(CustomEncoder)
         persistent.sessions['last_session_end']=datetime.datetime.now()

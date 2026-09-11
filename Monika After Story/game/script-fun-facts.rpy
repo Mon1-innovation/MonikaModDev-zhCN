@@ -14,7 +14,7 @@ init -10 python in mas_fun_facts:
         """
         return [
             fun_fact_evl
-            for fun_fact_evl, ev in fun_fact_db.iteritems()
+            for fun_fact_evl, ev in fun_fact_db.items()
             if not ev.unlocked
         ]
 
@@ -25,7 +25,7 @@ init -10 python in mas_fun_facts:
         OUT:
             List of all fun fact eventlabels
         """
-        return fun_fact_db.keys()
+        return list(fun_fact_db.keys())
 
 
 #Whether or not the last fun fact seen was a good fact
@@ -871,10 +871,10 @@ label mas_fun_fact_round_earth:
     menu:
         m "[player], do you think the Earth is round or flat?{fast}"
 
-        "Round.":
+        "Round.{#mas_fun_fact_round_earth_1}":
             m 3hua "Right! Pretty much everyone agrees on that nowadays."
 
-        "Flat.":
+        "Flat.{#mas_fun_fact_round_earth_2}":
             m 3hksdlb "Oh come on, [player]! Are you making fun of me?"
 
     m 1eua "Actually, the Earth being round is something that has been known for a pretty long time."

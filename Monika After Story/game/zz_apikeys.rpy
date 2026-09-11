@@ -310,7 +310,6 @@ init -979 python:
 init -980 python in mas_api_keys:
     import json
     import os
-    import pygame
     import store
     import store.mas_utils as mas_utils
 
@@ -488,13 +487,13 @@ init -980 python in mas_api_keys:
         if not feature_registered(feature):
             return
 
-        # grab key
-        new_key = pygame.scrap.get(pygame.SCRAP_TEXT).strip()
+        # AndroidClipboard returns text or an empty string on failure.
+        new_key = AndroidClipboard().get_from_clipboard()
         if not new_key:
             # null key is not counted
             return
 
-        # clear newlines
+        # Clear newlines before validation and storage.
         new_key = clean_key(new_key)
 
         # on change

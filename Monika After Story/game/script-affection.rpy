@@ -174,7 +174,7 @@ init -900 python in mas_affection:
         LOVE: 0.15
     }
 
-    __STRUCT = struct.Struct(__STRUCT_FMT)
+    __STRUCT = struct.Struct(str(__STRUCT_FMT))
 
     # compare functions for affection / group
     def _compareAff(aff_1, aff_2):
@@ -796,7 +796,12 @@ init -900 python in mas_affection:
             return
 
         new_data = list()
-
+        #旧版本好感为0时 直接更换版本
+        if old_data.get("affection", 0.0) == 0.0:
+            log.info(f"Prevent transferring affection from v1({old_data.get('affection', 0.0)}) to v2 because it is 0")
+            persistent._mas_affection_version += 1
+            return
+        log.info(f"Transferring affection from v1({old_data.get('affection', 0.0)}) to v2")
         aff = old_data.get("affection", 0.0)
         if aff >= 1000000:
             aff = 0.0
@@ -1701,6 +1706,7 @@ init 15 python in mas_affection:
         Initializes the talk quiplists
         """
         global talk_menu_quips
+
         def save_quips(_aff, quiplist):
             mas_ql = store.MASQuipList(allow_label=False)
             for _quip in quiplist:
@@ -1838,6 +1844,7 @@ init 15 python in mas_affection:
         Initializes the play quipliust
         """
         global play_menu_quips
+
         def save_quips(_aff, quiplist):
             mas_ql = store.MASQuipList(allow_label=False)
             for _quip in quiplist:
@@ -2838,7 +2845,7 @@ label monika_affection_nickname:
     $ _history_list.pop()
     menu:
         m "What do you say?{fast}"
-        "Yes.":
+        "Yes.{#monika_affection_nickname_1}":
             label monika_affection_nickname_yes:
                 pass
 
@@ -2967,7 +2974,7 @@ label monika_affection_nickname:
                         $ mas_lockEVL("monika_affection_nickname", "EVE")
                         $ done = True
 
-        "No.":
+        "No.{#monika_affection_nickname_yes_1}":
             m 1ekc "Oh..."
             m 1lksdlc "Alright then, if you say so."
             m 3eka "Just tell me if you ever change your mind, [player]."
@@ -3013,12 +3020,12 @@ label mas_affection_playernickname:
     menu:
         m "Is that alright with you?{fast}"
 
-        "Sure, [m_name].":
+        "Sure, [m_name].{#mas_affection_playernickname_1}":
             m 1hua "Great!"
             m 3eud "I should ask though, what names are you comfortable with?"
             call mas_player_nickname_loop("Deselect the names you're not comfortable with me calling you.", base_nicknames)
 
-        "No.":
+        "No.{#mas_affection_playernickname_2}":
             m 1eka "Alright, [player]."
             m 3eua "Just let me know if you ever change your mind, okay?"
 
@@ -3078,7 +3085,7 @@ label mas_player_nickname_loop(check_scrollable_text, nickname_pool):
 
     python:
         done = False
-        acceptable_nicknames = _return.keys()
+        acceptable_nicknames = list(_return.keys())
 
         if acceptable_nicknames:
             dlg_line = "Is there anything else you'd like me to call you?"
@@ -3096,7 +3103,7 @@ label mas_player_nickname_loop(check_scrollable_text, nickname_pool):
         menu:
             m "[dlg_line]{fast}"
 
-            "Yes.":
+            "Yes.{#monika_change_player_nicknames_1}":
                 label .name_enter_skip_loop:
                     pass
 
@@ -3148,7 +3155,7 @@ label mas_player_nickname_loop(check_scrollable_text, nickname_pool):
                     #If this is all good, then we'll add this to a list of things to add
                     $ acceptable_nicknames.append(lowername)
 
-            "No.":
+            "No.{#monika_change_player_nicknames_2}":
                 $ done = True
 
     if acceptable_nicknames:
@@ -3332,7 +3339,7 @@ label mas_finalfarewell_start:
         allow_dialogue = False
         store.songs.enabled = False
         mas_in_finalfarewell_mode = True
-        layout.QUIT = glitchtext(20)
+        layout.QUIT = mas_glitchText(20)
         #Console is not going to save you.
         config.keymap["console"] = []
 
@@ -3349,9 +3356,9 @@ label mas_finalfarewell:
     call mas_showpoem(mas_poems.getPoem(persistent._mas_finalfarewell_poem_id))
 
     menu:
-        "I'm sorry.":
+        "I'm sorry.{#mas_finalfarewell_1}":
             pass
-        "...":
+        "...{#mas_finalfarewell_2}":
             pass
 
     jump mas_finalfarewell
@@ -3486,7 +3493,7 @@ init python:
         ASSUMES:
             basedir
         """
-        filepath = basedir + path
+        filepath = basedir if not renpy.android else ANDROID_MASBASE + path
         if update or not renpy.exists(filepath):
             with open(filepath, "w") as note:
                 note.write(renpy.substitute(text))

@@ -125,7 +125,7 @@ label mas_piano_songchoice:
         $ _history_list.pop()
         menu:
             m "Did you want to play a song or play on your own, [player]?{fast}"
-            "Play a song.":
+            "Play a song.{#mas_piano_songchoice_1}":
                 m "Which song would you like to play?" nointeract
                 show monika at t21
                 call screen mas_gen_scrollable_menu(song_list, mas_piano_keys.MENU_AREA, mas_piano_keys.MENU_XALIGN, final_item)
@@ -154,10 +154,10 @@ label mas_piano_songchoice:
                 else:
                     jump mas_piano_songchoice
 
-            "On my own.":
+            "On my own.{#mas_piano_songchoice_2}":
                 pass
 
-            "Nevermind.":
+            "Nevermind.{#mas_piano_songchoice_3}":
                 jump mas_piano_loopend
 
     # otherwise, we default to freestyle mode
@@ -204,9 +204,9 @@ label mas_piano_setupstart:
         $ _history_list.pop()
         menu:
             m "Would you like to play again?{fast}"
-            "Yes.":
+            "Yes.{#mas_piano_setupstart_1}":
                 jump mas_piano_loopstart
-            "No.":
+            "No.{#mas_piano_setupstart_2}":
                 pass
 
 label mas_piano_loopend:
@@ -1958,7 +1958,7 @@ init 800 python in mas_piano_keys:
         # We only include stock songs if the player's played them successfully before
         song_list = [
             (pnml.name, pnml, False, False)
-            for pnml in pnml_db.itervalues()
+            for pnml in pnml_db.values()
             if (pnml.name not in STOCK_SONG_NAMES or pnml.wins > 0)
         ]
 
@@ -2015,7 +2015,7 @@ init 810 python:
         # DETECTION_LIST
 
         # AT_LIST
-        AT_LIST = [i22]
+        AT_LIST = []#[i22]
         TEXT_AT_LIST = [mas_piano_lyric_label]
 
         # expressions
@@ -2663,7 +2663,7 @@ init 810 python:
             # NOTE: highly recommend not adding too many detections
             self.pnml_list = []
             if self.mode == self.MODE_FREE:
-                for _pnml in mas_piano_keys.pnml_db.itervalues():
+                for _pnml in mas_piano_keys.pnml_db.values():
                     if _pnml.wins == 0:
                         self.pnml_list.append(_pnml)
                         _pnml._gen_pnm_sprites()
@@ -2862,7 +2862,7 @@ init 810 python:
             self.live_keymap = dict(mas_piano_keys.KEYMAP)
 
             # now apply adjustments
-            for key,real_key in persistent._mas_piano_keymaps.iteritems():
+            for key,real_key in persistent._mas_piano_keymaps.items():
                 if (
                         real_key in self.live_keymap
                         and real_key == self.live_keymap[real_key]

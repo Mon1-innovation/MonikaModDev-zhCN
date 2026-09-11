@@ -21,13 +21,15 @@ default persistent._mas_is_backup = False
 
 python early in mas_per_check:
     import __main__
-    import cPickle
+    import renpy.compat.pickle as pickle
+    import codecs
     import os
     import datetime
     import shutil
     import renpy
     import store
     import store.mas_utils as mas_utils
+    import traceback
 
     early_log = store.mas_logging.init_log("early", header=False)
 
@@ -37,6 +39,7 @@ python early in mas_per_check:
     mas_backup_copy_failed = False
     mas_backup_copy_filename = None
     mas_bad_backups = list()
+    mas_per_raw_errors = list()
 
     # unstable specific
     mas_unstable_per_in_stable = False
@@ -80,6 +83,13 @@ python early in mas_per_check:
         """
 
 
+    def _record_per_raw_error(filename, error_detail):
+        """
+        Records raw persistent-load errors for Android startup reporting.
+        """
+        mas_per_raw_errors.append((filename, error_detail))
+
+
     def reset_incompat_per_flags():
         """
         Resets the incompat per flags that are conditional (not the main one
@@ -89,6 +99,12 @@ python early in mas_per_check:
         store.persistent._mas_incompat_per_forced_update_failed = False
         store.persistent._mas_incompat_per_user_will_restore = False
         store.persistent._mas_incompat_per_rpy_files_found = False
+
+
+    def _load_per_data(path: str):
+        with open(path, "rb") as per_file:
+            pickle_data = codecs.decode(per_file.read(), "zlib")
+            return pickle.loads(pickle_data)
 
 
     def tryper(_tp_persistent, get_data=False):
@@ -106,13 +122,8 @@ python early in mas_per_check:
             [1] - the version number, or the persistent data if get_data is
                 True
         """
-        per_file = None
         try:
-            per_file = file(_tp_persistent, "rb")
-            per_data = per_file.read().decode("zlib")
-            per_file.close()
-            actual_data = cPickle.loads(per_data)
-
+            actual_data = _load_per_data(_tp_persistent)
             if get_data:
                 return True, actual_data
 
@@ -120,10 +131,6 @@ python early in mas_per_check:
 
         except Exception as e:
             raise e
-
-        finally:
-            if per_file is not None:
-                per_file.close()
 
 
     def is_version_compatible(per_version, cur_version):
@@ -395,7 +402,9 @@ python early in mas_per_check:
 
             # regular corruption flow
             mas_corrupted_per = True
-            early_log.error("persistent was corrupted! : " +repr(e))
+            error_detail = traceback.format_exc()
+            _record_per_raw_error("persistent", error_detail)
+            early_log.error("persistent was corrupted! : \n" + error_detail)
             # " this comment is to fix syntax highlighting issues on vim
 
         # if we got here, we had a corrupted persistent.
@@ -445,9 +454,11 @@ python early in mas_per_check:
                         sel_back = _this_file
 
                 except Exception as e:
+                    error_detail = traceback.format_exc()
                     early_log.error(
                         "'{0}' was corrupted: {1}".format(_this_file, repr(e))
                     )
+                    _record_per_raw_error(_this_file, error_detail)
                     sel_back = None
                     mas_bad_backups.append(_this_file)
 
@@ -482,6 +493,7 @@ python early in mas_per_check:
         except Exception as e:
             mas_backup_copy_failed = True
             mas_backup_copy_filename = sel_back
+            _record_per_raw_error(sel_back, traceback.format_exc())
             early_log.error(
                 "Failed to copy backup persistent: " + repr(e)
             )
@@ -693,13 +705,13 @@ init -900 python:
 
         # the seen ever dict must be iterated through
         from store.mas_ev_data_ver import _verify_str
-        for seen_ever_key in persistent._seen_ever.keys():
+        for seen_ever_key in list(persistent._seen_ever.keys()):
             if not _verify_str(seen_ever_key):
                 persistent._seen_ever.pop(seen_ever_key)
 
         # the seen images dict must be iterated through
         # NOTE: we only want to keep non-monika sprite images
-        for seen_images_key in persistent._seen_images.keys():
+        for seen_images_key in list(persistent._seen_images.keys()):
             if (
                     len(seen_images_key) > 0
                     and seen_images_key[0] == "monika"
@@ -743,9 +755,9 @@ label mas_backups_you_have_bad_persistent:
         "Do you have your own backups?{nw}"
         menu:
             "Do you have your own backups?{fast}"
-            "Yes.":
+            "Yes.{#mas_backups_you_have_bad_persistent_1}":
                 jump mas_backups_have_some
-            "No.":
+            "No.{#mas_backups_you_have_bad_persistent_2}":
                 jump mas_backups_have_none
 
     # otherwise we culd not copy
@@ -894,9 +906,9 @@ label mas_backups_incompat_start:
     # cannot pop history, no history for some reason
     menu:
         "Hello there!{fast}"
-        "What happened?":
+        "What happened?{#mas_backups_incompat_start_1}":
             pass
-        "Take me to the updater.":
+        "Take me to the updater.{#mas_backups_incompat_start_2}":
             jump mas_backups_incompat_updater_start_intro
 
     show chibika sad at mas_chflip_s(-1)
@@ -913,9 +925,9 @@ label mas_backups_incompat_what_do:
     # cannot pop history, no history for some reason
     menu:
         "What would you like to do?{fast}"
-        "Update MAS.":
+        "Update MAS.{#mas_backups_incompat_what_do_1}":
             jump mas_backups_incompat_updater_start_intro
-        "Restore a compatible persistent.":
+        "Restore a compatible persistent.{#mas_backups_incompat_what_do_2}":
             jump mas_backups_incompat_user_will_restore
 
 
@@ -954,9 +966,9 @@ label mas_backups_incompat_updater_cannot_because_rpy:
     "I'll have to delete those files for this to work. Is that okay?{nw}"
     menu:
         "I'll have to delete those files for this to work. Is that okay?{fast}"
-        "Yes, delete them.":
+        "Yes, delete them.{#mas_backups_incompat_updater_cannot_because_rpy_1}":
             jump mas_backups_incompat_rpy_yes_del
-        "No, don't delete them.":
+        "No, don't delete them.{#mas_backups_incompat_updater_cannot_because_rpy_2}":
             jump mas_backups_incompat_rpy_no_del
 
 
@@ -968,9 +980,9 @@ label mas_backups_incompat_updater_cannot_because_rpy_again:
     "Would you like me to try deleting them again?{nw}"
     menu:
         "Would you like me to try deleting them again?{fast}"
-        "Yes.":
+        "Yes.{#mas_backups_incompat_updater_cannot_because_rpy_again_1}":
             jump mas_backups_incompat_rpy_yes_del
-        "No.":
+        "No.{#mas_backups_incompat_updater_cannot_because_rpy_again_2}":
             jump mas_backups_incompat_rpy_no_del
 
 
